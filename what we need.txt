@@ -1,21 +1,3 @@
-2. Missing Logic: The "Heuristic Database"
-Strategy Reference: 2.4 Phase 2 - "Maintain a curated database... Rule: IF Insurer == 'Medicare'..."
-
-The Gap: Your current logic is too simple. You have:
-
-Medicare = Red
-
-UHC/Cigna = Yellow
-
-Everything else = Green
-
-Why it matters: This will yield "False Positives." For example, Blue Cross in Florida has completely different rules than Blue Cross in California. Your current code treats them identically.
-
-The Fix: You need a JSON "Lookup Table" (Simulated Database) that cross-references Carrier + State.
-
-
-
-
 
 3. Missing Deliverable: The PDF Report
 Strategy Reference: 2.3 - "User Receives: A personalized Coverage Intelligence Report... Formularly Status... Estimated Copay."

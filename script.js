@@ -71,33 +71,84 @@ function clearError(elementId) {
     if(elementId === 'state-error') document.getElementById('state').classList.remove('border-red-500');
 }
 
-// --- LOGIC ENGINE ---
+// --- 2025 VERIFIED COVERAGE RULES ---
+// Based on formulary updates effective Jan 1 & April 1, 2025
+const COVERAGE_RULES = {
+    "Aetna": {
+        "default": "yellow", // Requires PA and Step Therapy
+        "CA": "yellow",
+        "FL": "yellow",
+        "TX": "yellow"
+    },
+    "BCBS": {
+        "default": "yellow", // Varies by state/employer
+        "FL": "red",         // RESTRICTED: FL Blue banned GLP-1s for weight loss eff. 4/1/2025
+        "CA": "grey",        // RESTRICTED: CA Blue Shield limits to BMI > 40 (Class III Obesity)
+        "TX": "red",         // RESTRICTED: Standard plans often exclude anti-obesity meds
+        "MI": "green",       // Historically broader coverage
+        "MA": "green"        // Historically broader coverage
+    },
+    "Cigna": {
+        "default": "yellow", // High PA requirement
+    },
+    "UnitedHealthcare": {
+        "default": "yellow", // Requires "Total Weight Support" program enrollment
+        "NY": "red",         // Medicaid/Essential plans often exclude
+    },
+    "Medicare": {
+        "default": "red",    // Statutory Exclusion for weight loss
+        // Note: Covers Wegovy ONLY for Cardiovascular Disease, not plain obesity.
+    },
+    "Other": {
+        "default": "yellow"
+    }
+};
+
 function determineCoverageStatus() {
     const carrier = document.getElementById('carrier').value;
+    const state = document.getElementById('state').value;
     const bmi = parseFloat(document.getElementById('bmi').value);
     
-    // Get Checked Comorbidities
+    // Check Comorbidities
     const comorbidityCheckboxes = document.querySelectorAll('input[name="comorbidity"]:checked');
-    const hasComorbidities = Array.from(comorbidityCheckboxes).some(cb => cb.value !== 'none');
+    const hasDiabetes = Array.from(comorbidityCheckboxes).some(cb => cb.value === 'diabetes');
+    const hasHypertension = Array.from(comorbidityCheckboxes).some(cb => cb.value === 'hypertension');
 
-    // Rule 1: Hard Red (Medicare)
+    // --- RULE 1: DIABETES OVERRIDE ---
+    // If Type 2 Diabetes is present, coverage is almost always GREEN (Medical Necessity).
+    // Exception: Medicare still requires specific Part D checks, but generally favorable.
+    if (hasDiabetes) {
+        return 'green';
+    }
+
+    // --- RULE 2: MEDICARE CARDIAC LOOPHOLE ---
+    // If Medicare + Hypertension (proxy for heart risk) + BMI > 27, it MIGHT be covered.
+    // We mark this GREY (Specialist Review) instead of RED.
     if (carrier === 'Medicare') {
+        if (hasHypertension && bmi >= 27) {
+            return 'grey'; // Potential "Wegovy for Heart Health" coverage
+        }
         return 'red';
     }
 
-    // Rule 2: Force Yellow (Strict PAs)
-    if (['UnitedHealthcare', 'Cigna'].includes(carrier)) {
-        return 'yellow';
-    }
+    // --- RULE 3: DATABASE LOOKUP ---
+    let result = 'yellow'; // Default fallback
+    
+    // Locate the carrier rules
+    const carrierRules = COVERAGE_RULES[carrier] || COVERAGE_RULES["Other"];
+    
+    // Check for State Specific Rule -> Then Default
+    result = carrierRules[state] || carrierRules["default"];
 
-    // Rule 3: The Grey Light (BMI 27-29 + No Comorbidities)
-    // Note: Step 1 validator already blocks BMI < 27
-    if (bmi < 30 && !hasComorbidities) {
+    // --- RULE 4: CLINICAL NUANCE (The "Grey" Zone) ---
+    // Even if insurance allows it, BMI < 30 usually requires a comorbidity.
+    // If "Green/Yellow" but low BMI & no comorbidities -> Grey.
+    const hasComorbidities = comorbidityCheckboxes.length > 0;
+    if ((result === 'green' || result === 'yellow') && bmi < 30 && !hasComorbidities) {
         return 'grey'; 
     }
 
-    // Rule 4: Green Light (High Probability)
-    return 'green';
+    return result;
 }
 
 // --- SUBMISSION & ANIMATION ---
