@@ -1,0 +1,94 @@
+{
+  "safety_stop": {
+    "description": "Stops the user immediately if BMI is below FDA guidelines.",
+    "enabled": true,
+    "min_bmi": 27.0,
+    "modal_id": "safety-stop-modal"
+  },
+  "clinical_overrides": {
+    "diabetes_guarantee": {
+      "description": "Type 2 Diabetes (T2D) typically bypasses weight-loss exclusions via medical necessity.",
+      "enabled": true,
+      "condition_trigger": "diabetes",
+      "result_override": "green"
+    },
+    "medicare_cvd_bypass": {
+      "description": "Medicare Part D 2025 covers Wegovy for established Cardiovascular Disease (CVD).",
+      "enabled": true,
+      "carrier_trigger": "Medicare",
+      "required_condition": "hypertension",
+      "min_bmi": 27.0,
+      "result_success": "grey",
+      "result_fail": "red"
+    },
+    "osa_bypass": {
+      "description": "Zepbound approved for Moderate-to-Severe Obstructive Sleep Apnea (OSA).",
+      "enabled": true,
+      "condition_trigger": "pcos",
+      "carriers": ["UnitedHealthcare", "Cigna"],
+      "result_override": "grey"
+    },
+    "grey_zone_check": {
+      "description": "Downgrades results if BMI is low (<30) without specific comorbidities.",
+      "enabled": true,
+      "max_bmi_threshold": 30.0,
+      "requires_comorbidity": true,
+      "result_override": "grey"
+    }
+  },
+  "carrier_rules": {
+    "Aetna": {
+      "default": "yellow",
+      "states": {}
+    },
+    "BCBS": {
+      "default": "yellow",
+      "states": {
+        "FL": "yellow",
+        "CA": "grey",
+        "NC": "red",
+        "MI": "red",
+        "PA": "red",
+        "TX": "red",
+        "MA": "green"
+      }
+    },
+    "Independence Blue Cross": {
+      "default": "red",
+      "description": "Total exit from commercial weight loss market effective Jan 1, 2025.",
+      "states": {}
+    },
+    "Cigna": {
+      "default": "yellow",
+      "states": {}
+    },
+    "UnitedHealthcare": {
+      "default": "yellow",
+      "states": {
+        "NY": "red"
+      }
+    },
+    "Medicare": {
+      "default": "red",
+      "description": "Statutory exclusion for weight loss; requires CVD or T2D for coverage.",
+      "states": {}
+    },
+    "Other": {
+      "default": "yellow",
+      "states": {}
+    }
+  },
+  "ui_settings": {
+    "loading_animation": {
+      "steps": [
+        { "percent": 40, "time_ms": 100 },
+        { "percent": 75, "time_ms": 1500 },
+        { "percent": 100, "time_ms": 3500 }
+      ],
+      "text_updates": [
+        { "text": "Comparing BMI with 2025-2026 FDA Clinical Criteria...", "time_ms": 1500 },
+        { "text": "Identifying Payer-Specific Step Therapy Rules...", "time_ms": 3000 }
+      ]
+    }
+  }
+}
