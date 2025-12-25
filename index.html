@@ -107,22 +107,49 @@
                 <div id="step-2" class="step-transition hidden">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">2</div>
-                        <h2 class="text-xl font-semibold">Insurance Carrier</h2>
+                        <h2 class="text-xl font-semibold">Insurance & Location</h2>
                     </div>
 
                     <div class="space-y-6">
-                        <div>
-                            <label for="carrier" class="block text-sm font-medium text-slate-700 mb-2">Primary Medical Carrier <span class="text-red-500">*</span></label>
-                            <select id="carrier" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:ring-2 focus:ring-emerald-500" onchange="clearError('carrier-error')">
-                                <option value="" disabled selected>Select insurance provider...</option>
-                                <option value="Aetna">Aetna</option>
-                                <option value="BCBS">Blue Cross Blue Shield (BCBS)</option>
-                                <option value="Cigna">Cigna</option>
-                                <option value="Medicare">Medicare (Part D / Advantage)</option>
-                                <option value="UnitedHealthcare">UnitedHealthcare (UHC)</option>
-                                <option value="Other">Other / Commercial Private</option>
-                            </select>
-                            <p id="carrier-error" class="hidden mt-1 text-sm text-red-600 flex items-center gap-1"><span class="material-symbols-outlined text-sm">error</span> Please select your insurance carrier.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            
+                            <div class="md:col-span-2">
+                                <label for="carrier" class="block text-sm font-medium text-slate-700 mb-2">Primary Medical Carrier <span class="text-red-500">*</span></label>
+                                <select id="carrier" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:ring-2 focus:ring-emerald-500" onchange="clearError('carrier-error')">
+                                    <option value="" disabled selected>Select provider...</option>
+                                    <option value="Aetna">Aetna</option>
+                                    <option value="BCBS">Blue Cross Blue Shield</option>
+                                    <option value="Cigna">Cigna</option>
+                                    <option value="Medicare">Medicare</option>
+                                    <option value="UnitedHealthcare">UnitedHealthcare</option>
+                                    <option value="Other">Other / Commercial</option>
+                                </select>
+                                <p id="carrier-error" class="hidden mt-1 text-sm text-red-600 flex items-center gap-1"><span class="material-symbols-outlined text-sm">error</span> Required</p>
+                            </div>
+
+                            <div>
+                                <label for="state" class="block text-sm font-medium text-slate-700 mb-2">State <span class="text-red-500">*</span></label>
+                                <select id="state" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:ring-2 focus:ring-emerald-500">
+                                    <option value="" disabled selected>State</option>
+                                    <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option>
+                                    <option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option>
+                                    <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
+                                    <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option>
+                                    <option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
+                                    <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
+                                    <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option>
+                                    <option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
+                                    <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
+                                    <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option>
+                                    <option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
+                                    <option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
+                                    <option value="WI">WI</option><option value="WY">WY</option>
+                                </select>
+                                <p id="state-error" class="hidden mt-1 text-sm text-red-600 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">error</span> Required
+                                </p>
+                            </div>
                         </div>
 
                         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6">
@@ -341,11 +368,12 @@
     }
 
     function clearError(elementId) {
-        document.getElementById(elementId).classList.add('hidden');
-        if(elementId === 'medication-error') document.getElementById('medication').classList.remove('border-red-500');
-        if(elementId === 'bmi-error') document.getElementById('bmi').classList.remove('border-red-500');
-        if(elementId === 'carrier-error') document.getElementById('carrier').classList.remove('border-red-500');
-    }
+    document.getElementById(elementId).classList.add('hidden');
+    if(elementId === 'medication-error') document.getElementById('medication').classList.remove('border-red-500');
+    if(elementId === 'bmi-error') document.getElementById('bmi').classList.remove('border-red-500');
+    if(elementId === 'carrier-error') document.getElementById('carrier').classList.remove('border-red-500');
+    if(elementId === 'state-error') document.getElementById('state').classList.remove('border-red-500');
+}
 
     // --- LOGIC ENGINE ---
     function determineCoverageStatus() {
@@ -378,62 +406,70 @@
 
     // --- SUBMISSION & ANIMATION ---
     document.getElementById('clarity-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        // VALIDATION FOR STEP 2 (Now happens at submit)
-        const carrier = document.getElementById('carrier');
-        carrier.classList.remove('border-red-500');
-        if (!carrier.value) {
-            document.getElementById('carrier-error').classList.remove('hidden');
-            carrier.classList.add('border-red-500');
-            return; // Stop if invalid
-        }
+    e.preventDefault();
+    
+    let isValid = true;
+    
+    // 1. Validate Carrier
+    const carrier = document.getElementById('carrier');
+    if (!carrier.value) {
+        document.getElementById('carrier-error').classList.remove('hidden');
+        carrier.classList.add('border-red-500');
+        isValid = false;
+    }
 
-        // Hide Form
-        document.getElementById('form-container').classList.add('hidden');
-        document.getElementById('intro-section').classList.add('hidden');
-        
-        // Show Loading
-        const loadingState = document.getElementById('loading-state');
-        const loadingText = document.getElementById('loading-text');
-        const loadingBar = document.getElementById('loading-bar');
-        
-        loadingState.classList.remove('hidden');
+    // 2. Validate State (NEW STRICT CHECK)
+    const state = document.getElementById('state');
+    if (!state.value) {
+        document.getElementById('state-error').classList.remove('hidden');
+        state.classList.add('border-red-500');
+        isValid = false;
+    }
 
-        // Labor Illusion Animation Sequence
-        // Animate Bar
-        setTimeout(() => { loadingBar.style.width = "40%"; }, 100);
-        setTimeout(() => { loadingBar.style.width = "75%"; }, 1500);
-        setTimeout(() => { loadingBar.style.width = "100%"; }, 3500);
+    // Stop if either is missing
+    if (!isValid) return; 
 
-        // Rotating Messages
-        setTimeout(() => {
-            loadingText.textContent = "Comparing BMI with FDA Clinical Criteria...";
-        }, 1500);
-        
-        setTimeout(() => {
-            loadingText.textContent = "Identifying Secondary Coverage Pathways...";
-        }, 3000);
+    // --- Proceed to Loading Animation ---
+    document.getElementById('form-container').classList.add('hidden');
+    document.getElementById('intro-section').classList.add('hidden');
+    
+    const loadingState = document.getElementById('loading-state');
+    const loadingText = document.getElementById('loading-text');
+    const loadingBar = document.getElementById('loading-bar');
+    
+    loadingState.classList.remove('hidden');
 
-        // Calculate Result
-        currentResultType = determineCoverageStatus();
+    // Animations...
+    setTimeout(() => { loadingBar.style.width = "40%"; }, 100);
+    setTimeout(() => { loadingBar.style.width = "75%"; }, 1500);
+    setTimeout(() => { loadingBar.style.width = "100%"; }, 3500);
+    
+    // Rotating Text
+    setTimeout(() => { loadingText.textContent = "Comparing BMI with FDA Clinical Criteria..."; }, 1500);
+    setTimeout(() => { loadingText.textContent = "Identifying Secondary Coverage Pathways..."; }, 3000);
 
-        // FINISH -> Show Email Gate
-        setTimeout(() => {
-            loadingState.classList.add('hidden');
-            document.getElementById('email-gate').classList.remove('hidden');
-        }, 4000);
-    });
+    currentResultType = determineCoverageStatus();
 
+    setTimeout(() => {
+        loadingState.classList.add('hidden');
+        document.getElementById('email-gate').classList.remove('hidden');
+    }, 4000);
+});
     // --- UNLOCK RESULTS ---
     document.getElementById('email-form').addEventListener('submit', (e) => {
     e.preventDefault();
+
+    // 1. Capture Comorbidities (Fixing the missing variable)
+    const selectedComorbidities = Array.from(
+        document.querySelectorAll('input[name="comorbidity"]:checked')
+    ).map(cb => cb.value);
 
     // 1. DATA PACKAGING
     const sensitiveData = {
     email: document.getElementById('user-email').value,
     medication: document.getElementById('medication').value,
     bmi: document.getElementById('bmi').value,
+    comorbidities: selectedComorbidities,
     carrier: document.getElementById('carrier').value,
     memberId: document.getElementById('member-id').value || "NOT_PROVIDED"
     };
