@@ -14,7 +14,7 @@
     
     --color-error: #dc2626;
     --color-warning: #d97706;
-    --color-info: #2563eb;          /* Blue-600 for Info state */
+    --color-info: #2563eb;          
 
     --radius-sm: 0.5rem;
     --radius-lg: 1rem;      
@@ -48,18 +48,23 @@ body {
     margin: 2rem auto;
     position: relative;
     flex-grow: 1;
-    padding: 0 1rem; /* Added padding for mobile safety */
+    padding: 0 1rem;
 }
 .l-grid-2 {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
 }
+/* New Layout Utility for spanning full width in grids */
+.l-col-span-full {
+    grid-column: 1 / -1;
+}
+
 @media (min-width: 768px) {
     .l-grid-2 { grid-template-columns: 1fr 1fr; }
 }
 
-/* --- Helper for Loading Screen (Restored) --- */
+/* --- Helper for Loading Screen --- */
 .l-loading {
     display: flex;
     flex-direction: column;
@@ -73,6 +78,14 @@ body {
 .t-h2 { font-size: 1.25rem; font-weight: 600; }
 .t-body { color: var(--color-text-body); line-height: 1.5; }
 .t-center { text-align: center; }
+
+/* New Typography Utilities */
+.t-sm { font-size: 0.875rem; }
+.t-xs { font-size: 0.75rem; }
+.t-uppercase { text-transform: uppercase; letter-spacing: 0.05em; }
+.t-bold { font-weight: 700; }
+.t-semi { font-weight: 600; }
+.t-italic { font-style: italic; }
 
 /* --- COMPONENT: Header --- */
 .c-header {
@@ -93,8 +106,19 @@ body {
 }
 .c-brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.25rem; }
 .c-brand__icon { color: var(--color-primary); font-size: 2rem; }
+.c-brand__accent { color: var(--color-primary); font-style: italic; }
+
 .c-meta { display: none; gap: 1.5rem; font-size: 0.875rem; color: var(--color-text-muted); font-weight: 500; }
+.c-meta__icon { vertical-align: bottom; font-size: 1.1em; }
 @media (min-width: 768px) { .c-meta { display: flex; } }
+
+/* --- COMPONENT: Footer (New) --- */
+.c-footer {
+    background-color: #0f172a; /* Slate-900 hardcoded per design or map to token */
+    color: var(--color-text-muted);
+    padding: 3rem 1rem;
+    margin-top: auto;
+}
 
 /* --- COMPONENT: Progress Bar --- */
 .c-progress-track {
@@ -102,6 +126,12 @@ body {
     height: 6px;
     width: 100%;
 }
+/* Modifier for loading bar style */
+.c-progress-track--pill {
+    max-width: 300px;
+    border-radius: 99px;
+}
+
 .c-progress-fill {
     background-color: var(--color-primary);
     height: 100%;
@@ -109,7 +139,7 @@ body {
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --- COMPONENT: Spinner (Restored) --- */
+/* --- COMPONENT: Spinner --- */
 .c-spinner {
     width: 3rem; 
     height: 3rem;
@@ -143,6 +173,8 @@ body {
     margin-bottom: 0.5rem;
     color: var(--color-text-body);
 }
+.c-label__sub { font-weight: 400; color: var(--color-text-muted); }
+
 .c-input, .c-select {
     width: 100%;
     padding: 1rem;
@@ -154,11 +186,25 @@ body {
     appearance: none;
     transition: border-color var(--transition-fast);
 }
+/* Modifier for input with left icon */
+.c-input--icon-left { padding-left: 3rem; }
+
 .c-input:focus, .c-select:focus {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
+
+/* Input Icon Container */
+.c-input-icon-wrap { position: relative; }
+.c-input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    color: var(--color-text-muted);
+    pointer-events: none;
+}
+
 /* Custom Select Chevron */
 .c-select-wrap { position: relative; }
 .c-select-wrap::after {
@@ -179,6 +225,16 @@ body {
     align-items: center;
     gap: 0.25rem;
 }
+.c-error-icon { font-size: 1.1em; }
+
+.c-helper {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+.c-helper__icon { font-size: 1rem; color: var(--color-primary); }
 
 /* --- COMPONENT: Checkbox Grid --- */
 .c-check-grid { display: grid; gap: 0.5rem; }
@@ -215,7 +271,7 @@ body {
     justify-content: center;
     gap: 0.5rem;
     transition: all var(--transition-fast);
-    text-decoration: none; /* For anchor tags */
+    text-decoration: none; 
 }
 .c-btn--primary {
     background-color: var(--color-text-main);
@@ -234,7 +290,7 @@ body {
     color: white;
 }
 
-/* --- COMPONENT: Results (Scalable Modifiers) --- */
+/* --- COMPONENT: Results --- */
 .c-result {
     background: white;
     padding: 2rem;
@@ -243,7 +299,6 @@ body {
     border: 2px solid transparent;
     box-shadow: var(--shadow-card);
 }
-/* Modifiers */
 .c-result--success { border-color: var(--color-primary); }
 .c-result--warning { border-color: var(--color-warning); }
 .c-result--error   { border-color: var(--color-border); }
@@ -256,12 +311,16 @@ body {
     margin: 0 auto 1rem;
     font-size: 2.5rem;
 }
+
 /* Icon Colors */
 .c-result--success .c-result__icon { background: var(--color-primary-bg); color: var(--color-primary); }
 .c-result--warning .c-result__icon { background: #fef3c7; color: var(--color-warning); }
 .c-result--error .c-result__icon   { background: #f1f5f9; color: var(--color-text-muted); }
 .c-result--info .c-result__icon    { background: #dbeafe; color: var(--color-info); }
+/* Neutral override for safety modal */
+.c-result__icon--neutral { background: #f1f5f9; color: var(--color-text-body); }
 
+/* Price Box */
 .c-price-box {
     background: var(--color-bg-body);
     border: 1px solid var(--color-border);
@@ -270,6 +329,23 @@ body {
     margin: 1.5rem 0;
     display: inline-block;
 }
+.c-price-box__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.c-price-box__amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+.c-price-box__amount--sm { font-size: 1.5rem; }
+
+/* Price Text Colors */
+.u-text-primary-dark { color: var(--color-primary-dark); }
+.u-text-primary { color: var(--color-primary); }
+.u-text-body { color: var(--color-text-body); }
+.u-text-warning { color: var(--color-warning); }
+.u-text-info { color: var(--color-info); }
 
 /* --- COMPONENT: Modal --- */
 .c-modal-overlay {
@@ -292,5 +368,12 @@ body {
 /* --- Utilities --- */
 .u-hidden { display: none !important; }
 .u-text-error { color: var(--color-error); }
+.u-text-muted { color: var(--color-text-muted); }
 .u-flex-gap { display: flex; gap: 1rem; }
+.u-flex-check { display: flex; gap: 0.5rem; text-align: left; }
+
 .u-mt-lg { margin-top: 1.5rem; }
+.u-mb-sm { margin-bottom: 0.5rem; }
+.u-mb-md { margin-bottom: 1rem; }
+.u-mb-lg { margin-bottom: 1.5rem; }
+.u-mb-xl { margin-bottom: 2rem; }

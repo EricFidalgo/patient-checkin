@@ -9,8 +9,7 @@ let currentResultType = null;
 document.addEventListener('DOMContentLoaded', async () => {
     await loadConfig();
     
-    // Expose UI functions to global scope so HTML onclick="..." still works
-    // (Ideally, you would add event listeners here instead, but this keeps your HTML compatible)
+    // Expose UI functions to global scope so HTML onclick="..." works
     window.toggleEmployerField = UI.toggleEmployerField;
     window.clearError = UI.clearError;
     window.nextStep = handleNextStep; 
@@ -34,17 +33,17 @@ function handleNextStep(step) {
         UI.clearError('comorbidity-error');
 
         if (!medication.value) {
-            document.getElementById('medication-error').classList.remove('hidden');
-            medication.classList.add('border-red-500');
+            document.getElementById('medication-error').classList.remove('u-hidden'); // Fixed
+            medication.classList.add('border-red-500'); // Note: ensure this class exists in CSS or use inline style
             isValid = false;
         }
         if (!bmi.value) {
-            document.getElementById('bmi-error').classList.remove('hidden');
+            document.getElementById('bmi-error').classList.remove('u-hidden'); // Fixed
             bmi.classList.add('border-red-500');
             isValid = false;
         }
         if (comorbidities.length === 0) {
-            document.getElementById('comorbidity-error').classList.remove('hidden');
+            document.getElementById('comorbidity-error').classList.remove('u-hidden'); // Fixed
             isValid = false;
         }
 
@@ -72,18 +71,23 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     const planSource = document.getElementById('plan-source');
     let isValid = true;
 
+    // Reset errors first
+    UI.clearError('carrier-error');
+    UI.clearError('state-error');
+    UI.clearError('source-error');
+
     if (!carrier.value) {
-        document.getElementById('carrier-error').classList.remove('hidden');
+        document.getElementById('carrier-error').classList.remove('u-hidden'); // Fixed
         carrier.classList.add('border-red-500');
         isValid = false;
     }
     if (!state.value) {
-        document.getElementById('state-error').classList.remove('hidden');
+        document.getElementById('state-error').classList.remove('u-hidden'); // Fixed
         state.classList.add('border-red-500');
         isValid = false;
     }
     if (!planSource.value) {
-        document.getElementById('source-error').classList.remove('hidden');
+        document.getElementById('source-error').classList.remove('u-hidden'); // Fixed
         planSource.classList.add('border-red-500');
         isValid = false;
     }
@@ -103,16 +107,13 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
 
     // Trigger Animation & Reveal
     UI.runLoadingSequence(getConfig(), () => {
-        document.getElementById('email-gate').classList.remove('hidden');
+        document.getElementById('email-gate').classList.remove('u-hidden'); // Fixed
     });
 });
 
 // --- EMAIL GATE UNLOCK ---
 document.getElementById('email-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    
-    // In a real app, you would POST the sensitiveData here
-    // const sensitiveData = { ... };
     
     UI.displayResult(currentResultType);
 });

@@ -4,38 +4,50 @@ export function toggleEmployerField() {
     const employerField = document.getElementById('employer-field');
     const sourceError = document.getElementById('source-error');
     
-    sourceError.classList.add('hidden');
+    sourceError.classList.add('u-hidden'); // Fixed
     document.getElementById('plan-source').classList.remove('border-red-500');
 
     if (source === 'employer') {
-        employerField.classList.remove('hidden');
+        employerField.classList.remove('u-hidden'); // Fixed
     } else {
-        employerField.classList.add('hidden');
+        employerField.classList.add('u-hidden'); // Fixed
     }
 }
 
 export function clearError(elementId) {
-    document.getElementById(elementId).classList.add('hidden');
+    const el = document.getElementById(elementId);
+    if(el) el.classList.add('u-hidden'); // Fixed
+    
     // Map error IDs to input IDs to remove red borders
     const inputMap = {
         'medication-error': 'medication',
         'bmi-error': 'bmi',
         'carrier-error': 'carrier',
-        'state-error': 'state'
+        'state-error': 'state',
+        'source-error': 'plan-source', // Fixed key to match input ID
+        'comorbidity-error': null 
     };
+    
     if (inputMap[elementId]) {
-        document.getElementById(inputMap[elementId]).classList.remove('border-red-500');
+        const inputEl = document.getElementById(inputMap[elementId]);
+        if(inputEl) inputEl.classList.remove('border-red-500');
     }
 }
 
 export function transitionToStep(step) {
-    document.querySelectorAll('.step-transition').forEach(el => el.classList.add('hidden'));
-    document.getElementById(`step-${step}`).classList.remove('hidden');
-    document.getElementById('progress').style.width = `${(step / 2) * 100}%`;
+    // Hide all steps first
+    document.querySelectorAll('[data-js="step"]').forEach(el => el.classList.add('u-hidden')); // Fixed
+    
+    // Show target step
+    document.getElementById(`step-${step}`).classList.remove('u-hidden'); // Fixed
+    
+    // Update progress bar
+    const progress = document.getElementById('progress');
+    if(progress) progress.style.width = `${(step / 2) * 100}%`;
 }
 
 export function showModal(modalId) {
-    document.getElementById(modalId).classList.remove('hidden');
+    document.getElementById(modalId).classList.remove('u-hidden'); // Fixed
 }
 
 export function runLoadingSequence(config, onComplete) {
@@ -44,9 +56,12 @@ export function runLoadingSequence(config, onComplete) {
     const loadingBar = document.getElementById('loading-bar');
     
     // Hide Form
-    document.getElementById('form-container').classList.add('hidden');
-    document.getElementById('intro-section').classList.add('hidden');
-    loadingState.classList.remove('hidden');
+    document.getElementById('form-container').classList.add('u-hidden'); // Fixed
+    // Try to hide intro section if it exists, otherwise ignore
+    const intro = document.getElementById('intro-section');
+    if(intro) intro.classList.add('u-hidden'); // Fixed
+    
+    loadingState.classList.remove('u-hidden'); // Fixed
 
     const animSettings = config.ui_settings.loading_animation;
 
@@ -62,14 +77,14 @@ export function runLoadingSequence(config, onComplete) {
     const totalTime = Math.max(...animSettings.steps.map(s => s.time_ms)) + 500;
     
     setTimeout(() => {
-        loadingState.classList.add('hidden');
+        loadingState.classList.add('u-hidden'); // Fixed
         onComplete();
     }, totalTime);
 }
 
 export function displayResult(resultType) {
-    document.getElementById('email-gate').classList.add('hidden');
-    document.getElementById('results-container').classList.remove('hidden');
+    document.getElementById('email-gate').classList.add('u-hidden'); // Fixed
+    document.getElementById('results-container').classList.remove('u-hidden'); // Fixed
 
     const resultIds = {
         'green': 'result-green',
@@ -79,8 +94,11 @@ export function displayResult(resultType) {
     };
     
     // Hide all first (cleanup), then show the match
-    Object.values(resultIds).forEach(id => document.getElementById(id).classList.add('hidden'));
+    Object.values(resultIds).forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.classList.add('u-hidden'); // Fixed
+    });
     
     const targetId = resultIds[resultType] || 'result-red';
-    document.getElementById(targetId).classList.remove('hidden');
+    document.getElementById(targetId).classList.remove('u-hidden'); // Fixed
 }

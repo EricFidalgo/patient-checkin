@@ -1,248 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Coverage Clarity Engine | VeriScript</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0">
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <header class="c-header">
-        <div class="l-container c-header__inner">
-            <div class="c-brand">
-                <span class="material-symbols-outlined c-brand__icon">verified_user</span>
-                <span>VeriScript <span style="color: var(--color-primary); font-style: italic;">GLP-1 Network</span></span>
-            </div>
-            <div class="c-meta">
-                <span><span class="material-symbols-outlined" style="vertical-align: bottom; font-size: 1.1em;">lock</span> HIPAA Compliant</span>
-                <span><span class="material-symbols-outlined" style="vertical-align: bottom; font-size: 1.1em;">event</span> 2025 Rules</span>
-            </div>
+      <div class="l-container c-header__inner">
+        <div class="c-brand">
+          <span class="material-symbols-outlined c-brand__icon">verified_user</span>
+          <span>VeriScript <span class="c-brand__accent">GLP-1 Network</span></span>
         </div>
+        <div class="c-meta">
+          <span>
+            <span class="material-symbols-outlined c-meta__icon">lock</span>
+            HIPAA Compliant
+          </span>
+          <span>
+            <span class="material-symbols-outlined c-meta__icon">event</span>
+            2025 Rules
+          </span>
+        </div>
+      </div>
     </header>
 
     <main class="l-main">
-        
-        <div class="t-center" style="margin-bottom: 2rem;">
-            <h1 class="t-h1">Coverage Clarity Engine</h1>
-            <p class="t-body">Determine your GLP-1 insurance eligibility in 60 seconds.</p>
+      <div class="t-center u-mb-xl">
+        <h1 class="t-h1">Coverage Clarity Engine</h1>
+        <p class="t-body">Determine your GLP-1 insurance eligibility in 60 seconds.</p>
+      </div>
+
+      <div class="c-card" id="form-container">
+        <div class="c-progress-track">
+          <div id="progress" class="c-progress-fill" style="width: 50%" data-js="progress-bar"></div>
         </div>
 
-        <div class="c-card" id="form-container">
-            <div class="c-progress-track">
-                <div class="c-progress-fill" style="width: 50%" data-js="progress-bar"></div>
+        <form id="clarity-form" class="c-card__body">
+          <div id="step-1" data-js="step">
+            <div class="c-form-group">
+              <label class="c-label">Target Medication <span class="u-text-error">*</span></label>
+              <div class="c-select-wrap">
+                <select id="medication" class="c-select" required>
+                  <option value="" disabled selected>Select prescribed medication...</option>
+                  <option value="Wegovy">Wegovy (Semaglutide)</option>
+                  <option value="Zepbound">Zepbound (Tirzepatide)</option>
+                  <option value="Mounjaro">Mounjaro (Tirzepatide - Type 2 Focus)</option>
+                  <option value="Ozempic">Ozempic (Semaglutide - Type 2 Focus)</option>
+                </select>
+              </div>
+              <div class="c-error-msg u-hidden" id="medication-error">
+                <span class="material-symbols-outlined c-error-icon">error</span>
+                Selection required
+              </div>
             </div>
 
-            <form id="clarity-form" class="c-card__body">
-                
-                <div id="step-1" data-js="step">
-                    <div class="c-form-group">
-                        <label class="c-label">Target Medication <span class="u-text-error">*</span></label>
-                        <div class="c-select-wrap">
-                            <select id="medication" class="c-select" required>
-                                <option value="" disabled selected>Select prescribed medication...</option>
-                                <option value="Wegovy">Wegovy (Semaglutide)</option>
-                                <option value="Zepbound">Zepbound (Tirzepatide)</option>
-                                <option value="Mounjaro">Mounjaro (Tirzepatide - Type 2 Focus)</option>
-                                <option value="Ozempic">Ozempic (Semaglutide - Type 2 Focus)</option>
-                            </select>
-                        </div>
-                        <div class="c-error-msg u-hidden" id="medication-error">
-                            <span class="material-symbols-outlined" style="font-size: 1.1em;">error</span> Selection required
-                        </div>
-                    </div>
-
-                    <div class="l-grid-2">
-                        <div class="c-form-group">
-                            <label class="c-label">Current BMI <span class="u-text-error">*</span></label>
-                            <input type="number" id="bmi" step="0.1" class="c-input" placeholder="e.g. 31.5" required>
-                        </div>
-                        <div class="c-form-group">
-                            <label class="c-label">Comorbidities <span class="u-text-error">*</span></label>
-                            <div class="c-check-grid">
-                                <label class="c-check-card">
-                                    <input type="checkbox" name="comorbidity" value="hypertension"> Hypertension
-                                </label>
-                                <label class="c-check-card">
-                                    <input type="checkbox" name="comorbidity" value="diabetes"> Type 2 Diabetes
-                                </label>
-                                <label class="c-check-card">
-                                    <input type="checkbox" name="comorbidity" value="pcos"> PCOS / Prediabetes
-                                </label>
-                                <label class="c-check-card">
-                                    <input type="checkbox" name="comorbidity" value="none"> None
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="button" class="c-btn c-btn--primary u-mt-lg" onclick="nextStep(2)">
-                        Continue to Insurance <span class="material-symbols-outlined">arrow_forward</span>
-                    </button>
+            <div class="l-grid-2">
+              <div class="c-form-group">
+                <label class="c-label">Current BMI <span class="u-text-error">*</span></label>
+                <input type="number" id="bmi" step="0.1" class="c-input" placeholder="e.g. 31.5" required />
+                <div class="c-error-msg u-hidden" id="bmi-error">
+                  <span class="material-symbols-outlined c-error-icon">error</span>
+                  Required
                 </div>
-
-                <div id="step-2" class="u-hidden" data-js="step">
-                    <div class="l-grid-2">
-                        <div class="c-form-group" style="grid-column: 1/-1;">
-                            <label class="c-label">Insurance Source <span class="u-text-error">*</span></label>
-                            <div class="c-select-wrap">
-                                <select id="plan-source" class="c-select" onchange="toggleEmployerField()">
-                                    <option value="" disabled selected>Select source...</option>
-                                    <option value="employer">Through my Job (Employer)</option>
-                                    <option value="marketplace">Marketplace</option>
-                                    <option value="govt">Government (VA/TriCare)</option>
-                                    <option value="direct">Direct Private Purchase</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="c-form-group u-hidden" id="employer-field" style="grid-column: 1/-1;">
-                            <label class="c-label">Employer Name</label>
-                            <input type="text" id="employer-name" class="c-input" placeholder="e.g. Amazon, State of FL">
-                        </div>
-
-                        <div class="c-form-group">
-                            <label class="c-label">Primary Carrier <span class="u-text-error">*</span></label>
-                            <div class="c-select-wrap">
-                                <select id="carrier" class="c-select">
-                                    <option value="" disabled selected>Select provider...</option>
-                                    <option value="Aetna">Aetna</option>
-                                    <option value="BCBS">Blue Cross Blue Shield</option>
-                                    <option value="Cigna">Cigna</option>
-                                    <option value="UHC">UnitedHealthcare</option>
-                                    <option value="Medicare">Medicare</option>
-                                    <option value="Other">Other / Commercial</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="c-form-group">
-                            <label class="c-label">State <span class="u-text-error">*</span></label>
-                            <div class="c-select-wrap">
-                                <select id="state" class="c-select">
-                                    <option value="" disabled selected>State</option>
-                                    <option value="NY">NY</option>
-                                    <option value="CA">CA</option>
-                                    <option value="FL">FL</option>
-                                    <option value="TX">TX</option>
-                                    <option value="PA">PA</option>
-                                    </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="c-form-group u-mt-lg">
-                        <label class="c-label">Member ID <span style="font-weight: 400; color: var(--color-text-muted);">(Optional)</span></label>
-                        <div style="position: relative;">
-                            <input type="text" id="member-id" class="c-input" style="padding-left: 3rem;" placeholder="e.g. W123456789">
-                            <span class="material-symbols-outlined" style="position: absolute; left: 1rem; top: 1rem; color: var(--color-text-muted);">id_card</span>
-                        </div>
-                         <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.5rem; display: flex; gap: 0.5rem;">
-                            <span class="material-symbols-outlined" style="font-size: 1rem; color: var(--color-primary);">check_circle</span>
-                            Providing this allows us to verify your exact copay.
-                        </p>
-                    </div>
-
-                    <div class="u-flex-gap u-mt-lg">
-                        <button type="button" class="c-btn c-btn--secondary" onclick="nextStep(1)">Back</button>
-                        <button type="submit" class="c-btn c-btn--primary">Check Coverage <span class="material-symbols-outlined">analytics</span></button>
-                    </div>
+              </div>
+              <div class="c-form-group">
+                <label class="c-label">Comorbidities <span class="u-text-error">*</span></label>
+                <div class="c-check-grid">
+                  <label class="c-check-card">
+                    <input type="checkbox" name="comorbidity" value="hypertension" /> Hypertension
+                  </label>
+                  <label class="c-check-card">
+                    <input type="checkbox" name="comorbidity" value="diabetes" /> Type 2 Diabetes
+                  </label>
+                  <label class="c-check-card">
+                    <input type="checkbox" name="comorbidity" value="pcos" /> PCOS / Prediabetes
+                  </label>
+                  <label class="c-check-card">
+                    <input type="checkbox" name="comorbidity" value="none" /> None
+                  </label>
                 </div>
-            </form>
+                <div class="c-error-msg u-hidden" id="comorbidity-error">
+                  <span class="material-symbols-outlined c-error-icon">error</span>
+                  Selection required
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="c-btn c-btn--primary u-mt-lg" onclick="nextStep(2)">
+              Continue to Insurance
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+
+          <div id="step-2" class="u-hidden" data-js="step">
+            <div class="l-grid-2">
+              <div class="c-form-group l-col-span-full">
+                <label class="c-label">Insurance Source <span class="u-text-error">*</span></label>
+                <div class="c-select-wrap">
+                  <select id="plan-source" class="c-select" onchange="toggleEmployerField()">
+                    <option value="" disabled selected>Select source...</option>
+                    <option value="employer">Through my Job (Employer)</option>
+                    <option value="marketplace">Marketplace</option>
+                    <option value="govt">Government (VA/TriCare)</option>
+                    <option value="direct">Direct Private Purchase</option>
+                  </select>
+                </div>
+                <div class="c-error-msg u-hidden" id="source-error">
+                  <span class="material-symbols-outlined c-error-icon">error</span>
+                  Selection required
+                </div>
+              </div>
+
+              <div class="c-form-group l-col-span-full u-hidden" id="employer-field">
+                <label class="c-label">Employer Name</label>
+                <input type="text" id="employer-name" class="c-input" placeholder="e.g. Amazon, State of FL" />
+              </div>
+
+              <div class="c-form-group">
+                <label class="c-label">Primary Carrier <span class="u-text-error">*</span></label>
+                <div class="c-select-wrap">
+                  <select id="carrier" class="c-select">
+                    <option value="" disabled selected>Select provider...</option>
+                    <option value="Aetna">Aetna</option>
+                    <option value="BCBS">Blue Cross Blue Shield</option>
+                    <option value="Cigna">Cigna</option>
+                    <option value="UHC">UnitedHealthcare</option>
+                    <option value="Medicare">Medicare</option>
+                    <option value="Other">Other / Commercial</option>
+                  </select>
+                </div>
+                <div class="c-error-msg u-hidden" id="carrier-error">
+                  <span class="material-symbols-outlined c-error-icon">error</span>
+                  Selection required
+                </div>
+              </div>
+
+              <div class="c-form-group">
+                <label class="c-label">State <span class="u-text-error">*</span></label>
+                <div class="c-select-wrap">
+                  <select id="state" class="c-select">
+                    <option value="" disabled selected>State</option>
+                    <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option>
+                    <option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option>
+                    <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
+                    <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option>
+                    <option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
+                    <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
+                    <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option>
+                    <option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
+                    <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
+                    <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option>
+                    <option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
+                    <option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
+                    <option value="WI">WI</option><option value="WY">WY</option>
+                  </select>
+                </div>
+                <div class="c-error-msg u-hidden" id="state-error">
+                  <span class="material-symbols-outlined c-error-icon">error</span>
+                  Selection required
+                </div>
+              </div>
+            </div>
+
+            <div class="c-form-group u-mt-lg">
+              <label class="c-label">Member ID <span class="c-label__sub">(Optional)</span></label>
+              <div class="c-input-icon-wrap">
+                <input type="text" id="member-id" class="c-input c-input--icon-left" placeholder="e.g. W123456789" />
+                <span class="material-symbols-outlined c-input-icon">id_card</span>
+              </div>
+              <p class="c-helper">
+                <span class="material-symbols-outlined c-helper__icon">check_circle</span>
+                Providing this allows us to verify your exact copay.
+              </p>
+            </div>
+
+            <div class="u-flex-gap u-mt-lg">
+              <button type="button" class="c-btn c-btn--secondary" onclick="nextStep(1)">Back</button>
+              <button type="submit" class="c-btn c-btn--primary">
+                Check Coverage
+                <span class="material-symbols-outlined">analytics</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div id="loading-state" class="l-loading u-hidden">
+        <div class="c-spinner u-mb-lg"></div>
+        <h3 id="loading-text" class="t-h2 u-mb-md">Accessing 2025 Payer Formularies...</h3>
+        <div class="c-progress-track c-progress-track--pill">
+          <div id="loading-bar" class="c-progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div id="safety-stop-modal" class="c-modal-overlay u-hidden">
+        <div class="c-modal">
+          <div class="c-result__icon c-result__icon--neutral">
+            <span class="material-symbols-outlined">block</span>
+          </div>
+          <h2 class="t-h2">Clinical Criteria Not Met</h2>
+          <p class="t-body t-sm u-mb-lg">
+            GLP-1 medications typically require a BMI ≥ 27. Your profile indicates you may not qualify for insurance coverage.
+          </p>
+          <a href="#" class="c-btn c-btn--primary">View Lifestyle Programs</a>
+        </div>
+      </div>
+
+      <div id="email-gate" class="c-modal-overlay u-hidden">
+        <div class="c-modal">
+          <div class="c-result__icon" style="background: var(--color-primary-bg); color: var(--color-primary);">
+            <span class="material-symbols-outlined">lock</span>
+          </div>
+          <h2 class="t-h2">Analysis Complete</h2>
+          <p class="t-body t-sm">Enter your email to unlock your full fee report.</p>
+
+          <form id="email-form" class="u-mt-lg">
+            <input type="email" id="user-email" required placeholder="name@example.com" class="c-input u-mb-md" />
+            <label class="u-flex-check u-mb-md">
+              <input type="checkbox" required />
+              <span class="t-xs u-text-muted">I authorize VeriScript to disclose my health profile to its pharmacy network.</span>
+            </label>
+            <button type="submit" class="c-btn c-btn--primary">Unlock Report</button>
+          </form>
+        </div>
+      </div>
+
+      <div id="results-container" class="u-hidden u-mt-lg"> <div id="result-green" class="c-result c-result--success u-hidden">
+          <div class="c-result__icon"><span class="material-symbols-outlined">check_circle</span></div>
+          <h2 class="t-h2">Match Found!</h2>
+          <div class="c-price-box">
+            <div class="c-price-box__label u-text-primary-dark">With Savings Card</div>
+            <div class="c-price-box__amount u-text-primary">$25.00<span class="t-sm u-text-muted">/mo</span></div>
+          </div>
+          <p class="t-body">Your carrier indicates favorable coverage.</p>
+          <a href="#" class="c-btn c-btn--success u-mt-lg">Finalize Intake</a>
         </div>
 
-        <div id="loading-state" class="l-loading u-hidden">
-            <div class="c-spinner" style="margin-bottom: 1.5rem;"></div>
-            <h3 id="loading-text" class="t-h2" style="margin-bottom: 1rem; color: var(--color-text-main);">
-                Accessing 2025 Payer Formularies...
-            </h3>
-            <div class="c-progress-track" style="max-width: 300px; border-radius: 99px;">
-                <div id="loading-bar" class="c-progress-fill" style="width: 0%"></div>
-            </div>
+        <div id="result-yellow" class="c-result c-result--warning u-hidden">
+          <div class="c-result__icon"><span class="material-symbols-outlined">assignment_late</span></div>
+          <h2 class="t-h2">Verification Pending</h2>
+          <p class="t-body t-semi u-text-warning">Manual Review Required</p>
+          <p class="t-body t-sm">Your plan requires Prior Authorization. We can handle this.</p>
+          <a href="#" class="c-btn c-btn--primary u-mt-lg">Request Review</a>
         </div>
 
-        <div id="safety-stop-modal" class="c-modal-overlay u-hidden">
-            <div class="c-modal">
-                <div class="c-result__icon" style="background: #f1f5f9; color: var(--color-text-body);">
-                    <span class="material-symbols-outlined">block</span>
-                </div>
-                <h2 class="t-h2">Clinical Criteria Not Met</h2>
-                <p class="t-body" style="font-size: 0.875rem; margin-bottom: 1.5rem;">
-                    GLP-1 medications typically require a BMI ≥ 27. Your profile indicates you may not qualify for insurance coverage.
-                </p>
-                <a href="#" class="c-btn c-btn--primary">View Lifestyle Programs</a>
-            </div>
+        <div id="result-red" class="c-result c-result--error u-hidden">
+          <div class="c-result__icon"><span class="material-symbols-outlined">policy</span></div>
+          <h2 class="t-h2">Coverage Unlikely</h2>
+          <div class="c-price-box">
+            <div class="c-price-box__label u-text-body">Alternative Option</div>
+            <div class="c-price-box__amount c-price-box__amount--sm">$199/mo</div>
+          </div>
+          <a href="#" class="c-btn c-btn--primary u-mt-lg">View Cash Options</a>
         </div>
 
-        <div id="email-gate" class="c-modal-overlay u-hidden">
-            <div class="c-modal">
-                <div class="c-result__icon" style="background: var(--color-primary-bg); color: var(--color-primary);">
-                    <span class="material-symbols-outlined">lock</span>
-                </div>
-                <h2 class="t-h2">Analysis Complete</h2>
-                <p class="t-body" style="font-size: 0.875rem;">Enter your email to unlock your full fee report.</p>
-                
-                <form id="email-form" class="u-mt-lg">
-                    <input type="email" id="user-email" required placeholder="name@example.com" class="c-input" style="margin-bottom: 1rem;">
-                    <label style="display: flex; gap: 0.5rem; text-align: left; margin-bottom: 1rem;">
-                        <input type="checkbox" required>
-                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">I authorize VeriScript to disclose my health profile to its pharmacy network.</span>
-                    </label>
-                    <button type="submit" class="c-btn c-btn--primary">Unlock Report</button>
-                </form>
-            </div>
+        <div id="result-grey" class="c-result c-result--info u-hidden">
+          <div class="c-result__icon"><span class="material-symbols-outlined">medical_services</span></div>
+          <h2 class="t-h2">Specialist Review</h2>
+          <p class="t-body t-semi u-text-info">Clinical Nuance Detected</p>
+          <p class="t-body t-sm">Due to 2025 rules for your carrier, a pharmacist must verify this manually.</p>
+          <a href="#" class="c-btn c-btn--primary u-mt-lg">Request Priority Review</a>
         </div>
-
-        <div id="results-container" class="u-hidden" style="margin-top: 2rem;">
-            
-            <div id="result-green" class="c-result c-result--success u-hidden">
-                <div class="c-result__icon"><span class="material-symbols-outlined">check_circle</span></div>
-                <h2 class="t-h2">Match Found!</h2>
-                <div class="c-price-box">
-                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-primary-dark); text-transform: uppercase;">With Savings Card</div>
-                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-primary);">$25.00<span style="font-size: 1rem; color: var(--color-text-muted);">/mo</span></div>
-                </div>
-                <p class="t-body">Your carrier indicates favorable coverage.</p>
-                <a href="#" class="c-btn c-btn--success u-mt-lg">Finalize Intake</a>
-            </div>
-
-            <div id="result-yellow" class="c-result c-result--warning u-hidden">
-                <div class="c-result__icon"><span class="material-symbols-outlined">assignment_late</span></div>
-                <h2 class="t-h2">Verification Pending</h2>
-                <p class="t-body" style="color: var(--color-warning); font-weight: 600;">Manual Review Required</p>
-                <p class="t-body" style="font-size: 0.875rem;">Your plan requires Prior Authorization. We can handle this.</p>
-                <a href="#" class="c-btn c-btn--primary u-mt-lg">Request Review</a>
-            </div>
-
-            <div id="result-red" class="c-result c-result--error u-hidden">
-                <div class="c-result__icon"><span class="material-symbols-outlined">policy</span></div>
-                <h2 class="t-h2">Coverage Unlikely</h2>
-                <div class="c-price-box">
-                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-body); text-transform: uppercase;">Alternative Option</div>
-                    <div style="font-size: 1.5rem; font-weight: 700;">$199/mo</div>
-                </div>
-                <a href="#" class="c-btn c-btn--primary u-mt-lg">View Cash Options</a>
-            </div>
-
-            <div id="result-grey" class="c-result c-result--info u-hidden">
-                <div class="c-result__icon"><span class="material-symbols-outlined">medical_services</span></div>
-                <h2 class="t-h2">Specialist Review</h2>
-                <p class="t-body" style="color: var(--color-info); font-weight: 600;">Clinical Nuance Detected</p>
-                <p class="t-body" style="font-size: 0.875rem;">Due to 2025 rules for your carrier, a pharmacist must verify this manually.</p>
-                <a href="#" class="c-btn c-btn--primary u-mt-lg">Request Priority Review</a>
-            </div>
-
-        </div>
-
+      </div>
     </main>
 
-    <footer class="c-footer" style="background: #0f172a; color: #94a3b8; padding: 3rem 1rem; margin-top: auto;">
-        <div class="l-container t-center" style="font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase;">
-            © 2025 VeriScript Health Technology Systems. All Rights Reserved.
-        </div>
+    <footer class="c-footer">
+      <div class="l-container t-center t-xs t-uppercase">
+        © 2025 VeriScript Health Technology Systems. All Rights Reserved.
+      </div>
     </footer>
 
-    <script src="scripts/main.js"></script>
-</body>
+    <script type="module" src="scripts/main.js"></script>
+  </body>
 </html>
