@@ -1,5 +1,22 @@
 let currentResultType = null;
 
+// --- UI TOGGLE (NEW) ---
+function toggleEmployerField() {
+    const source = document.getElementById('plan-source').value;
+    const employerField = document.getElementById('employer-field');
+    const sourceError = document.getElementById('source-error');
+    
+    // Clear error when user interacts
+    sourceError.classList.add('hidden');
+    document.getElementById('plan-source').classList.remove('border-red-500');
+
+    if (source === 'employer') {
+        employerField.classList.remove('hidden');
+    } else {
+        employerField.classList.add('hidden');
+    }
+}
+
 function nextStep(step) {
     // STEP 1 VALIDATION & SAFETY STOP
     if (step === 2) {
@@ -105,7 +122,15 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
         isValid = false;
     }
 
-    // Stop if either is missing
+    // 3. NEW: Validate Plan Source
+    const planSource = document.getElementById('plan-source');
+    if (!planSource.value) {
+        document.getElementById('source-error').classList.remove('hidden');
+        planSource.classList.add('border-red-500');
+        isValid = false;
+    }
+
+    // Stop if any are missing
     if (!isValid) return; 
 
     // --- Proceed to Loading Animation ---
@@ -144,13 +169,16 @@ document.getElementById('email-form').addEventListener('submit', (e) => {
         document.querySelectorAll('input[name="comorbidity"]:checked')
     ).map(cb => cb.value);
 
-    // 1. DATA PACKAGING
+    // 1. DATA PACKAGING (Updated with new fields)
     const sensitiveData = {
         email: document.getElementById('user-email').value,
         medication: document.getElementById('medication').value,
         bmi: document.getElementById('bmi').value,
         comorbidities: selectedComorbidities,
+        planSource: document.getElementById('plan-source').value,      // NEW
+        employerName: document.getElementById('employer-name').value,  // NEW
         carrier: document.getElementById('carrier').value,
+        state: document.getElementById('state').value,
         memberId: document.getElementById('member-id').value || "NOT_PROVIDED"
     };
 
