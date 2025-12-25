@@ -1,15 +1,119 @@
-body { font-family: 'Inter', sans-serif; }
-.step-transition { transition: all 0.3s ease-in-out; }
-.progress-bar { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-input:focus, select:focus { outline: 2px solid #10b981; outline-offset: 1px; }
-
-.spinner {
-    border: 3px solid rgba(16, 185, 129, 0.1);
-    border-top: 3px solid #10b981;
-    border-radius: 50%;
-    width: 40px; height: 40px;
-    animation: spin 1s linear infinite;
+:root {
+    /* Theme Tokens - Changing these updates the whole app */
+    --primary: #10b981;       /* Emerald-500 */
+    --primary-dark: #059669;  /* Emerald-600 */
+    --surface: #ffffff;
+    --background: #f8fafc;    /* Slate-50 */
+    --text-main: #0f172a;     /* Slate-900 */
+    --text-muted: #64748b;    /* Slate-500 */
+    --border: #e2e8f0;        /* Slate-200 */
+    --radius: 0.75rem;        /* 12px - rounded-xl */
+    --input-height: 3.5rem;
 }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-.blur-backdrop { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+/* Base Reset */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background);
+    color: var(--text-main);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- COMPONENT: Card --- */
+.c-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+    position: relative;
+    max-width: 48rem; /* max-w-3xl */
+    margin: 0 auto;
+    z-index: 10;
+}
+
+/* --- COMPONENT: Inputs (Abstracted) --- */
+.c-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.5rem;
+}
+
+.c-input, .c-select {
+    width: 100%;
+    height: var(--input-height);
+    background-color: var(--background);
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius);
+    padding: 0 1rem;
+    font-size: 1rem;
+    color: var(--text-main);
+    transition: all 0.2s;
+    appearance: none; /* Removes default OS styling */
+}
+
+/* State changes handled via CSS classes, not JS inline styles */
+.c-input:focus, .c-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.c-input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+/* --- COMPONENT: Buttons --- */
+.c-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--input-height);
+    padding: 0 2rem;
+    font-weight: 600;
+    border-radius: var(--radius);
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+}
+
+.c-btn--primary {
+    background-color: var(--text-main);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.c-btn--primary:hover {
+    background-color: #1e293b; /* Slate-800 */
+    transform: translateY(-1px);
+}
+
+.c-btn--secondary {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    color: #334155;
+}
+
+.c-btn--secondary:hover {
+    background-color: var(--background);
+}
+
+/* --- COMPONENT: Layout Utilities --- */
+.l-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .l-grid-2 { grid-template-columns: 1fr 1fr; }
+}
+
+.u-hidden { display: none !important; }
