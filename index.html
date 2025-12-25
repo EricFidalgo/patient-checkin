@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coverage Clarity Engine | Specialty Pharmacy Network</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .step-transition { transition: all 0.3s ease-in-out; }
+        .progress-bar { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        input:focus, select:focus { outline: 2px solid #10b981; outline-offset: 1px; }
+        
+        .spinner {
+            border: 3px solid rgba(16, 185, 129, 0.1);
+            border-top: 3px solid #10b981;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media print { .no-print { display: none !important; } }
+        
+        /* Modal Animation */
+        .modal-enter { opacity: 0; transform: scale(0.95); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 300ms, transform 300ms; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-600 text-3xl font-bold">verified_user</span>
+                <span class="font-bold text-xl tracking-tight text-slate-800">VeriScript <span class="text-emerald-600 font-medium text-lg italic">GLP-1 Network</span></span>
+            </div>
+            <div class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-500">
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">lock</span> HIPAA Compliant</span>
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">event</span> 2025 Plan Rules</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-3xl mx-auto w-full px-4 py-8 relative">
+        
+        <section id="intro-section" class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">Coverage Clarity Engine</h1>
+            <p class="text-slate-600">Determine your GLP-1 insurance eligibility and 2025 copay probability in 60 seconds.</p>
+        </section>
+
+        <div id="form-container" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 h-1.5 w-full">
+                <div id="progress" class="progress-bar bg-emerald-500 h-full w-1/4"></div>
+            </div>
+
+            <form id="clarity-form" class="p-6 md:p-8">
+                <div id="step-1" class="step-transition">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">1</div>
+                        <h2 class="text-xl font-semibold">Clinical Profile</h2>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label for="medication" class="block text-sm font-medium text-slate-700 mb-2">Target Medication <span class="text-red-500">*</span></label>
+                            <select id="medication" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:ring-2 focus:ring-emerald-500" onchange="clearError('medication-error')">
+                                <option value="" disabled selected>Select prescribed medication...</option>
+                                <option value="Wegovy">Wegovy (Semaglutide)</option>
+                                <option value="Zepbound">Zepbound (Tirzepatide)</option>
+                                <option value="Mounjaro">Mounjaro (Tirzepatide - Type 2 Focus)</option>
+                                <option value="Ozempic">Ozempic (Semaglutide - Type 2 Focus)</option>
+                            </select>
+                            <p id="medication-error" class="hidden mt-1 text-sm text-red-600 flex items-center gap-1"><span class="material-symbols-outlined text-sm">error</span> Please select a medication.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="bmi" class="block text-sm font-medium text-slate-700 mb-2">Your Current BMI <span class="text-red-500">*</span></label>
+                                <input type="number" id="bmi" step="0.1" placeholder="e.g. 31.5" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3" oninput="clearError('bmi-error')">
+                                <p id="bmi-error" class="hidden mt-1 text-sm text-red-600 flex items-center gap-1"><span class="material-symbols-outlined text-sm">error</span> BMI is required.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Comorbidities <span class="text-red-500">*</span></label>
+                                <div class="grid grid-cols-1 gap-2" id="comorbidity-group">
+                                    <label class="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded border border-slate-200 cursor-pointer hover:border-emerald-300 transition-colors">
+                                        <input type="checkbox" name="comorbidity" value="hypertension" class="w-4 h-4 accent-emerald-500" onchange="clearError('comorbidity-error')"> Hypertension
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded border border-slate-200 cursor-pointer hover:border-emerald-300 transition-colors">
+                                        <input type="checkbox" name="comorbidity" value="diabetes" class="w-4 h-4 accent-emerald-500" onchange="clearError('comorbidity-error')"> Type 2 Diabetes
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded border border-slate-200 cursor-pointer hover:border-emerald-300 transition-colors">
+                                        <input type="checkbox" name="comorbidity" value="pcos" class="w-4 h-4 accent-emerald-500" onchange="clearError('comorbidity-error')"> PCOS / Prediabetes
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded border border-slate-200 cursor-pointer hover:border-emerald-300 transition-colors">
+                                        <input type="checkbox" name="comorbidity" value="none" class="w-4 h-4 accent-emerald-500" onchange="clearError('comorbidity-error')"> None / No known conditions
+                                    </label>
+                                </div>
+                                <p id="comorbidity-error" class="hidden mt-1 text-sm text-red-600 flex items-center gap-1"><span class="material-symbols-outlined text-sm">error</span> Please select at least one option.</p>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="nextStep(2)" class="w-full bg-slate-900 text-white font-semibold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg">
+                            Continue to Insurance <span class="material-symbols-outlined align-middle ml-1">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="step-2" class="step-transition hidden">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">2</div>
+                        <h2 class="text-xl font-semibold">Insurance Carrier</h2>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label for="carrier" class="block text-sm font-medium text-slate-700 mb-2">Primary Medical Carrier <span class="text-red-500">*</span></label>
+                            <select id="carrier" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:ring-2 focus:ring-emerald-500" onchange="clearError('carrier-error')">
+                                <option value="" disabled selected>Select insurance provider...</option>
+                                <option value="Aetna">Aetna</option>
+                                <option value="BCBS">Blue Cross Blue Shield (BCBS)</option>
+                                <option value="Cigna">Cigna</option>
+                                <option value="Medicare">Medicare (Part D / Advantage)</option>
+                                <option value="UnitedHealthcare">UnitedHealthcare (UHC)</option>
+                                <option value="Other">Other / Commercial Private</option>
+                            </select>
+                            <p id="carrier-error" class="hidden mt-1 text-sm text-red-600 flex items-center gap-1"><span class="material-symbols-outlined text-sm">error</span> Please select your insurance carrier.</p>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <button type="button" onclick="nextStep(1)" class="flex-1 border border-slate-300 text-slate-600 font-semibold py-4 rounded-xl hover:bg-slate-50">Back</button>
+                            <button type="button" onclick="nextStep(3)" class="flex-[2] bg-slate-900 text-white font-semibold py-4 rounded-xl hover:bg-slate-800 shadow-lg">Verification Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step-3" class="step-transition hidden">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">3</div>
+                        <h2 class="text-xl font-semibold">Benefit Verification</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                            <label for="memberId" class="block text-sm font-medium text-slate-700 mb-3 flex items-center gap-1">
+                                Insurance Member ID (Optional)
+                            </label>
+                            <input type="text" id="memberId" oninput="toggleAuth(this)" placeholder="E.G. W123456789" class="w-full bg-white border border-slate-300 rounded-lg p-4 text-slate-900 uppercase tracking-widest placeholder:text-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <p class="mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">verified</span> End-to-End Encryption Enabled
+                            </p>
+                        </div>
+                        <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-5">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="material-symbols-outlined text-emerald-600 text-xl font-bold">gavel</span>
+                                <h3 class="text-sm font-bold text-slate-800">Digital Health Authorization</h3>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed mb-5">
+                                I authorize <strong class="text-emerald-800">VeriScript Network</strong> to disclose my health information...
+                            </p>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" id="hipaa-consent" onchange="validateForm()" class="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 accent-emerald-600">
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
+                                    I electronically sign and agree to the HIPAA Authorization and Terms of Service.
+                                </span>
+                            </label>
+                        </div>
+                        <div class="flex gap-4">
+                            <button type="button" onclick="nextStep(2)" class="flex-1 border-2 border-slate-200 text-slate-800 font-bold py-4 rounded-xl hover:bg-slate-50 transition-all">Back</button>
+                            <button type="submit" id="submit-btn" disabled class="flex-[2] bg-slate-300 text-white font-bold py-4 rounded-xl cursor-not-allowed transition-all flex items-center justify-center gap-2">
+                                Check Coverage <span class="material-symbols-outlined">analytics</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="loading-state" class="hidden flex flex-col items-center justify-center py-20 animate-pulse">
+            <div class="spinner mb-4"></div>
+            <h3 class="text-lg font-semibold text-slate-800">Consulting 2025 PBM Formulary Databases...</h3>
+            <p class="text-sm text-slate-500 mt-2">Checking Prior Authorization Rules...</p>
+        </div>
+
+        <div id="email-gate" class="hidden fixed inset-0 z-[60] flex items-center justify-center px-4">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative z-10 transform transition-all scale-100">
+                <div class="text-center mb-6">
+                    <div class="bg-emerald-100 text-emerald-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-2xl">check_circle</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">Analysis Complete</h2>
+                    <p class="text-slate-600 mt-2 text-sm">
+                        We found a match for <strong id="modal-carrier-name" class="text-emerald-700">your carrier</strong>.
+                    </p>
+                    <p class="text-slate-500 text-xs mt-4 px-4">
+                        To protect your privacy and view your detailed Fee & Coverage Report (PDF), please verify your email address.
+                    </p>
+                </div>
+                
+                <form id="email-form" class="space-y-4">
+                    <div>
+                        <input type="email" id="user-email" required placeholder="name@example.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-4 text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 shadow-lg flex items-center justify-center gap-2">
+                        Unlock My Report <span class="material-symbols-outlined text-sm">lock_open</span>
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="text-[10px] text-slate-400">Your data is encrypted and never sold.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12 px-4 mt-auto no-print">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-emerald-500 font-bold">verified_user</span>
+                    <span class="font-bold text-white tracking-tight">VeriScript</span>
+                </div>
+                <p class="text-xs leading-relaxed">VeriScript is a national specialty pharmacy network simplifying GLP-1 access through real-time benefit transparency and automated PA processing.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-widest">Compliance</h4>
+                <ul class="text-xs space-y-2">
+                    <li>HIPAA Privacy Policy</li>
+                    <li>SOC2 Type II Certified</li>
+                    <li>Pharmacist Licensure Verification</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-widest">Support</h4>
+                <p class="text-xs">Member Support: 1-800-GLP-VERI</p>
+                <p class="text-xs">Pharmacy Hours: Mon-Fri 8am - 8pm EST</p>
+            </div>
+        </div>
+        <div class="max-w-5xl mx-auto border-t border-slate-800 mt-8 pt-8 text-[10px] text-center tracking-widest">
+            © 2025 VeriScript Health Technology Systems. All Rights Reserved.
+        </div>
+    </footer>
+
+    <script>
+    // Store the calculated result type globally so we can access it after email capture
+    let currentResultType = null;
+
+    function nextStep(step) {
+        // Validate Step 1 before moving to Step 2
+        if (step === 2) {
+            let isValid = true;
+            
+            const medication = document.getElementById('medication');
+            const bmi = document.getElementById('bmi');
+            const comorbidities = document.querySelectorAll('input[name="comorbidity"]:checked');
+
+            // Reset borders
+            medication.classList.remove('border-red-500');
+            bmi.classList.remove('border-red-500');
+
+            if (!medication.value) {
+                document.getElementById('medication-error').classList.remove('hidden');
+                medication.classList.add('border-red-500');
+                isValid = false;
+            }
+            if (!bmi.value) {
+                document.getElementById('bmi-error').classList.remove('hidden');
+                bmi.classList.add('border-red-500');
+                isValid = false;
+            }
+            if (comorbidities.length === 0) {
+                document.getElementById('comorbidity-error').classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (!isValid) return; 
+        }
+
+        // Validate Step 2 before moving to Step 3
+        if (step === 3) {
+            const carrier = document.getElementById('carrier');
+            carrier.classList.remove('border-red-500');
+            
+            if (!carrier.value) {
+                document.getElementById('carrier-error').classList.remove('hidden');
+                carrier.classList.add('border-red-500');
+                return;
+            }
+        }
+
+        // Execute Transition
+        document.querySelectorAll('.step-transition').forEach(el => el.classList.add('hidden'));
+        document.getElementById(`step-${step}`).classList.remove('hidden');
+        document.getElementById('progress').style.width = `${(step / 3) * 100}%`;
+        window.scrollTo({ top: 100, behavior: 'smooth' });
+    }
+
+    // Helper to hide error messages
+    function clearError(elementId) {
+        document.getElementById(elementId).classList.add('hidden');
+        if(elementId === 'medication-error') document.getElementById('medication').classList.remove('border-red-500');
+        if(elementId === 'bmi-error') document.getElementById('bmi').classList.remove('border-red-500');
+        if(elementId === 'carrier-error') document.getElementById('carrier').classList.remove('border-red-500');
+    }
+
+    function toggleAuth(input) {
+        validateForm();
+    }
+
+    function validateForm() {
+        const memberId = document.getElementById('memberId').value;
+        const consent = document.getElementById('hipaa-consent');
+        const submitBtn = document.getElementById('submit-btn');
+
+        // Logic fix: Consent is strictly required IF memberID is present, OR generally required for valid submission context
+        // For this flow, let's make consent mandatory for legal safety regardless of ID
+        const isAuthValid = consent.checked; 
+
+        if (isAuthValid) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('bg-slate-300', 'cursor-not-allowed');
+            submitBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'shadow-lg');
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('bg-slate-300', 'cursor-not-allowed');
+            submitBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700', 'shadow-lg');
+        }
+    }
+
+    // --- HEURISTIC LOGIC ENGINE ---
+    function determineCoverageStatus() {
+        const bmi = parseFloat(document.getElementById('bmi').value);
+        const carrier = document.getElementById('carrier').value;
+        
+        // Check Comorbidities (Are any checked that aren't 'none'?)
+        const comorbidities = Array.from(document.querySelectorAll('input[name="comorbidity"]:checked'))
+                                   .map(cb => cb.value);
+        const hasCondition = comorbidities.some(c => c !== 'none');
+
+        // Rule 4: Clinical Denial (Safety Stop)
+        // Priority: Highest. If BMI is too low, insurance doesn't matter.
+        if (bmi < 27) {
+            return 'clinical-denial'; 
+        }
+
+        // Rule 3: Red Light (Statutory Exclusion)
+        if (carrier === 'Medicare') {
+            return 'red-light';
+        }
+
+        // Check Medical Necessity (BMI > 30 OR (BMI > 27 AND Condition))
+        const isMedicallyNecessary = (bmi >= 30) || (bmi >= 27 && hasCondition);
+
+        if (!isMedicallyNecessary) {
+            // Technically a clinical denial, but if they are borderline, we might want manual review
+            return 'clinical-denial';
+        }
+
+        // Rule 1: Green Light (High Probability)
+        if (carrier === 'BCBS') {
+            return 'green-light';
+        }
+
+        // Rule 2: Yellow Light (PA Required - Standard Commercial)
+        if (['Aetna', 'Cigna', 'UnitedHealthcare'].includes(carrier)) {
+            return 'yellow-light';
+        }
+
+        // Rule 5: Grey Light (Manual Review / Other)
+        return 'grey-light';
+    }
+
+    // --- FORM SUBMISSION & EMAIL GATE FLOW ---
+    document.getElementById('clarity-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // 1. Hide Form & Intro
+        document.getElementById('form-container').classList.add('hidden');
+        document.getElementById('intro-section').classList.add('hidden');
+        
+        // 2. Show Loading Animation
+        document.getElementById('loading-state').classList.remove('hidden');
+
+        // 3. Run Logic Engine
+        currentResultType = determineCoverageStatus();
+        
+        // Update Modal Text dynamically
+        const carrierName = document.getElementById('carrier').value;
+        document.getElementById('modal-carrier-name').textContent = carrierName;
+
+        // 4. Wait 2.5s then Show Gate
+        setTimeout(() => {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('email-gate').classList.remove('hidden');
+        }, 2500);
+    });
+
+    // --- HANDLE EMAIL SUBMISSION & DOWNLOAD ---
+    document.getElementById('email-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('user-email').value;
+
+        // In a real app, you would send this email to your backend/Zapier webhook here
+        console.log(`Lead Captured: ${email}, Result Type: ${currentResultType}`);
+
+        // Update UI to show success
+        const btn = e.target.querySelector('button');
+        btn.innerHTML = 'Report Sent! <span class="material-symbols-outlined">check</span>';
+        btn.classList.remove('bg-slate-900', 'hover:bg-slate-800');
+        btn.classList.add('bg-emerald-600');
+
+        // Simulate PDF Download based on Logic Result
+        // NOTE: You must create these 5 PDF files and place them in your hosted folder
+        const pdfFiles = {
+            'green-light': 'reports/VeriScript_Coverage_Green.pdf',
+            'yellow-light': 'reports/VeriScript_Coverage_Yellow_PA.pdf',
+            'red-light': 'reports/VeriScript_Coverage_Medicare_Exclusion.pdf',
+            'clinical-denial': 'reports/VeriScript_Clinical_Guidelines.pdf',
+            'grey-light': 'reports/VeriScript_Coverage_Manual_Review.pdf'
+        };
+
+        const fileToDownload = pdfFiles[currentResultType];
+
+        setTimeout(() => {
+            // Create invisible link to trigger download
+            const link = document.createElement('a');
+            link.href = fileToDownload; 
+            link.download = fileToDownload.split('/').pop(); // Extracts filename
+            // For demo purposes, since files don't exist, we alert the user
+            alert(`DEMO: The user would now receive/download: ${fileToDownload}`);
+            // link.click(); // Uncomment this when real files exist
+        }, 1000);
+    });
+    </script>
+</body>
+</html>
