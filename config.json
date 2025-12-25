@@ -12,7 +12,7 @@
       "condition_trigger": "diabetes",
       "result_override": "green"
     },
-    "medicare_cvd_bypass": {
+    "medicare_cardiac_loophole": {
       "description": "Medicare Part D 2025 covers Wegovy for established Cardiovascular Disease (CVD).",
       "enabled": true,
       "carrier_trigger": "Medicare",
