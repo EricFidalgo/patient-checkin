@@ -14,10 +14,10 @@
     
     --color-error: #dc2626;
     --color-warning: #d97706;
-    --color-info: #2563eb;
+    --color-info: #2563eb;          /* Blue-600 for Info state */
 
     --radius-sm: 0.5rem;
-    --radius-lg: 1rem;      /* Rounded-2xl */
+    --radius-lg: 1rem;      
     --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     
@@ -38,16 +38,17 @@ body {
 
 /* --- Layout --- */
 .l-container {
-    max-width: 64rem; /* 5xl */
+    max-width: 64rem; 
     margin: 0 auto;
     padding: 0 1rem;
     width: 100%;
 }
 .l-main {
-    max-width: 48rem; /* 3xl */
+    max-width: 48rem;
     margin: 2rem auto;
     position: relative;
     flex-grow: 1;
+    padding: 0 1rem; /* Added padding for mobile safety */
 }
 .l-grid-2 {
     display: grid;
@@ -56,6 +57,15 @@ body {
 }
 @media (min-width: 768px) {
     .l-grid-2 { grid-template-columns: 1fr 1fr; }
+}
+
+/* --- Helper for Loading Screen (Restored) --- */
+.l-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
 }
 
 /* --- Typography --- */
@@ -97,6 +107,20 @@ body {
     height: 100%;
     width: 50%;
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- COMPONENT: Spinner (Restored) --- */
+.c-spinner {
+    width: 3rem; 
+    height: 3rem;
+    border: 3px solid var(--color-primary-bg);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { 
+    to { transform: rotate(360deg); } 
 }
 
 /* --- COMPONENT: Card --- */
@@ -191,6 +215,7 @@ body {
     justify-content: center;
     gap: 0.5rem;
     transition: all var(--transition-fast);
+    text-decoration: none; /* For anchor tags */
 }
 .c-btn--primary {
     background-color: var(--color-text-main);
@@ -218,7 +243,7 @@ body {
     border: 2px solid transparent;
     box-shadow: var(--shadow-card);
 }
-/* Modifiers for different states */
+/* Modifiers */
 .c-result--success { border-color: var(--color-primary); }
 .c-result--warning { border-color: var(--color-warning); }
 .c-result--error   { border-color: var(--color-border); }
@@ -231,6 +256,7 @@ body {
     margin: 0 auto 1rem;
     font-size: 2.5rem;
 }
+/* Icon Colors */
 .c-result--success .c-result__icon { background: var(--color-primary-bg); color: var(--color-primary); }
 .c-result--warning .c-result__icon { background: #fef3c7; color: var(--color-warning); }
 .c-result--error .c-result__icon   { background: #f1f5f9; color: var(--color-text-muted); }
