@@ -1,0 +1,15 @@
+body { font-family: 'Inter', sans-serif; }
+.step-transition { transition: all 0.3s ease-in-out; }
+.progress-bar { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+input:focus, select:focus { outline: 2px solid #10b981; outline-offset: 1px; }
+
+.spinner {
+    border: 3px solid rgba(16, 185, 129, 0.1);
+    border-top: 3px solid #10b981;
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.blur-backdrop { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
