@@ -33,7 +33,7 @@
     <main class="l-main">
       <div class="t-center u-mb-xl">
         <h1 class="t-h1">Coverage Clarity Engine</h1>
-        <p class="t-body">Determine your GLP-1 insurance eligibility in 60 seconds.</p>
+        <p class="t-body">Determine your GLP-1 insurance eligibility and 2025 copay probability in 60 seconds.</p>
       </div>
 
       <div class="c-card" id="form-container">
@@ -43,6 +43,10 @@
 
         <form id="clarity-form" class="c-card__body">
           <div id="step-1" data-js="step">
+            <div class="c-step-header u-mb-lg">
+                <span class="c-step-header__circle">1</span>
+                <h2 class="c-step-header__title">Clinical Profile</h2>
+            </div>
             <div class="c-form-group">
               <label class="c-label">Target Medication <span class="u-text-error">*</span></label>
               <div class="c-select-wrap">
@@ -99,6 +103,10 @@
           </div>
 
           <div id="step-2" class="u-hidden" data-js="step">
+            <div class="c-step-header u-mb-lg">
+                <span class="c-step-header__circle">2</span>
+                <h2 class="c-step-header__title">Insurance & Location</h2>
+            </div>
             <div class="l-grid-2">
               <div class="c-form-group l-col-span-full">
                 <label class="c-label">Insurance Source <span class="u-text-error">*</span></label>
@@ -168,18 +176,27 @@
               </div>
             </div>
 
-            <div class="c-form-group u-mt-lg">
-              <label class="c-label">Member ID <span class="c-label__sub">(Optional)</span></label>
-              <div class="c-input-icon-wrap">
-                <input type="text" id="member-id" class="c-input c-input--icon-left" placeholder="e.g. W123456789" />
-                <span class="material-symbols-outlined c-input-icon">id_card</span>
-              </div>
-              <p class="c-helper">
-                <span class="material-symbols-outlined c-helper__icon">check_circle</span>
-                Providing this allows us to verify your exact copay.
-              </p>
-            </div>
+            <div class="c-highlight-box u-mt-lg">
+              <div class="c-form-group u-mb-0">
+                <label class="c-label">Member ID / Policy Number <span class="c-label__sub">(Optional)</span></label>
+                
+                <div class="c-input-icon-wrap">
+                  <input 
+                    type="text" 
+                    id="member-id" 
+                    class="c-input c-input--icon-left c-input--card-type" 
+                    placeholder="W123456789" 
+                  />
+                  <span class="material-symbols-outlined c-input-icon">id_card</span>
+                </div>
 
+                <p class="c-helper">
+                  <span class="material-symbols-outlined c-helper__icon">check_circle</span>
+                  Providing this allows us to verify your exact copay. Otherwise, we estimate.
+                </p>
+              </div>
+            </div>
+            
             <div class="u-flex-gap u-mt-lg">
               <button type="button" class="c-btn c-btn--secondary" onclick="nextStep(1)">Back</button>
               <button type="submit" class="c-btn c-btn--primary">
@@ -270,9 +287,42 @@
       </div>
     </main>
 
-    <footer class="c-footer">
-      <div class="l-container t-center t-xs t-uppercase">
-        © 2025 VeriScript Health Technology Systems. All Rights Reserved.
+<footer class="c-footer">
+      <div class="l-container">
+        <div class="c-footer__grid">
+          <div class="c-footer__col">
+            <div class="c-brand u-mb-md" style="color: white;">
+              <span class="material-symbols-outlined c-brand__icon">verified_user</span>
+              <span>VeriScript</span>
+            </div>
+            <p class="c-footer-text">
+              VeriScript is a national specialty pharmacy network simplifying GLP-1 
+              access through real-time benefit transparency and automated PA processing.
+            </p>
+          </div>
+
+          <div class="c-footer__col">
+            <h4 class="c-footer-title">Compliance</h4>
+            <ul class="c-footer-list">
+              <li><a href="#">HIPAA Privacy Policy</a></li>
+              <li><a href="#">SOC2 Type II Certified</a></li>
+              <li><a href="#">Pharmacist Licensure Verification</a></li>
+              <li><a href="#">2025 PBM Transparency Act Compliance</a></li>
+            </ul>
+          </div>
+
+          <div class="c-footer__col">
+            <h4 class="c-footer-title">Support</h4>
+            <ul class="c-footer-list">
+              <li>Member Support: 1-800-GLP-VERI</li>
+              <li>Pharmacy Hours: Mon-Fri 8am - 8pm EST</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="c-footer__bottom">
+          © 2025 VeriScript Health Technology Systems. All Rights Reserved.
+        </div>
       </div>
     </footer>
 

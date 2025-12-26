@@ -44,7 +44,8 @@ body {
     width: 100%;
 }
 .l-main {
-    max-width: 48rem;
+    width: 100%;          /* Fills the screen on mobile */
+    max-width: 50rem;     /* Caps width at approx 1200px on desktop (Wider than before) */
     margin: 2rem auto;
     position: relative;
     flex-grow: 1;
@@ -111,14 +112,6 @@ body {
 .c-meta { display: none; gap: 1.5rem; font-size: 0.875rem; color: var(--color-text-muted); font-weight: 500; }
 .c-meta__icon { vertical-align: bottom; font-size: 1.1em; }
 @media (min-width: 768px) { .c-meta { display: flex; } }
-
-/* --- COMPONENT: Footer (New) --- */
-.c-footer {
-    background-color: #0f172a; /* Slate-900 hardcoded per design or map to token */
-    color: var(--color-text-muted);
-    padding: 3rem 1rem;
-    margin-top: auto;
-}
 
 /* --- COMPONENT: Progress Bar --- */
 .c-progress-track {
@@ -377,3 +370,130 @@ body {
 .u-mb-md { margin-bottom: 1rem; }
 .u-mb-lg { margin-bottom: 1.5rem; }
 .u-mb-xl { margin-bottom: 2rem; }
+
+/* --- COMPONENT: Step Header (New) --- */
+.c-step-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* The pale green circle */
+.c-step-header__circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    /* Uses existing Emerald-50 token */
+    background-color: var(--color-primary-bg);
+    /* Uses existing Emerald-500 token */
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0; /* Ensures it stays a perfect circle */
+}
+
+/* The header text beside the circle */
+.c-step-header__title {
+    font-size: 1.25rem; /* Matches standard t-h2 size */
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin: 0; /* Removes default browser margins */
+}
+
+/* --- COMPONENT: Member ID Highlight Box --- */
+.c-highlight-box {
+    background-color: var(--color-bg-body); /* Uses the light slate gray (#f8fafc) */
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem; /* Adds space around the input */
+}
+
+/* Override utility to remove margin inside the box if needed */
+.u-mb-0 { margin-bottom: 0 !important; }
+
+/* --- COMPONENT: ID Card Input Style (Updated) --- */
+.c-input--card-type {
+    font-family: 'Inter', sans-serif; /* Back to clean Sans-Serif */
+    text-transform: uppercase;        /* Forces capitals like EFLJ FE */
+    letter-spacing: 0.2em;            /* Wide spacing like the screenshot */
+    font-size: 1.125rem;
+    background-color: white;          /* Ensures input is white against gray box */
+}
+
+.c-input--card-type::placeholder {
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: 1rem;
+}
+
+/* --- COMPONENT: Footer (Updated) --- */
+.c-footer {
+    background-color: #0f172a; /* Slate-900 */
+    color: #94a3b8;            /* Slate-400 (Muted text) */
+    padding: 4rem 1rem 2rem;
+    margin-top: auto;
+    font-size: 0.875rem;
+}
+
+.c-footer__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+/* On Desktop: 3 Columns (Large first col, smaller others) */
+@media (min-width: 768px) {
+    .c-footer__grid {
+        grid-template-columns: 2fr 1.5fr 1.5fr;
+        gap: 4rem;
+    }
+}
+
+.c-footer-title {
+    color: white;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.c-footer-text {
+    line-height: 1.6;
+    margin: 0;
+    max-width: 32ch; /* Limits width for readability */
+}
+
+.c-footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.c-footer-list a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.c-footer-list a:hover {
+    color: white;
+}
+
+.c-footer__bottom {
+    border-top: 1px solid #1e293b; /* Slate-800 line */
+    padding-top: 2rem;
+    text-align: center;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b; /* Slate-500 */
+}
