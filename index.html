@@ -24,7 +24,7 @@
           </span>
           <span>
             <span class="material-symbols-outlined c-meta__icon">event</span>
-            2025 Rules
+            <span class="current-year">2025</span> Rules
           </span>
         </div>
       </div>
@@ -33,7 +33,7 @@
     <main class="l-main">
       <div class="t-center u-mb-xl">
         <h1 class="t-h1">Coverage Clarity Engine</h1>
-        <p class="t-body">Determine your GLP-1 insurance eligibility and 2025 copay probability in 60 seconds.</p>
+        <p class="t-body">Determine your GLP-1 insurance eligibility and <span class="current-year">2025</span> copay probability in 60 seconds.</p>
       </div>
 
       <div class="c-card" id="form-container">
@@ -189,13 +189,13 @@
                   />
                   <span class="material-symbols-outlined c-input-icon">id_card</span>
                 </div>
-
-                <p class="c-helper">
-                  <span class="material-symbols-outlined c-helper__icon">check_circle</span>
-                  Providing your Member ID allows our partner pharmacies to manually verify your 2025 benefits and include a verified price in your official PDF report.
+            <p class="c-helper">
+                <span class="material-symbols-outlined c-helper__icon">check_circle</span>
+                <span>
+                    Providing your Member ID allows our partner pharmacies to manually verify your 
+                    <span class="current-year">2025</span> benefits and include a verified price in your official PDF report.
+                </span>
                 </p>
-              </div>
-            </div>
             
             <div class="u-flex-gap u-mt-lg">
               <button type="button" class="c-btn c-btn--secondary" onclick="nextStep(1)">Back</button>
@@ -210,7 +210,7 @@
 
       <div id="loading-state" class="l-loading u-hidden">
         <div class="c-spinner u-mb-lg"></div>
-        <h3 id="loading-text" class="t-h2 u-mb-md">Accessing 2025 Payer Formularies...</h3>
+        <h3 id="loading-text" class="t-h2 u-mb-md">Accessing <span class="current-year">2025</span> Payer Formularies...</h3>
         <div class="c-progress-track c-progress-track--pill">
           <div id="loading-bar" class="c-progress-fill" style="width: 0%"></div>
         </div>
@@ -281,7 +281,7 @@
           <div class="c-result__icon"><span class="material-symbols-outlined">medical_services</span></div>
           <h2 class="t-h2">Specialist Review</h2>
           <p class="t-body t-semi u-text-info">Clinical Nuance Detected</p>
-          <p class="t-body t-sm">Due to 2025 rules for your carrier, a pharmacist must verify this manually.</p>
+          <p class="t-body t-sm">Due to <span class="current-year">2025</span> rules for your carrier, a pharmacist must verify this manually.</p>
           <a href="#" class="c-btn c-btn--primary u-mt-lg">Request Priority Review</a>
         </div>
       </div>
@@ -320,7 +320,7 @@
     </div>
 
     <div class="c-footer__bottom">
-      © 2025 VeriScript GLP-1 Intelligence. All Rights Reserved.
+      © <span class="current-year">2025</span> VeriScript GLP-1 Intelligence. All Rights Reserved.
     </div>
   </div>
 </footer>

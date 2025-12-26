@@ -8,6 +8,11 @@ let currentResultType = null;
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
     await loadConfig();
+
+    const year = new Date().getFullYear();
+    document.querySelectorAll('.current-year').forEach(el => {
+        el.textContent = year;
+    });
     
     // Expose UI functions to global scope so HTML onclick="..." works
     window.toggleEmployerField = UI.toggleEmployerField;

@@ -13,7 +13,7 @@
       "result_override": "green"
     },
     "medicare_cardiac_loophole": {
-      "description": "Medicare Part D 2025 covers Wegovy for established Cardiovascular Disease (CVD).",
+      "description": "Medicare Part D {{YEAR}} covers Wegovy for established Cardiovascular Disease (CVD).",
       "enabled": true,
       "carrier_trigger": "Medicare",
       "required_condition": "hypertension",
@@ -86,7 +86,7 @@
         { "percent": 100, "time_ms": 3500 }
       ],
       "text_updates": [
-        { "text": "Comparing BMI with 2025-2026 FDA Clinical Criteria...", "time_ms": 1500 },
+        { "text": "Comparing BMI with {{YEAR}} FDA Clinical Criteria...", "time_ms": 1500 },
         { "text": "Identifying Payer-Specific Step Therapy Rules...", "time_ms": 3000 }
       ]
     }
