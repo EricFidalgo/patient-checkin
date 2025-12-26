@@ -13,12 +13,12 @@
       "result_override": "green"
     },
     "medicare_cardiac_loophole": {
-      "description": "Medicare Part D {{YEAR}} covers Wegovy for established Cardiovascular Disease (CVD).",
+      "description": "Medicare Part D 2025 covers Wegovy for established Cardiovascular Disease (CVD).",
       "enabled": true,
       "carrier_trigger": "Medicare",
       "required_condition": "hypertension",
       "min_bmi": 27.0,
-      "result_success": "grey",
+      "result_success": "yellow",
       "result_fail": "red"
     },
     "osa_bypass": {
@@ -26,31 +26,22 @@
       "enabled": true,
       "condition_trigger": "pcos",
       "carriers": ["UnitedHealthcare", "Cigna"],
-      "result_override": "grey"
+      "result_override": "yellow"
     },
     "grey_zone_check": {
       "description": "Downgrades results if BMI is low (<30) without specific comorbidities.",
       "enabled": true,
       "max_bmi_threshold": 30.0,
       "requires_comorbidity": true,
-      "result_override": "grey"
+      "result_override": "yellow"
     }
   },
   "carrier_rules": {
-    "Aetna": {
-      "default": "yellow",
-      "states": {}
-    },
+    "Aetna": { "default": "yellow", "states": {} },
     "BCBS": {
       "default": "yellow",
       "states": {
-        "FL": "yellow",
-        "CA": "grey",
-        "NC": "red",
-        "MI": "red",
-        "PA": "red",
-        "TX": "red",
-        "MA": "green"
+        "FL": "yellow", "CA": "yellow", "NC": "red", "MI": "red", "PA": "red", "TX": "red", "MA": "green"
       }
     },
     "Independence Blue Cross": {
@@ -58,37 +49,16 @@
       "description": "Total exit from commercial weight loss market effective Jan 1, 2025.",
       "states": {}
     },
-    "Cigna": {
-      "default": "yellow",
-      "states": {}
-    },
+    "Cigna": { "default": "yellow", "states": {} },
     "UnitedHealthcare": {
       "default": "yellow",
-      "states": {
-        "NY": "red"
-      }
+      "states": { "NY": "red" }
     },
     "Medicare": {
       "default": "red",
       "description": "Statutory exclusion for weight loss; requires CVD or T2D for coverage.",
       "states": {}
     },
-    "Other": {
-      "default": "yellow",
-      "states": {}
-    }
-  },
-  "ui_settings": {
-    "loading_animation": {
-      "steps": [
-        { "percent": 40, "time_ms": 100 },
-        { "percent": 75, "time_ms": 1500 },
-        { "percent": 100, "time_ms": 3500 }
-      ],
-      "text_updates": [
-        { "text": "Comparing BMI with {{YEAR}} FDA Clinical Criteria...", "time_ms": 1500 },
-        { "text": "Identifying Payer-Specific Step Therapy Rules...", "time_ms": 3000 }
-      ]
-    }
+    "Other": { "default": "yellow", "states": {} }
   }
 }

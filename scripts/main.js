@@ -38,17 +38,17 @@ function handleNextStep(step) {
         UI.clearError('comorbidity-error');
 
         if (!medication.value) {
-            document.getElementById('medication-error').classList.remove('u-hidden'); // Fixed
-            medication.classList.add('border-red-500'); // Note: ensure this class exists in CSS or use inline style
+            document.getElementById('medication-error').classList.remove('u-hidden');
+            medication.classList.add('border-red-500'); 
             isValid = false;
         }
         if (!bmi.value) {
-            document.getElementById('bmi-error').classList.remove('u-hidden'); // Fixed
+            document.getElementById('bmi-error').classList.remove('u-hidden');
             bmi.classList.add('border-red-500');
             isValid = false;
         }
         if (comorbidities.length === 0) {
-            document.getElementById('comorbidity-error').classList.remove('u-hidden'); // Fixed
+            document.getElementById('comorbidity-error').classList.remove('u-hidden');
             isValid = false;
         }
 
@@ -74,6 +74,9 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     const carrier = document.getElementById('carrier');
     const state = document.getElementById('state');
     const planSource = document.getElementById('plan-source');
+    // Retrieve medication from Step 1
+    const medication = document.getElementById('medication');
+
     let isValid = true;
 
     // Reset errors first
@@ -82,17 +85,17 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     UI.clearError('source-error');
 
     if (!carrier.value) {
-        document.getElementById('carrier-error').classList.remove('u-hidden'); // Fixed
+        document.getElementById('carrier-error').classList.remove('u-hidden');
         carrier.classList.add('border-red-500');
         isValid = false;
     }
     if (!state.value) {
-        document.getElementById('state-error').classList.remove('u-hidden'); // Fixed
+        document.getElementById('state-error').classList.remove('u-hidden');
         state.classList.add('border-red-500');
         isValid = false;
     }
     if (!planSource.value) {
-        document.getElementById('source-error').classList.remove('u-hidden'); // Fixed
+        document.getElementById('source-error').classList.remove('u-hidden');
         planSource.classList.add('border-red-500');
         isValid = false;
     }
@@ -104,7 +107,8 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
         carrier: carrier.value,
         state: state.value,
         bmi: parseFloat(document.getElementById('bmi').value),
-        comorbidities: Array.from(document.querySelectorAll('input[name="comorbidity"]:checked')).map(cb => cb.value)
+        comorbidities: Array.from(document.querySelectorAll('input[name="comorbidity"]:checked')).map(cb => cb.value),
+        medication: medication.value // Added medication to data object
     };
 
     // Run Logic
@@ -112,7 +116,7 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
 
     // Trigger Animation & Reveal
     UI.runLoadingSequence(getConfig(), () => {
-        document.getElementById('email-gate').classList.remove('u-hidden'); // Fixed
+        document.getElementById('email-gate').classList.remove('u-hidden');
     });
 });
 
