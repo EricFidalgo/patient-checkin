@@ -22,6 +22,7 @@ export function clearError(elementId) {
     const inputMap = {
         'medication-error': 'medication',
         'bmi-error': 'bmi',
+        'age-error': 'age',
         'carrier-error': 'carrier',
         'state-error': 'state',
         'source-error': 'plan-source', // Fixed key to match input ID

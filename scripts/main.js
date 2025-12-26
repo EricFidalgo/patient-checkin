@@ -28,6 +28,7 @@ function handleNextStep(step) {
         // validate step 1
         const medication = document.getElementById('medication');
         const bmi = document.getElementById('bmi');
+        const age = document.getElementById('age');
         const comorbidities = document.querySelectorAll('input[name="comorbidity"]:checked');
         
         let isValid = true;
@@ -35,6 +36,7 @@ function handleNextStep(step) {
         // Reset errors
         UI.clearError('medication-error');
         UI.clearError('bmi-error');
+        UI.clearError('age-error');
         UI.clearError('comorbidity-error');
 
         if (!medication.value) {
@@ -45,6 +47,11 @@ function handleNextStep(step) {
         if (!bmi.value) {
             document.getElementById('bmi-error').classList.remove('u-hidden');
             bmi.classList.add('border-red-500');
+            isValid = false;
+        }
+        if (!age.value) {
+            document.getElementById('age-error').classList.remove('u-hidden');
+            age.classList.add('border-red-500');
             isValid = false;
         }
         if (comorbidities.length === 0) {
@@ -107,6 +114,7 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
         carrier: carrier.value,
         state: state.value,
         bmi: parseFloat(document.getElementById('bmi').value),
+        age: parseInt(document.getElementById('age').value),
         comorbidities: Array.from(document.querySelectorAll('input[name="comorbidity"]:checked')).map(cb => cb.value),
         medication: medication.value // Added medication to data object
     };
