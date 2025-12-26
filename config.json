@@ -60,5 +60,18 @@
       "states": {}
     },
     "Other": { "default": "yellow", "states": {} }
+  },
+  "ui_settings": {
+    "loading_animation": {
+      "steps": [
+        { "percent": 40, "time_ms": 100 },
+        { "percent": 75, "time_ms": 1500 },
+        { "percent": 100, "time_ms": 3500 }
+      ],
+      "text_updates": [
+        { "text": "Comparing BMI with {{YEAR}} FDA Clinical Criteria...", "time_ms": 1500 },
+        { "text": "Identifying Payer-Specific Step Therapy Rules...", "time_ms": 3000 }
+      ]
+    }
   }
 }
