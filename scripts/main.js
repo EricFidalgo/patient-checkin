@@ -7,6 +7,10 @@ let currentResultType = null;
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Load Data into Form
+    UI.populateFormInputs();
+
+    // 2. Load Config & Date
     await loadConfig();
     const year = new Date().getFullYear();
     document.querySelectorAll('.current-year').forEach(el => el.textContent = year);
@@ -76,7 +80,6 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     const planSource = document.getElementById('plan-source');
     const employerNameInput = document.getElementById('employer-name'); 
     const medication = document.getElementById('medication');
-    // [NEW] Capture the lifestyle program checkbox (safely handles if element is missing)
     const lifestyleInput = document.getElementById('lifestyle-program');
 
     let isValid = true;
@@ -103,7 +106,7 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
 
     if (!isValid) return;
 
-    // Gather Data for Logic Engine
+    // Gather Data
     const inputData = {
         carrier: carrier.value,
         state: state.value,
@@ -114,7 +117,6 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
         comorbidities: Array.from(document.querySelectorAll('input[name="comorbidity"]:checked')).map(cb => cb.value),
         medicationHistory: Array.from(document.querySelectorAll('input[name="med_history"]:checked')).map(cb => cb.value),
         medication: medication.value,
-        // [NEW] Pass the enrollment status to logic.js
         lifestyleProgramEnrollment: lifestyleInput ? lifestyleInput.checked : false
     };
 

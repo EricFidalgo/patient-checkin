@@ -1,5 +1,63 @@
-// ui.js
-import { getConfig } from './config.js'; // Need config for messages
+// scripts/ui.js
+import { getConfig } from './config.js';
+import { formData } from './formData.js'; // Import the new data
+
+export function populateFormInputs() {
+    // Helper to create options
+    const createOptions = (selectId, dataArray) => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        // Keep the first "placeholder" option (index 0)
+        const placeholder = select.firstElementChild;
+        select.innerHTML = '';
+        select.appendChild(placeholder);
+
+        dataArray.forEach(item => {
+            const opt = document.createElement('option');
+            // Handle simple array of strings (like states) vs objects
+            if (typeof item === 'string') {
+                opt.value = item;
+                opt.textContent = item;
+            } else {
+                opt.value = item.value;
+                opt.textContent = item.label;
+            }
+            select.appendChild(opt);
+        });
+    };
+
+    // Helper to create checkboxes
+    const createCheckboxes = (containerId, dataArray, inputName) => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        container.innerHTML = ''; // Clear existing
+
+        dataArray.forEach(item => {
+            const label = document.createElement('label');
+            label.className = 'c-check-card';
+            
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.name = inputName;
+            input.value = item.value;
+
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(' ' + item.label));
+            container.appendChild(label);
+        });
+    };
+
+    // Execute Population
+    createOptions('medication', formData.medications);
+    createOptions('plan-source', formData.planSources);
+    createOptions('carrier', formData.carriers);
+    createOptions('state', formData.states);
+
+    createCheckboxes('med-history-grid', formData.medicationHistory, 'med_history');
+    createCheckboxes('comorbidity-grid', formData.comorbidities, 'comorbidity');
+}
 
 export function toggleEmployerField() {
     const source = document.getElementById('plan-source').value;
@@ -37,15 +95,12 @@ export function clearError(elementId) {
 }
 
 export function transitionToStep(step) {
-    // 1. Swap the steps
     document.querySelectorAll('[data-js="step"]').forEach(el => el.classList.add('u-hidden'));
     document.getElementById(`step-${step}`).classList.remove('u-hidden');
     
-    // 2. Update progress bar
     const progress = document.getElementById('progress');
     if(progress) progress.style.width = `${(step / 2) * 100}%`;
 
-    // 3. Scroll up to the header text
     const header = document.getElementById('form-header');
     if (header) header.scrollIntoView({ behavior: 'smooth' });
 }
@@ -55,14 +110,10 @@ export function runLoadingSequence(config, onComplete) {
     const loadingText = document.getElementById('loading-text');
     const loadingBar = document.getElementById('loading-bar');
     
-    // 1. Hide Form & Show Loader
     document.getElementById('form-container').classList.add('u-hidden');
     loadingState.classList.remove('u-hidden');
-
-    // 2. --- FIX: Scroll all the way to the top of the page ---
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // 3. Start Animation
     const animSettings = config.ui_settings.loading_animation;
 
     animSettings.steps.forEach(step => {
@@ -82,7 +133,6 @@ export function runLoadingSequence(config, onComplete) {
 }
 
 export function displayResult(resultData) {
-    // Handle cases where resultData might still be a string (backward compatibility)
     const resultType = resultData.status || resultData;
     const reasonText = resultData.reason || "Standard clinical criteria applied.";
 
@@ -95,33 +145,26 @@ export function displayResult(resultData) {
         'red': 'result-red'
     };
     
-    // Hide all
     Object.values(resultIds).forEach(id => {
         const el = document.getElementById(id);
         if(el) el.classList.add('u-hidden');
     });
     
-    // Show Target
     const targetId = resultIds[resultType] || 'result-red';
     const targetEl = document.getElementById(targetId);
     targetEl.classList.remove('u-hidden');
 
-    // --- FIX: Update the Existing Reason Text Element ---
     const reasonEl = targetEl.querySelector('.js-reason-text');
     if (reasonEl) {
         reasonEl.textContent = reasonText;
         reasonEl.classList.remove('u-hidden'); 
     }
 
-    // --- Pricing Warning Logic ---
     const config = getConfig();
     if (config && config.pricing_intelligence) {
-        
-        // 1. Accumulator Warning for Green results
         if (resultType === 'green') {
             const priceBox = targetEl.querySelector('.c-price-box');
             let warningEl = targetEl.querySelector('.js-acc-warning');
-            
             if (!warningEl) {
                 warningEl = document.createElement('p');
                 warningEl.className = 't-xs u-text-error u-mt-sm js-acc-warning';
@@ -130,11 +173,9 @@ export function displayResult(resultData) {
             warningEl.textContent = config.pricing_intelligence.savings_card_warning;
         }
 
-        // 2. Regulatory Warning for Red/Cash results
         if (resultType === 'red') {
             const priceBox = targetEl.querySelector('.c-price-box');
             let warningEl = targetEl.querySelector('.js-reg-warning');
-            
             if (!warningEl) {
                 warningEl = document.createElement('p');
                 warningEl.className = 't-xs u-text-warning u-mt-sm js-reg-warning';

@@ -14,7 +14,7 @@ export function determineCoverageStatus(inputData) {
         planSource, 
         employerName,
         medication,
-        lifestyleProgramEnrollment // [NEW] Added to support program gating logic
+        lifestyleProgramEnrollment 
     } = inputData;
 
     const rules = config.coverage_engine_config;
