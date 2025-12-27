@@ -662,3 +662,24 @@ body {
   letter-spacing: 0.05em;
   color: #64748b; /* Slate-500 */
 }
+
+
+/* --- COMPONENT: Loading Box --- */
+.c-loading-box {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 36rem; /* Keeps the box focused */
+  margin: 2rem auto;
+  text-align: center;
+}
+
+/* Ensure the pill-style progress bar is centered inside the box */
+.c-loading-box .c-progress-track--pill {
+  margin: 0 auto;
+}
