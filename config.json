@@ -6,27 +6,32 @@
     "modal_id": "safety-stop-modal"
   },
   "clinical_overrides": {
-    "diabetes_guarantee": {
-      "description": "Type 2 Diabetes (T2D) typically bypasses weight-loss exclusions via medical necessity.",
+    "t2d_step_therapy": {
+      "description": "2025 Gate: Type 2 Diabetes requires failure of Metformin AND SGLT-2 inhibitors.",
       "enabled": true,
       "condition_trigger": "diabetes",
-      "result_override": "green"
+      "required_meds": ["metformin", "sglt2"],
+      "result_success": "green",
+      "result_fail": "yellow",
+      "fail_message": "Step Therapy Likely: Insurers require SGLT-2 trial first."
     },
-    "medicare_cardiac_loophole": {
-      "description": "Medicare Part D 2025 covers Wegovy for established Cardiovascular Disease (CVD).",
+    "medicare_cvd_firewall": {
+      "description": "Medicare Part D covers Wegovy ONLY for Established CVD (Heart Attack/Stroke), NOT Hypertension.",
       "enabled": true,
       "carrier_trigger": "Medicare",
-      "required_condition": "hypertension",
+      "required_condition": "established_cvd",
+      "excluded_condition": "hypertension",
       "min_bmi": 27.0,
       "result_success": "yellow",
       "result_fail": "red"
     },
     "osa_bypass": {
-      "description": "Zepbound approved for Moderate-to-Severe Obstructive Sleep Apnea (OSA).",
+      "description": "Zepbound approved for OSA on UHC and Cigna.",
       "enabled": true,
-      "condition_trigger": "pcos",
+      "condition_trigger": "osa",
       "carriers": ["UnitedHealthcare", "Cigna"],
-      "result_override": "yellow"
+      "medication_match": "Zepbound",
+      "result_override": "green"
     },
     "grey_zone_check": {
       "description": "Downgrades results if BMI is low (<30) without specific comorbidities.",
@@ -37,40 +42,49 @@
     }
   },
   "carrier_rules": {
-    "Aetna": { "default": "yellow", "states": {} },
     "BCBS": {
       "default": "yellow",
       "states": {
-        "FL": "yellow", "CA": "yellow", "NC": "red", "MI": "red", "PA": "red", "TX": "red", "MA": "green"
+        "MI": "red",
+        "PA": "red", 
+        "NC": "yellow",
+        "TX": "red" 
+      },
+      "state_notes": {
+        "MI": "Fully Insured Exclusion (BCBSM)",
+        "NC": "Requires 'Vida' Program Enrollment",
+        "PA": "IBX 'Sole Purpose' Exclusion",
+        "TX": "TRS-ActiveCare Exclusion"
       }
     },
-    "Independence Blue Cross": {
-      "default": "red",
-      "description": "Total exit from commercial weight loss market effective Jan 1, 2025.",
-      "states": {}
-    },
-    "Cigna": { "default": "yellow", "states": {} },
+    "Independence Blue Cross": { "default": "red", "states": {} },
     "UnitedHealthcare": {
       "default": "yellow",
-      "states": { "NY": "red" }
+      "states": { "NY": "yellow" }
     },
-    "Medicare": {
-      "default": "red",
-      "description": "Statutory exclusion for weight loss; requires CVD or T2D for coverage.",
-      "states": {}
-    },
+    "Cigna": { "default": "yellow", "states": {} },
+    "Aetna": { "default": "yellow", "states": {} },
+    "Medicare": { "default": "red", "states": {} },
     "Other": { "default": "yellow", "states": {} }
+  },
+  "pricing_intelligence": {
+    "savings_card_warning": "Warning: 2025 Accumulator Adjustments may prevent this card from counting toward your deductible.",
+    "compounding_warning": "Regulatory Risk: Access to $199 pricing may end May 2025 due to FDA shortage resolution.",
+    "prices": {
+        "green_monthly": "$25.00",
+        "red_monthly": "$199"
+    }
   },
   "ui_settings": {
     "loading_animation": {
       "steps": [
-        { "percent": 40, "time_ms": 100 },
-        { "percent": 75, "time_ms": 1500 },
+        { "percent": 30, "time_ms": 100 },
+        { "percent": 60, "time_ms": 1500 },
         { "percent": 100, "time_ms": 3500 }
       ],
       "text_updates": [
-        { "text": "Comparing BMI with {{YEAR}} FDA Clinical Criteria...", "time_ms": 1500 },
-        { "text": "Identifying Payer-Specific Step Therapy Rules...", "time_ms": 3000 }
+        { "text": "Validating 2025 Step Therapy Protocols...", "time_ms": 1000 },
+        { "text": "Checking 'Established CVD' Criteria...", "time_ms": 2500 }
       ]
     }
   }

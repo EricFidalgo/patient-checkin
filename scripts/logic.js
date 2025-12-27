@@ -3,50 +3,52 @@ import { getConfig } from './config.js';
 
 export function determineCoverageStatus(inputData) {
     const config = getConfig();
-    if (!config) return 'yellow'; // Fallback if config completely fails
+    if (!config) return 'yellow'; 
 
-    // Updated to include medication
-    const { carrier, state, bmi, comorbidities, medication } = inputData;
-    
-    // Safety: Default to empty object if missing
+    const { carrier, state, bmi, comorbidities, medication, medicationHistory } = inputData;
     const overrides = config.clinical_overrides || {};
 
-    // RULE 1: Diabetes Override
-    if (overrides.diabetes_guarantee?.enabled) {
-        const trigger = overrides.diabetes_guarantee.condition_trigger;
-        if (comorbidities.includes(trigger)) {
-            return overrides.diabetes_guarantee.result_override;
+    // RULE 1: T2D Step Therapy Check (New 2025 Logic)
+    if (overrides.t2d_step_therapy?.enabled && comorbidities.includes(overrides.t2d_step_therapy.condition_trigger)) {
+        const required = overrides.t2d_step_therapy.required_meds; // ['metformin', 'sglt2']
+        const hasStepTherapy = required.every(med => medicationHistory.includes(med));
+        
+        if (hasStepTherapy) {
+            return overrides.t2d_step_therapy.result_success; // Green
+        } else {
+            return overrides.t2d_step_therapy.result_fail; // Yellow (needs step therapy)
         }
     }
 
-    // RULE 2: Medicare Loophole
-    const medicareRule = overrides.medicare_cardiac_loophole;
+    // RULE 2: Medicare "Established CVD" Firewall
+    // Strict check: Must have "established_cvd", cannot rely on "hypertension" alone
+    const medicareRule = overrides.medicare_cvd_firewall;
     if (medicareRule?.enabled && carrier === medicareRule.carrier_trigger) {
-        const hasCondition = comorbidities.includes(medicareRule.required_condition);
-        if (hasCondition && bmi >= medicareRule.min_bmi) {
-            return medicareRule.result_success;
+        const hasEstablished = comorbidities.includes(medicareRule.required_condition);
+        
+        if (hasEstablished && bmi >= medicareRule.min_bmi) {
+            return medicareRule.result_success; // Yellow (Valid PA)
         }
+        // If they only have hypertension, or nothing, fall to Red
         return medicareRule.result_fail;
     }
 
-    // RULE 3: OSA Bypass (New)
+    // RULE 3: OSA Bypass (Zepbound Specific)
     const osaRule = overrides.osa_bypass;
     if (osaRule?.enabled && osaRule.carriers.includes(carrier)) {
-        // Check for PCOS trigger and specifically Zepbound
-        if (comorbidities.includes(osaRule.condition_trigger) && medication === 'Zepbound') {
-            return osaRule.result_override;
+        if (comorbidities.includes(osaRule.condition_trigger) && medication === osaRule.medication_match) {
+            return osaRule.result_override; // Green
         }
     }
 
-    // RULE 4: Carrier Lookup
+    // RULE 4: Carrier/State Rules
     const carrierRules = config.carrier_rules[carrier] || config.carrier_rules["Other"];
-    
     const stateRule = carrierRules.states?.[state];
     let result = stateRule || carrierRules.default;
 
-    // RULE 5: Clinical Nuance (Grey Zone)
+    // RULE 5: Grey Zone
     const greyRule = overrides.grey_zone_check;
-    const hasComorbidities = comorbidities.length > 0;
+    const hasComorbidities = comorbidities.length > 0 && !comorbidities.includes('none');
     
     if (greyRule?.enabled) {
         if ((result === 'green' || result === 'yellow') && 

@@ -43,74 +43,91 @@
 
         <form id="clarity-form" class="c-card__body">
           <div id="step-1" data-js="step">
-            <div class="c-step-header u-mb-lg">
-                <span class="c-step-header__circle">1</span>
-                <h2 class="c-step-header__title">Clinical Profile</h2>
-            </div>
-            <div class="c-form-group">
-              <label class="c-label">Target Medication <span class="u-text-error">*</span></label>
-              <div class="c-select-wrap">
-                <select id="medication" class="c-select" required>
-                  <option value="" disabled selected>Select prescribed medication...</option>
-                  <option value="Wegovy">Wegovy (Semaglutide)</option>
-                  <option value="Zepbound">Zepbound (Tirzepatide)</option>
-                  <option value="Mounjaro">Mounjaro (Tirzepatide - Type 2 Focus)</option>
-                  <option value="Ozempic">Ozempic (Semaglutide - Type 2 Focus)</option>
-                </select>
-              </div>
-              <div class="c-error-msg u-hidden" id="medication-error">
-                <span class="material-symbols-outlined c-error-icon">error</span>
-                Selection required
-              </div>
-            </div>
+  <div class="c-step-header u-mb-lg">
+      <span class="c-step-header__circle">1</span>
+      <h2 class="c-step-header__title">Clinical Profile</h2>
+  </div>
+  
+  <div class="c-form-group">
+    <label class="c-label">Target Medication <span class="u-text-error">*</span></label>
+    <div class="c-select-wrap">
+      <select id="medication" class="c-select" required>
+        <option value="" disabled selected>Select prescribed medication...</option>
+        <option value="Wegovy">Wegovy (Semaglutide)</option>
+        <option value="Zepbound">Zepbound (Tirzepatide)</option>
+        <option value="Mounjaro">Mounjaro (Tirzepatide - Type 2 Focus)</option>
+        <option value="Ozempic">Ozempic (Semaglutide - Type 2 Focus)</option>
+      </select>
+    </div>
+    <div class="c-error-msg u-hidden" id="medication-error">
+      <span class="material-symbols-outlined c-error-icon">error</span>
+      Selection required
+    </div>
+  </div>
 
-            <div class="l-grid-2">
-              <div class="c-form-group">
-                <label class="c-label">Age <span class="u-text-error">*</span></label>
-                <input type="number" id="age" class="c-input" placeholder="e.g. 45" required min="18" />
-                <div class="c-error-msg u-hidden" id="age-error">
-                  <span class="material-symbols-outlined c-error-icon">error</span>
-                  Required
-                </div>
-              </div>
+  <div class="l-grid-2">
+    <div class="c-form-group">
+      <label class="c-label">Age <span class="u-text-error">*</span></label>
+      <input type="number" id="age" class="c-input" placeholder="e.g. 45" required min="18" />
+      <div class="c-error-msg u-hidden" id="age-error">
+        <span class="material-symbols-outlined c-error-icon">error</span> Required
+      </div>
+    </div>
 
-              <div class="c-form-group">
-                <label class="c-label">Current BMI <span class="u-text-error">*</span></label>
-                <input type="number" id="bmi" step="0.1" class="c-input" placeholder="e.g. 31.5" required />
-                <div class="c-error-msg u-hidden" id="bmi-error">
-                  <span class="material-symbols-outlined c-error-icon">error</span>
-                  Required
-                </div>
-              </div>
+    <div class="c-form-group">
+      <label class="c-label">Current BMI <span class="u-text-error">*</span></label>
+      <input type="number" id="bmi" step="0.1" class="c-input" placeholder="e.g. 31.5" required />
+      <div class="c-error-msg u-hidden" id="bmi-error">
+        <span class="material-symbols-outlined c-error-icon">error</span> Required
+      </div>
+    </div>
 
-              <div class="c-form-group l-col-span-full">
-                <label class="c-label">Comorbidities <span class="u-text-error">*</span></label>
-                <div class="c-check-grid">
-                  <label class="c-check-card">
-                    <input type="checkbox" name="comorbidity" value="hypertension" /> Hypertension
-                  </label>
-                  <label class="c-check-card">
-                    <input type="checkbox" name="comorbidity" value="diabetes" /> Type 2 Diabetes
-                  </label>
-                  <label class="c-check-card">
-                    <input type="checkbox" name="comorbidity" value="pcos" /> PCOS / Prediabetes
-                  </label>
-                  <label class="c-check-card">
-                    <input type="checkbox" name="comorbidity" value="none" /> None
-                  </label>
-                </div>
-                <div class="c-error-msg u-hidden" id="comorbidity-error">
-                  <span class="material-symbols-outlined c-error-icon">error</span>
-                  Selection required
-                </div>
-              </div>
-            </div>
+    <div class="c-form-group l-col-span-full">
+        <label class="c-label">Medication History <span class="c-label__sub">(Check all that apply)</span></label>
+        <div class="c-check-grid">
+            <label class="c-check-card">
+                <input type="checkbox" name="med_history" value="metformin" /> Metformin (90+ days)
+            </label>
+            <label class="c-check-card">
+                <input type="checkbox" name="med_history" value="sglt2" /> SGLT-2 (e.g. Jardiance, Farxiga)
+            </label>
+        </div>
+    </div>
 
-            <button type="button" class="c-btn c-btn--primary u-mt-lg" onclick="nextStep(2)">
-              Continue to Insurance
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </button>
-          </div>
+    <div class="c-form-group l-col-span-full">
+      <label class="c-label">Conditions <span class="u-text-error">*</span></label>
+      <div class="c-check-grid">
+        <label class="c-check-card">
+          <input type="checkbox" name="comorbidity" value="diabetes" /> Type 2 Diabetes
+        </label>
+        <label class="c-check-card">
+            <input type="checkbox" name="comorbidity" value="established_cvd" /> Heart Attack / Stroke / PAD
+        </label>
+        <label class="c-check-card">
+          <input type="checkbox" name="comorbidity" value="hypertension" /> Hypertension / High BP
+        </label>
+        <label class="c-check-card">
+            <input type="checkbox" name="comorbidity" value="osa" /> Obstructive Sleep Apnea (OSA)
+        </label>
+        <label class="c-check-card">
+          <input type="checkbox" name="comorbidity" value="pcos" /> PCOS / Prediabetes
+        </label>
+        <label class="c-check-card">
+          <input type="checkbox" name="comorbidity" value="none" /> None
+        </label>
+      </div>
+      <div class="c-error-msg u-hidden" id="comorbidity-error">
+        <span class="material-symbols-outlined c-error-icon">error</span>
+        Selection required
+      </div>
+    </div>
+  </div>
+
+  <button type="button" class="c-btn c-btn--primary u-mt-lg" onclick="nextStep(2)">
+    Continue to Insurance
+    <span class="material-symbols-outlined">arrow_forward</span>
+  </button>
+</div>
 
           <div id="step-2" class="u-hidden" data-js="step">
             <div class="c-step-header u-mb-lg">
