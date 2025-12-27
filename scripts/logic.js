@@ -63,9 +63,11 @@ export function determineCoverageStatus(inputData) {
     let result = stateRule || carrierRules.default;
     
     // Create a dynamic reason based on the lookup
-    let baseReason = `Standard Payer Policy: ${carrier} in ${state} typically returns this status for your profile.`;
-    if (config.carrier_rules[carrier]?.state_notes?.[state]) {
-        baseReason = config.carrier_rules[carrier].state_notes[state];
+    let baseReason = carrierRules.default_reason || `Standard Payer Policy: ${carrier} typically reviews these requests on a case-by-case basis.`;
+
+    // 2. Check for a specific State override note (highest priority)
+    if (carrierRules.state_notes && carrierRules.state_notes[state]) {
+        baseReason = carrierRules.state_notes[state];
     }
 
     // RULE 5: Grey Zone (Downgrade)

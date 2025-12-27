@@ -42,34 +42,44 @@
     }
   },
   "carrier_rules": {
-    "BCBS": {
-      "default": "yellow",
-      "states": {
-        "MI": "red",
-        "PA": "red", 
-        "NC": "yellow",
-        "TX": "red" 
-      },
-      "state_notes": {
-        "MI": "Fully Insured Exclusion (BCBSM)",
-        "NC": "Requires 'Vida' Program Enrollment",
-        "PA": "IBX 'Sole Purpose' Exclusion",
-        "TX": "TRS-ActiveCare Exclusion"
-      }
+  "BCBS": {
+    "default": "yellow",
+    "default_reason": "Most Blue Cross plans require a Prior Authorization verifying a history of lifestyle modification.",
+    "states": {
+      "MI": "red",
+      "PA": "red", 
+      "NC": "yellow",
+      "TX": "red" 
     },
-    "Independence Blue Cross": { "default": "red", "states": {} },
-    "UnitedHealthcare": {
-      "default": "yellow",
-      "states": { "NY": "yellow" }
-    },
-    "Cigna": { "default": "yellow", "states": {} },
-    "Aetna": { "default": "yellow", "states": {} },
-    "Medicare": { "default": "red", "states": {} },
-    "Other": { "default": "yellow", "states": {} }
+    "state_notes": {
+      "MI": "Fully Insured Exclusion (BCBSM)",
+      "NC": "Requires 'Vida' Program Enrollment",
+      "PA": "IBX 'Sole Purpose' Exclusion",
+      "TX": "TRS-ActiveCare Exclusion"
+    }
   },
+  "UnitedHealthcare": {
+    "default": "yellow",
+    "default_reason": "UHC requires step therapy (Metformin) for Type 2 Diabetes diagnoses.",
+    "states": { "NY": "yellow" }
+  },
+  "Aetna": { 
+    "default": "yellow",
+    "default_reason": "Aetna typically requires a 6-month documented weight management program." 
+  },
+  "Medicare": { 
+    "default": "red",
+    "default_reason": "The Medicare Modernization Act (MMA) prohibits coverage for weight loss; the TROA bill is pending to repeal this." 
+  },
+  "Other": { 
+    "default": "yellow",
+    "default_reason": "Commercial plans typically require a Prior Authorization for this drug class." 
+  }
+},
+
   "pricing_intelligence": {
-    "savings_card_warning": "Warning: 2025 Accumulator Adjustments may prevent this card from counting toward your deductible.",
-    "compounding_warning": "Regulatory Risk: Access to $199 pricing may end May 2025 due to FDA shortage resolution.",
+    "savings_card_warning": "Warning: {{YEAR}} Accumulator Adjustments may prevent this card from counting toward your deductible.",
+    "compounding_warning": "Regulatory Notice: Enforcement of FDA shortage resolutions (passed May 2025) has restricted access to $199 compounded pricing.",
     "prices": {
         "green_monthly": "$25.00",
         "red_monthly": "$199"

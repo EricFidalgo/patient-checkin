@@ -104,7 +104,7 @@ export function displayResult(resultData) {
     // --- FIX: Update the Existing Reason Text Element ---
     const reasonEl = targetEl.querySelector('.js-reason-text');
     if (reasonEl) {
-        reasonEl.textContent = `Logic Analysis: ${reasonText}`;
+        reasonEl.textContent = reasonText;
         reasonEl.classList.remove('u-hidden'); 
     }
 
