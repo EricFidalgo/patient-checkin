@@ -21,27 +21,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // --- STEP HANDLER ---
-function handleNextStep(step) {
+function handleNextStep(targetStep) {
     if (!getConfig()) return;
 
-    if (step === 2) {
-        const medication = document.getElementById('medication');
+    // VALIDATE STEP 1 (Moving to Step 2)
+    if (targetStep === 2) {
         const bmi = document.getElementById('bmi');
         const age = document.getElementById('age');
         const comorbidities = document.querySelectorAll('input[name="comorbidity"]:checked');
         
         let isValid = true;
         
-        UI.clearError('medication-error');
         UI.clearError('bmi-error');
         UI.clearError('age-error');
         UI.clearError('comorbidity-error');
 
-        if (!medication.value) {
-            document.getElementById('medication-error').classList.remove('u-hidden');
-            medication.classList.add('border-red-500'); 
-            isValid = false;
-        }
         if (!bmi.value) {
             document.getElementById('bmi-error').classList.remove('u-hidden');
             bmi.classList.add('border-red-500');
@@ -59,6 +53,7 @@ function handleNextStep(step) {
 
         if (!isValid) return;
 
+        // Perform Clinical Safety Check immediately after clinical data is entered
         const safetyCheck = checkSafetyStop(parseFloat(bmi.value));
         if (!safetyCheck.safe) {
             UI.showModal(safetyCheck.modalId);
@@ -66,36 +61,52 @@ function handleNextStep(step) {
         }
     }
 
-    UI.transitionToStep(step);
+    // VALIDATE STEP 2 (Moving to Step 3)
+    if (targetStep === 3) {
+        const medication = document.getElementById('medication');
+        const state = document.getElementById('state');
+        
+        let isValid = true;
+        
+        UI.clearError('medication-error');
+        UI.clearError('state-error');
+
+        if (!medication.value) {
+            document.getElementById('medication-error').classList.remove('u-hidden');
+            medication.classList.add('border-red-500'); 
+            isValid = false;
+        }
+        if (!state.value) {
+            document.getElementById('state-error').classList.remove('u-hidden');
+            state.classList.add('border-red-500');
+            isValid = false;
+        }
+
+        if (!isValid) return;
+    }
+
+    UI.transitionToStep(targetStep);
 }
 
-// --- FORM SUBMISSION ---
+// --- FORM SUBMISSION (STEP 3) ---
 document.getElementById('clarity-form').addEventListener('submit', (e) => {
     e.preventDefault();
     if (!getConfig()) return;
 
-    // Validate Step 2 Inputs
+    // Validate Step 3 Inputs
     const carrier = document.getElementById('carrier');
-    const state = document.getElementById('state');
     const planSource = document.getElementById('plan-source');
     const employerNameInput = document.getElementById('employer-name'); 
-    const medication = document.getElementById('medication');
     const lifestyleInput = document.getElementById('lifestyle-program');
 
     let isValid = true;
 
     UI.clearError('carrier-error');
-    UI.clearError('state-error');
     UI.clearError('source-error');
 
     if (!carrier.value) {
         document.getElementById('carrier-error').classList.remove('u-hidden');
         carrier.classList.add('border-red-500');
-        isValid = false;
-    }
-    if (!state.value) {
-        document.getElementById('state-error').classList.remove('u-hidden');
-        state.classList.add('border-red-500');
         isValid = false;
     }
     if (!planSource.value) {
@@ -106,17 +117,17 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
 
     if (!isValid) return;
 
-    // Gather Data
+    // Gather Data (from all steps)
     const inputData = {
         carrier: carrier.value,
-        state: state.value,
+        state: document.getElementById('state').value,
         planSource: planSource.value,
         employerName: employerNameInput ? employerNameInput.value : '',
         bmi: parseFloat(document.getElementById('bmi').value),
         age: parseInt(document.getElementById('age').value),
         comorbidities: Array.from(document.querySelectorAll('input[name="comorbidity"]:checked')).map(cb => cb.value),
         medicationHistory: Array.from(document.querySelectorAll('input[name="med_history"]:checked')).map(cb => cb.value),
-        medication: medication.value,
+        medication: document.getElementById('medication').value,
         lifestyleProgramEnrollment: lifestyleInput ? lifestyleInput.checked : false
     };
 

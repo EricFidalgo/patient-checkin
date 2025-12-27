@@ -1,6 +1,6 @@
 // scripts/ui.js
 import { getConfig } from './config.js';
-import { formData } from './formData.js'; // Import the new data
+import { formData } from './formData.js'; 
 
 export function populateFormInputs() {
     // Helper to create options
@@ -8,14 +8,12 @@ export function populateFormInputs() {
         const select = document.getElementById(selectId);
         if (!select) return;
         
-        // Keep the first "placeholder" option (index 0)
         const placeholder = select.firstElementChild;
         select.innerHTML = '';
         select.appendChild(placeholder);
 
         dataArray.forEach(item => {
             const opt = document.createElement('option');
-            // Handle simple array of strings (like states) vs objects
             if (typeof item === 'string') {
                 opt.value = item;
                 opt.textContent = item;
@@ -32,7 +30,7 @@ export function populateFormInputs() {
         const container = document.getElementById(containerId);
         if (!container) return;
         
-        container.innerHTML = ''; // Clear existing
+        container.innerHTML = ''; 
 
         dataArray.forEach(item => {
             const label = document.createElement('label');
@@ -49,7 +47,6 @@ export function populateFormInputs() {
         });
     };
 
-    // Execute Population
     createOptions('medication', formData.medications);
     createOptions('plan-source', formData.planSources);
     createOptions('carrier', formData.carriers);
@@ -95,11 +92,15 @@ export function clearError(elementId) {
 }
 
 export function transitionToStep(step) {
+    // Hide all steps
     document.querySelectorAll('[data-js="step"]').forEach(el => el.classList.add('u-hidden'));
+    
+    // Show target step
     document.getElementById(`step-${step}`).classList.remove('u-hidden');
     
+    // Update Progress Bar (3 steps total)
     const progress = document.getElementById('progress');
-    if(progress) progress.style.width = `${(step / 2) * 100}%`;
+    if(progress) progress.style.width = `${(step / 3) * 100}%`;
 
     const header = document.getElementById('form-header');
     if (header) header.scrollIntoView({ behavior: 'smooth' });
