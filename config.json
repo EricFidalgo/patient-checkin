@@ -39,7 +39,6 @@
         "Ascension", "Ascension Health",
         "Hennepin", "Hennepin Healthcare",
         "University of Texas", "UT System", "UT Select",
-        "State of North Carolina", "North Carolina State Health Plan",
         "BCBS Michigan", "Blue Cross Blue Shield of Michigan",
         "Independence Blue Cross", "IBX"
       ],
@@ -58,7 +57,10 @@
       }
     },
     "sehp_audit": {
-      "NC": { "status": "RED", "reason": "State Health Plan terminated coverage due to solvency concerns." },
+      "NC": { 
+          "status": "YELLOW", 
+          "reason": "Coverage reinstated for 2026 (starting Dec 2025) via direct manufacturer contracting. Strict Prior Authorization applies." 
+      },
       "CT": { "status": "YELLOW", "reason": "Mandatory 'Flyte' (Intellihealth) program enrollment required." },
       "NJ": { "status": "YELLOW", "reason": "Tiered Copay Penalty: $125/mo without lifestyle program, $45/mo with it." },
       "TN": { "status": "YELLOW", "reason": "2026 Coinsurance increased to 25%; removed from preventive list." },

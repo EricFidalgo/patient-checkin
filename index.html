@@ -57,6 +57,7 @@
         <option value="Zepbound">Zepbound (Tirzepatide)</option>
         <option value="Mounjaro">Mounjaro (Tirzepatide - Type 2 Focus)</option>
         <option value="Ozempic">Ozempic (Semaglutide - Type 2 Focus)</option>
+        <option value="Saxenda">Saxenda (Liraglutide)</option> </select>
       </select>
     </div>
     <div class="c-error-msg u-hidden" id="medication-error">
@@ -113,6 +114,9 @@
           <input type="checkbox" name="comorbidity" value="pcos" /> PCOS / Prediabetes
         </label>
         <label class="c-check-card">
+        <input type="checkbox" name="comorbidity" value="high_cholesterol" /> High Cholesterol
+        </label>
+        <label class="c-check-card">
           <input type="checkbox" name="comorbidity" value="none" /> None
         </label>
       </div>
@@ -166,6 +170,9 @@
                     <option value="BCBS">Blue Cross Blue Shield</option>
                     <option value="Cigna">Cigna</option>
                     <option value="UnitedHealthcare">UnitedHealthcare</option>
+                    <option value="Kaiser">Kaiser Permanente</option>
+                    <option value="Humana">Humana</option>
+                    <option value="Medicaid">Medicaid (State)</option>
                     <option value="Medicare">Medicare</option>
                     <option value="Other">Other / Commercial</option>
                   </select>
