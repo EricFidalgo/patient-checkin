@@ -76,27 +76,39 @@ export function runLoadingSequence(config, onComplete) {
     }, totalTime);
 }
 
-export function displayResult(resultType) {
+export function displayResult(resultData) {
+    // Handle cases where resultData might still be a string (backward compatibility)
+    const resultType = resultData.status || resultData;
+    const reasonText = resultData.reason || "Standard clinical criteria applied.";
+
     document.getElementById('email-gate').classList.add('u-hidden');
     document.getElementById('results-container').classList.remove('u-hidden');
 
     const resultIds = {
         'green': 'result-green',
         'yellow': 'result-yellow',
-        'red': 'result-red',
-        'grey': 'result-grey'
+        'red': 'result-red'
     };
     
+    // Hide all
     Object.values(resultIds).forEach(id => {
         const el = document.getElementById(id);
         if(el) el.classList.add('u-hidden');
     });
     
+    // Show Target
     const targetId = resultIds[resultType] || 'result-red';
     const targetEl = document.getElementById(targetId);
     targetEl.classList.remove('u-hidden');
 
-    // --- NEW: Inject Pricing Warnings ---
+    // --- FIX: Update the Existing Reason Text Element ---
+    const reasonEl = targetEl.querySelector('.js-reason-text');
+    if (reasonEl) {
+        reasonEl.textContent = `Logic Analysis: ${reasonText}`;
+        reasonEl.classList.remove('u-hidden'); 
+    }
+
+    // --- Pricing Warning Logic ---
     const config = getConfig();
     if (config && config.pricing_intelligence) {
         
