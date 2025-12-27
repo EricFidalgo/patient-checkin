@@ -30,7 +30,7 @@ export function populateFormInputs() {
         const container = document.getElementById(containerId);
         if (!container) return;
         
-        container.innerHTML = ''; 
+        container.innerHTML = ''; // Clear existing
 
         dataArray.forEach(item => {
             const label = document.createElement('label');
@@ -41,12 +41,30 @@ export function populateFormInputs() {
             input.name = inputName;
             input.value = item.value;
 
+            // --- NEW: Add Exclusivity Logic ---
+            input.addEventListener('change', function() {
+                const allChecks = container.querySelectorAll(`input[name="${inputName}"]`);
+                
+                if (this.value === 'none' && this.checked) {
+                    // If "None" is checked, uncheck everything else
+                    allChecks.forEach(cb => {
+                        if (cb !== this) cb.checked = false;
+                    });
+                } else if (this.value !== 'none' && this.checked) {
+                    // If any other option is checked, uncheck "None"
+                    allChecks.forEach(cb => {
+                        if (cb.value === 'none') cb.checked = false;
+                    });
+                }
+            });
+            // ----------------------------------
+
             label.appendChild(input);
             label.appendChild(document.createTextNode(' ' + item.label));
             container.appendChild(label);
         });
     };
-
+    
     createOptions('medication', formData.medications);
     createOptions('plan-source', formData.planSources);
     createOptions('carrier', formData.carriers);

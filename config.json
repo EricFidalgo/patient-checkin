@@ -57,7 +57,7 @@
       }
     },
     "sehp_audit": {
-      "NC": { "status": "RED", "reason": "Coverage for weight loss medications terminates effective Oct 1, 2025 due to state budget restrictions." },
+      "NC": { "status": "RED", "reason": "Coverage for weight loss medications terminated effective Oct 1, 2025 due to state budget restrictions." },
       "CT": { "status": "YELLOW", "reason": "Mandatory 'Flyte' (Intellihealth) program enrollment required." },
       "NJ": { "status": "YELLOW", "reason": "Tiered Copay Penalty: $125/mo without lifestyle program, $45/mo with it." },
       "TN": { "status": "YELLOW", "reason": "2026 Coinsurance increased to 25%; removed from preventive list." },
@@ -67,7 +67,7 @@
     },
     "carrier_logic": {
       "Kaiser": {
-        "id": "kp_2025",
+        "id": "kp_{{YEAR}}",
         "status": "yellow",
         "requires_closed_loop": true,
         "reason_text": "Kaiser requires enrollment in their internal 'Medical Weight Management Program'. External prescriptions are typically denied.",
@@ -84,7 +84,7 @@
         }
       },
       "Humana": {
-        "id": "hum_2025",
+        "id": "hum_{{YEAR}}",
         "status": "red",
         "reason_text": "Humana has exited the commercial employer market. If you have a legacy plan, coverage is unlikely.",
         "sub_plans": {
@@ -98,7 +98,7 @@
         }
       },
       "Medicaid": {
-        "id": "medicaid_2025",
+        "id": "medicaid_{{YEAR}}",
         "status": "dynamic",
         "logic_map": {
           "green_states": [],
@@ -115,14 +115,18 @@
               "reason_reinstated": "Benefit Reinstated: Coverage restored effective Dec 12, 2025."
             },
             "CA": {
-              "status": "yellow",
-              "warning_flag": "sunset_imminent",
-              "reason_text": "Currently covered (Yellow) with PA, but be advised: The State of California has scheduled this benefit to end on January 1, 2026."
+              "cutoff_date": "2026-01-01",
+              "status_pre": "yellow",
+              "status_post": "red",
+              "reason_pre": "Currently covered (Yellow) with PA, but be advised: The State of California has scheduled this benefit to end on January 1, 2026.",
+              "reason_post": "State Benefit Expired: As of Jan 1, 2026, California Medicaid no longer covers GLP-1 medications for weight loss."
             },
             "NH": {
-              "status": "yellow",
-              "warning_flag": "sunset_imminent",
-              "reason_text": "Currently covered (Yellow) with PA, but coverage ends Jan 1, 2026."
+              "cutoff_date": "2026-01-01",
+              "status_pre": "yellow",
+              "status_post": "red",
+              "reason_pre": "Currently covered (Yellow) with PA, but coverage ends Jan 1, 2026.",
+              "reason_post": "State Benefit Expired: Coverage ended effective Jan 1, 2026."
             }
           }
         }
@@ -155,7 +159,7 @@
     }
   },
   "pricing_intelligence": {
-    "savings_card_warning": "Warning: 2025 Accumulator Adjustments may prevent this card from counting toward your deductible.",
+    "savings_card_warning": "Warning: {{YEAR}} Accumulator Adjustments may prevent this card from counting toward your deductible.",
     "compounding_warning": "Regulatory Notice: FDA shortage resolutions have restricted access to $199 compounded pricing effective May 22, 2025.",
     "accumulator_ban_states": ["AZ", "AR", "CO", "CT", "DE", "GA", "IL", "KY", "LA", "ME", "NM", "NY", "NC", "OK", "OR", "TN", "TX", "VT", "VA", "WA", "WV"],
     "prices": {
@@ -171,9 +175,9 @@
         { "percent": 100, "time_ms": 3500 }
       ],
       "text_updates": [
-        { "text": "Analyzing 2025 Actuarial Tables...", "time_ms": 800 },
-        { "text": "Verifying 'Closed Loop' Attribution...", "time_ms": 1800 },
-        { "text": "Checking Medicaid Sunset Dates...", "time_ms": 2800 }
+        { "text": "Scanning {{YEAR}} Commercial Payer Rules...", "time_ms": 800 },
+        { "text": "Identifying Pharmacy Partner Availability...", "time_ms": 1800 },
+        { "text": "Calculating Copay & Savings Eligibility...", "time_ms": 2800 }
       ]
     }
   }

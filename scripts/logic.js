@@ -27,7 +27,7 @@ export function determineCoverageStatus(inputData) {
     if (medication === 'Saxenda') {
         return {
             status: 'yellow',
-            reason: "Not a preferred 'Green' option. Saxenda often requires the same PA as Wegovy and is increasingly classified as non-preferred (Tier 3) due to lower efficacy. Plans typically require a trial of oral Phentermine first."
+            reason: "Saxenda often requires the same PA as Wegovy and is increasingly classified as non-preferred (Tier 3) due to lower efficacy. Plans typically require a trial of oral Phentermine first."
         };
     }
 
@@ -154,29 +154,35 @@ export function determineCoverageStatus(inputData) {
          }
 
          // 2. Sunset States (Date Aware)
-         if (mcdRules.sunset_states[state]) {
-             const sunsetRule = mcdRules.sunset_states[state];
-             
-             // [UPDATED] NC Specific Reinstatement Logic
-             if (state === 'NC') {
-                 const cutoff = new Date(sunsetRule.cutoff_date); // 2025-10-01
-                 const reinstatement = new Date('2025-12-12'); // Reinstatement Date
-                 
-                 // If we are past the reinstatement date
-                 if (today >= reinstatement) {
-                    return { status: 'yellow', reason: "Benefit Reinstated: Effective Dec 12, 2025, NC Medicaid has restored coverage for weight loss medications." };
-                 }
+        if (mcdRules.sunset_states[state]) {
+            const sunsetRule = mcdRules.sunset_states[state];
+            
+            // Check if a cutoff date exists and if we have passed it
+            if (sunsetRule.cutoff_date && today >= new Date(sunsetRule.cutoff_date)) {
+                
+                // If passed cutoff, check if there is a Reinstatement Date (e.g., NC)
+                // AND if we have passed that date too.
+                if (sunsetRule.reinstatement_date && today >= new Date(sunsetRule.reinstatement_date)) {
+                    return { 
+                        status: sunsetRule.status_reinstated || 'yellow', 
+                        reason: sunsetRule.reason_reinstated 
+                    };
+                }
 
-                 // If we are in the "blackout" period
-                 if (today >= cutoff) {
-                     return { status: 'red', reason: sunsetRule.reason_post };
-                 }
-                 return { status: 'yellow', reason: "Currently covered, but Benefit Terminated effective Oct 1, 2025 (Restores Dec 12, 2025)." };
-             }
-             
-             // CA / NH Warnings
-             return { status: 'yellow', reason: sunsetRule.reason_text };
-         }
+                // If past cutoff and NOT reinstated (or no reinstatement exists) -> Expired (RED)
+                return { 
+                    status: sunsetRule.status_post || 'red', 
+                    reason: sunsetRule.reason_post 
+                };
+            }
+
+            // If BEFORE the cutoff date -> Still Valid (YELLOW)
+            // Uses 'reason_pre' (warning text) or falls back to 'reason_text'
+            return { 
+                status: sunsetRule.status_pre || 'yellow', 
+                reason: sunsetRule.reason_pre || sunsetRule.reason_text 
+            };
+        }
 
          // 3. Yellow States
          if (mcdRules.yellow_states.includes(state)) {
