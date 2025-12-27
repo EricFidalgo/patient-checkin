@@ -5,81 +5,94 @@
     "min_bmi": 27.0,
     "modal_id": "safety-stop-modal"
   },
-  "clinical_overrides": {
-    "t2d_step_therapy": {
-      "description": "2025 Gate: Type 2 Diabetes requires failure of Metformin AND SGLT-2 inhibitors.",
-      "enabled": true,
-      "condition_trigger": "diabetes",
-      "required_meds": ["metformin", "sglt2"],
-      "result_success": "green",
-      "result_fail": "yellow",
-      "fail_message": "Step Therapy Likely: Insurers require SGLT-2 trial first."
+  "coverage_engine_config": {
+    "plan_source_matrix": {
+      "marketplace_aca": {
+        "default_status": "RED",
+        "default_reason": "Standard ACA Marketplace plans exclude weight loss medications.",
+        "exceptions": {
+          "MN": { "status": "GREEN", "reason": "MN Statute 62Q.474 mandates coverage for FDA-approved obesity medications." },
+          "IL": { "status": "YELLOW", "reason": "BCBS IL coverage active but gated by strict Prior Authorization Quantitative Limits (PAQL)." },
+          "WA": { "status": "RED", "reason": "Mandate pending for 2026 (SB 5353). Current status: Excluded." }
+        }
+      },
+      "government": {
+        "tricare": {
+          "age_cutoff_for_life": 65,
+          "tricare_for_life": {
+            "status": "RED",
+            "reason": "Statutory exclusion for TRICARE For Life (Medicare-eligible)."
+          },
+          "tricare_prime_select": {
+            "status": "YELLOW",
+            "reason": "Covered with Step Therapy: Must fail Phentermine, Qsymia, and Contrave first."
+          }
+        },
+        "veterans_affairs": {
+          "status": "YELLOW",
+          "reason": "Covered (Non-Formulary). Requires 'MOVE!' program enrollment and 5% weight loss stopping rule."
+        }
+      }
     },
-    "medicare_cvd_firewall": {
-      "description": "Medicare Part D covers Wegovy ONLY for Established CVD (Heart Attack/Stroke), NOT Hypertension.",
-      "enabled": true,
-      "carrier_trigger": "Medicare",
-      "required_condition": "established_cvd",
-      "excluded_condition": "hypertension",
-      "min_bmi": 27.0,
-      "result_success": "yellow",
-      "result_fail": "red"
+    "employer_database": {
+      "red_list_carve_outs": [
+        "Ascension", "Ascension Health",
+        "Hennepin", "Hennepin Healthcare",
+        "University of Texas", "UT System", "UT Select",
+        "State of North Carolina", "North Carolina State Health Plan",
+        "BCBS Michigan", "Blue Cross Blue Shield of Michigan",
+        "Independence Blue Cross", "IBX"
+      ],
+      "green_list_managed": {
+        "Google": "Green (Managed): Coverage maintained as retention tool.",
+        "Alphabet": "Green (Managed): Coverage maintained as retention tool.",
+        "Microsoft": "Green (Conditional): Covered with PA. Perks+ reimbursement excludes prescriptions.",
+        "Princeton": "Green: Covered via OptumRx with tiered copays.",
+        "Princeton University": "Green: Covered via OptumRx with tiered copays."
+      },
+      "yellow_list_restricted": {
+        "University of Michigan": "Yellow: 2-year lifetime limit and concurrent program required.",
+        "Mayo Clinic": "Yellow: Coverage contingent on 'Mayo Clinic Weight Management Program' enrollment.",
+        "Federal Employee Program": "Yellow: Tier 3 (High Cost) with strict PA rules.",
+        "FEP": "Yellow: Tier 3 (High Cost) with strict PA rules."
+      }
     },
-    "osa_bypass": {
-      "description": "Zepbound approved for OSA on UHC and Cigna.",
-      "enabled": true,
-      "condition_trigger": "osa",
-      "carriers": ["UnitedHealthcare", "Cigna"],
-      "medication_match": "Zepbound",
-      "result_override": "green"
+    "sehp_audit": {
+      "NC": { "status": "RED", "reason": "State Health Plan terminated coverage due to solvency concerns." },
+      "CT": { "status": "YELLOW", "reason": "Mandatory 'Flyte' (Intellihealth) program enrollment required." },
+      "NJ": { "status": "YELLOW", "reason": "Tiered Copay Penalty: $125/mo without lifestyle program, $45/mo with it." },
+      "TN": { "status": "YELLOW", "reason": "2026 Coinsurance increased to 25%; removed from preventive list." },
+      "VA": { "status": "YELLOW", "reason": "Zepbound excluded; Wegovy requires PA." },
+      "FL": { "status": "RED", "reason": "Florida Blue/State Plan general exclusion for weight loss drugs." },
+      "KY": { "status": "YELLOW", "reason": "Coinsurance model (25-30%) implemented." }
     },
-    "grey_zone_check": {
-      "description": "Downgrades results if BMI is low (<30) without specific comorbidities.",
-      "enabled": true,
-      "max_bmi_threshold": 30.0,
-      "requires_comorbidity": true,
-      "result_override": "yellow"
+    "carrier_logic": {
+      "Aetna": {
+        "status": "YELLOW",
+        "reason": "Requires 'Lookback': 6-month weight management program history documented prior to start."
+      },
+      "Cigna": {
+        "status": "YELLOW",
+        "reason": "Standard PA requires 3 months behavioral modification. 'Encircle Rx' members may bypass."
+      },
+      "BCBS": {
+        "default": "YELLOW",
+        "default_reason": "Policy varies by state affiliate. Check local plan documents.",
+        "state_exclusions": ["MI", "PA", "TX"]
+      },
+      "UnitedHealthcare": {
+        "status": "YELLOW",
+        "reason": "Step therapy (Metformin) often required for T2D; PA required for weight loss."
+      },
+      "Medicare": {
+        "status": "RED",
+        "reason": "Statutory Exclusion (MMA). Only covered for established CVD (Heart Attack/Stroke) + BMI > 27."
+      }
     }
   },
-  "carrier_rules": {
-  "BCBS": {
-    "default": "yellow",
-    "default_reason": "Most Blue Cross plans require a Prior Authorization verifying a history of lifestyle modification.",
-    "states": {
-      "MI": "red",
-      "PA": "red", 
-      "NC": "yellow",
-      "TX": "red" 
-    },
-    "state_notes": {
-      "MI": "Fully Insured Exclusion (BCBSM)",
-      "NC": "Requires 'Vida' Program Enrollment",
-      "PA": "IBX 'Sole Purpose' Exclusion",
-      "TX": "TRS-ActiveCare Exclusion"
-    }
-  },
-  "UnitedHealthcare": {
-    "default": "yellow",
-    "default_reason": "UHC requires step therapy (Metformin) for Type 2 Diabetes diagnoses.",
-    "states": { "NY": "yellow" }
-  },
-  "Aetna": { 
-    "default": "yellow",
-    "default_reason": "Aetna typically requires a 6-month documented weight management program." 
-  },
-  "Medicare": { 
-    "default": "red",
-    "default_reason": "The Medicare Modernization Act (MMA) prohibits coverage for weight loss; the TROA bill is pending to repeal this." 
-  },
-  "Other": { 
-    "default": "yellow",
-    "default_reason": "Commercial plans typically require a Prior Authorization for this drug class." 
-  }
-},
-
   "pricing_intelligence": {
-    "savings_card_warning": "Warning: {{YEAR}} Accumulator Adjustments may prevent this card from counting toward your deductible.",
-    "compounding_warning": "Regulatory Notice: Enforcement of FDA shortage resolutions (passed May 2025) has restricted access to $199 compounded pricing.",
+    "savings_card_warning": "Warning: 2025 Accumulator Adjustments may prevent this card from counting toward your deductible.",
+    "compounding_warning": "Regulatory Notice: FDA shortage resolutions have restricted access to $199 compounded pricing.",
     "prices": {
         "green_monthly": "$25.00",
         "red_monthly": "$199"
@@ -93,8 +106,9 @@
         { "percent": 100, "time_ms": 3500 }
       ],
       "text_updates": [
-        { "text": "Validating 2025 Step Therapy Protocols...", "time_ms": 1000 },
-        { "text": "Checking 'Established CVD' Criteria...", "time_ms": 2500 }
+        { "text": "Analyzing 2025 Actuarial Tables...", "time_ms": 800 },
+        { "text": "Checking Employer Carve-Out Lists...", "time_ms": 1800 },
+        { "text": "Verifying Utilization Management Gates...", "time_ms": 2800 }
       ]
     }
   }

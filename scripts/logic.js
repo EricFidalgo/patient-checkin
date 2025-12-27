@@ -3,91 +3,152 @@ import { getConfig } from './config.js';
 
 export function determineCoverageStatus(inputData) {
     const config = getConfig();
-    // Return object structure even for fallback
     if (!config) return { status: 'yellow', reason: 'Configuration Error: Rules not loaded.' };
 
-    const { carrier, state, bmi, comorbidities, medication, medicationHistory } = inputData;
-    const overrides = config.clinical_overrides || {};
+    const { 
+        carrier, 
+        state, 
+        bmi, 
+        age,
+        comorbidities, 
+        planSource, 
+        employerName 
+    } = inputData;
 
-    // RULE 1: T2D Step Therapy Check
-    if (overrides.t2d_step_therapy?.enabled && comorbidities.includes(overrides.t2d_step_therapy.condition_trigger)) {
-        const required = overrides.t2d_step_therapy.required_meds;
-        // Safety check: ensure medicationHistory exists (default to empty array if undefined)
-        const history = medicationHistory || [];
-        const hasStepTherapy = required.every(med => history.includes(med));
-        
-        if (hasStepTherapy) {
+    const rules = config.coverage_engine_config;
+
+    // ---------------------------------------------------------
+    // TIER 1: EMPLOYER CHECK (Highest Priority)
+    // ---------------------------------------------------------
+    if (planSource === 'employer' && employerName) {
+        const cleanName = employerName.toLowerCase().trim();
+        const db = rules.employer_database;
+
+        // 1. Red List (Carve Outs)
+        const isRed = db.red_list_carve_outs.some(name => cleanName.includes(name.toLowerCase()));
+        if (isRed) {
             return { 
-                status: overrides.t2d_step_therapy.result_success, 
-                reason: "Approved: Type 2 Diabetes diagnosis with verified step therapy (Metformin + SGLT-2) history."
+                status: 'red', 
+                reason: `Employer Carve-Out: ${employerName} has explicitly terminated coverage for weight loss medications.` 
             };
-        } else {
-            return { 
-                status: overrides.t2d_step_therapy.result_fail, 
-                reason: overrides.t2d_step_therapy.fail_message || "Step Therapy Required: Missing required trial of Metformin and/or SGLT-2 inhibitors."
-            };
+        }
+
+        // 2. Green List (Managed)
+        const greenKey = Object.keys(db.green_list_managed).find(key => cleanName.includes(key.toLowerCase()));
+        if (greenKey) {
+            return { status: 'green', reason: db.green_list_managed[greenKey] };
+        }
+
+        // 3. Yellow List (Restricted)
+        const yellowKey = Object.keys(db.yellow_list_restricted).find(key => cleanName.includes(key.toLowerCase()));
+        if (yellowKey) {
+            return { status: 'yellow', reason: db.yellow_list_restricted[yellowKey] };
         }
     }
 
-    // RULE 2: Medicare "Established CVD" Firewall
-    const medicareRule = overrides.medicare_cvd_firewall;
-    if (medicareRule?.enabled && carrier === medicareRule.carrier_trigger) {
-        const hasEstablished = comorbidities.includes(medicareRule.required_condition);
-        
-        if (hasEstablished && bmi >= medicareRule.min_bmi) {
-            return { 
-                status: medicareRule.result_success, 
-                reason: "Medicare Exception: Covered for Established CVD (Heart Attack/Stroke/PAD)."
-            };
-        }
-        return { 
-            status: medicareRule.result_fail, 
-            reason: "Medicare Exclusion: Weight loss drugs are not covered for Hypertension alone without established CVD."
+    // ---------------------------------------------------------
+    // TIER 2: STATE EMPLOYEE HEALTH PLAN (SEHP) AUDIT
+    // ---------------------------------------------------------
+    // If they selected Employer Source and didn't match a specific name, 
+    // check if they are in a state with strict SEHP rules.
+    // (Assumption: State employees often select "Employer" + their State)
+    if (planSource === 'employer' && rules.sehp_audit[state]) {
+        // We add a disclaimer that this applies if they are a state employee
+        const sehpRule = rules.sehp_audit[state];
+        // If the rule is RED, we warn them. If it's YELLOW, we warn them.
+        // We append a note about SEHP relevance.
+        return {
+            status: sehpRule.status.toLowerCase(),
+            reason: `State Plan Audit (${state}): ${sehpRule.reason} (Applies to State Employees).`
         };
     }
 
-    // RULE 3: OSA Bypass
-    const osaRule = overrides.osa_bypass;
-    if (osaRule?.enabled && osaRule.carriers.includes(carrier)) {
-        if (comorbidities.includes(osaRule.condition_trigger) && medication === osaRule.medication_match) {
-            return { 
-                status: osaRule.result_override, 
-                reason: `OSA Exception: ${carrier} specifically covers Zepbound for Obstructive Sleep Apnea.`
+    // ---------------------------------------------------------
+    // TIER 3: GOVERNMENT PAYER LOGIC
+    // ---------------------------------------------------------
+    if (planSource === 'govt') {
+        const govtRules = rules.plan_source_matrix.government;
+        
+        // TRICARE Logic
+        // If carrier is explicitly TriCare or inferred from Govt source
+        if (carrier === 'Other' || carrier === 'UnitedHealthcare' || true) { // Broad catch for Govt source
+             // TriCare For Life (Age 65+)
+             if (age >= govtRules.tricare.age_cutoff_for_life) {
+                 return {
+                     status: govtRules.tricare.tricare_for_life.status.toLowerCase(),
+                     reason: govtRules.tricare.tricare_for_life.reason
+                 };
+             }
+             // TriCare Prime/Select (Under 65)
+             return {
+                 status: govtRules.tricare.tricare_prime_select.status.toLowerCase(),
+                 reason: govtRules.tricare.tricare_prime_select.reason
+             };
+        }
+    }
+
+    // ---------------------------------------------------------
+    // TIER 4: MARKETPLACE (ACA) LOGIC
+    // ---------------------------------------------------------
+    if (planSource === 'marketplace') {
+        const mktRules = rules.plan_source_matrix.marketplace_aca;
+        const stateRule = mktRules.exceptions[state];
+
+        if (stateRule) {
+            return {
+                status: stateRule.status.toLowerCase(),
+                reason: stateRule.reason
+            };
+        }
+        
+        // Default Marketplace
+        return {
+            status: mktRules.default_status.toLowerCase(),
+            reason: mktRules.default_reason
+        };
+    }
+
+    // ---------------------------------------------------------
+    // TIER 5: CARRIER LOGIC (Standard Commercial)
+    // ---------------------------------------------------------
+    const carrierRules = rules.carrier_logic[carrier] || rules.carrier_logic["BCBS"]; // Fallback style
+    
+    // Medicare Override (Defined in carrier logic)
+    if (carrier === 'Medicare') {
+        // Check for Established CVD Exception
+        if (comorbidities.includes('established_cvd') && bmi >= 27) {
+            return {
+                status: 'yellow',
+                reason: "Medicare Exception: Coverage likely for Established CVD diagnosis. (Hypertension alone is excluded)."
+            };
+        }
+        return {
+            status: carrierRules.status.toLowerCase(),
+            reason: carrierRules.reason
+        };
+    }
+
+    // BCBS Special Handling
+    if (carrier === 'BCBS') {
+        if (carrierRules.state_exclusions && carrierRules.state_exclusions.includes(state)) {
+            return {
+                status: 'red',
+                reason: `BCBS ${state} Exclusion: Fully insured plans in your state have terminated weight loss coverage.`
             };
         }
     }
 
-    // RULE 4: Carrier/State Rules
-    const carrierRules = config.carrier_rules[carrier] || config.carrier_rules["Other"];
-    const stateRule = carrierRules.states?.[state];
-    let result = stateRule || carrierRules.default;
-    
-    // Create a dynamic reason based on the lookup
-    let baseReason = carrierRules.default_reason || `Standard Payer Policy: ${carrier} typically reviews these requests on a case-by-case basis.`;
-
-    // 2. Check for a specific State override note (highest priority)
-    if (carrierRules.state_notes && carrierRules.state_notes[state]) {
-        baseReason = carrierRules.state_notes[state];
+    // Default Carrier Result
+    if (carrierRules) {
+        return {
+            status: (carrierRules.status || 'yellow').toLowerCase(),
+            reason: carrierRules.reason || carrierRules.default_reason
+        };
     }
 
-    // RULE 5: Grey Zone (Downgrade)
-    const greyRule = overrides.grey_zone_check;
-    // Filter out "none" to see if real comorbidities exist
-    const hasComorbidities = comorbidities.length > 0 && !comorbidities.includes('none');
-    
-    if (greyRule?.enabled) {
-        if ((result === 'green' || result === 'yellow') && bmi < greyRule.max_bmi_threshold && !hasComorbidities) {
-            return { 
-                status: greyRule.result_override, 
-                reason: "Clinical Mismatch: BMI is below 30 without comorbidities. PA will likely require peer-to-peer review."
-            };
-        }
-    }
-
-    return { status: result, reason: baseReason };
+    return { status: 'yellow', reason: 'Standard Payer Policy: Prior Authorization likely required.' };
 }
 
-// --- MISSING FUNCTION RESTORED BELOW ---
 export function checkSafetyStop(bmi) {
     const config = getConfig();
     if (!config || !config.safety_stop?.enabled) return { safe: true };
