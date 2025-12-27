@@ -74,8 +74,10 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     const carrier = document.getElementById('carrier');
     const state = document.getElementById('state');
     const planSource = document.getElementById('plan-source');
-    const employerNameInput = document.getElementById('employer-name'); // Get the input
+    const employerNameInput = document.getElementById('employer-name'); 
     const medication = document.getElementById('medication');
+    // [NEW] Capture the lifestyle program checkbox (safely handles if element is missing)
+    const lifestyleInput = document.getElementById('lifestyle-program');
 
     let isValid = true;
 
@@ -105,13 +107,15 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     const inputData = {
         carrier: carrier.value,
         state: state.value,
-        planSource: planSource.value, // Added planSource
-        employerName: employerNameInput ? employerNameInput.value : '', // Added employerName
+        planSource: planSource.value,
+        employerName: employerNameInput ? employerNameInput.value : '',
         bmi: parseFloat(document.getElementById('bmi').value),
         age: parseInt(document.getElementById('age').value),
         comorbidities: Array.from(document.querySelectorAll('input[name="comorbidity"]:checked')).map(cb => cb.value),
         medicationHistory: Array.from(document.querySelectorAll('input[name="med_history"]:checked')).map(cb => cb.value),
-        medication: medication.value 
+        medication: medication.value,
+        // [NEW] Pass the enrollment status to logic.js
+        lifestyleProgramEnrollment: lifestyleInput ? lifestyleInput.checked : false
     };
 
     currentResultType = determineCoverageStatus(inputData);
