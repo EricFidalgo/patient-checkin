@@ -114,7 +114,6 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
         age: parseInt(document.getElementById('age').value),
         // Collect checkboxes from Step 1
         comorbidities: Array.from(document.querySelectorAll('input[name="comorbidity"]:checked')).map(cb => cb.value),
-        // NEW: Collect Medication History for Step Therapy Logic
         medicationHistory: Array.from(document.querySelectorAll('input[name="med_history"]:checked')).map(cb => cb.value),
         medication: medication.value 
     };

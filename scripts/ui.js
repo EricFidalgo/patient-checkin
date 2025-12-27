@@ -37,14 +37,17 @@ export function clearError(elementId) {
 }
 
 export function transitionToStep(step) {
+    // 1. Swap the steps
     document.querySelectorAll('[data-js="step"]').forEach(el => el.classList.add('u-hidden'));
     document.getElementById(`step-${step}`).classList.remove('u-hidden');
+    
+    // 2. Update progress bar
     const progress = document.getElementById('progress');
     if(progress) progress.style.width = `${(step / 2) * 100}%`;
-}
 
-export function showModal(modalId) {
-    document.getElementById(modalId).classList.remove('u-hidden');
+    // 3. Scroll up to the header text
+    const header = document.getElementById('form-header');
+    if (header) header.scrollIntoView({ behavior: 'smooth' });
 }
 
 export function runLoadingSequence(config, onComplete) {
@@ -52,12 +55,14 @@ export function runLoadingSequence(config, onComplete) {
     const loadingText = document.getElementById('loading-text');
     const loadingBar = document.getElementById('loading-bar');
     
+    // 1. Hide Form & Show Loader
     document.getElementById('form-container').classList.add('u-hidden');
-    const intro = document.getElementById('intro-section');
-    if(intro) intro.classList.add('u-hidden');
-    
     loadingState.classList.remove('u-hidden');
 
+    // 2. --- FIX: Scroll all the way to the top of the page ---
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // 3. Start Animation
     const animSettings = config.ui_settings.loading_animation;
 
     animSettings.steps.forEach(step => {

@@ -713,3 +713,8 @@ body {
   border-left-color: var(--color-error);
   color: #991b1b; /* Red-800 */
 }
+
+#form-header {
+  /* This creates the magic offset gap at the top */
+  scroll-margin-top: 15px; 
+}
