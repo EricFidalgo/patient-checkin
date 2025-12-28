@@ -64,7 +64,7 @@ export function populateFormInputs() {
             container.appendChild(label);
         });
     };
-    
+
     createOptions('medication', formData.medications);
     createOptions('plan-source', formData.planSources);
     createOptions('carrier', formData.carriers);
@@ -72,6 +72,24 @@ export function populateFormInputs() {
 
     createCheckboxes('med-history-grid', formData.medicationHistory, 'med_history');
     createCheckboxes('comorbidity-grid', formData.comorbidities, 'comorbidity');
+}
+
+export function toggleCarrierField() {
+    const carrier = document.getElementById('carrier').value;
+    const otherField = document.getElementById('other-carrier-field');
+    
+    // Clear error style if they change selection
+    document.getElementById('carrier').classList.remove('border-red-500');
+    document.getElementById('carrier-error').classList.add('u-hidden');
+
+    if (carrier === 'Other') {
+        otherField.classList.remove('u-hidden');
+    } else {
+        otherField.classList.add('u-hidden');
+        // Clear value if they switch away so we don't submit bad data
+        const otherInput = document.getElementById('other-carrier-name');
+        if(otherInput) otherInput.value = ''; 
+    }
 }
 
 export function toggleEmployerField() {

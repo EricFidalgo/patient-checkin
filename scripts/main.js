@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupInputConstraints();
 
     window.toggleEmployerField = UI.toggleEmployerField;
+    window.toggleCarrierField = UI.toggleCarrierField;
     window.clearError = UI.clearError;
     window.nextStep = handleNextStep; 
 });
@@ -171,6 +172,9 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
 
     const inputData = {
         carrier: carrier.value,
+        carrierSpecificName: (carrier.value === 'Other') 
+        ? document.getElementById('other-carrier-name').value 
+        : carrier.value,
         state: document.getElementById('state').value,
         planSource: planSource.value,
         employerName: employerNameInput ? employerNameInput.value : '',
@@ -254,6 +258,19 @@ function validateMemberID(carrier, rawId) {
                 return { valid: false, msg: "Invalid format for Tricare ID." };
             }
             break;
+        case 'Ambetter':
+          // Ambetter often starts with U (e.g. U12345678) or is numeric
+          if (!/^[A-Z0-9]+$/.test(id)) { 
+                return { valid: false, msg: "Invalid Ambetter ID format." };
+          }
+          break;
+
+      case 'Molina':
+          // Molina is typically 9-12 digits
+          if (!/^\d+$/.test(id)) {
+                return { valid: false, msg: "Molina IDs are typically numbers only." };
+          }
+          break;
     }
 
     return { valid: true };

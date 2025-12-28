@@ -11,16 +11,19 @@ export const formData = {
     planSources: [
         { value: "employer", label: "Through my Job (Employer)" },
         { value: "marketplace", label: "Marketplace" },
-        { value: "govt", label: "Government (VA/TriCare)" },
+        { value: "govt", label: "Government / Military" },
         { value: "direct", label: "Direct Private Purchase" }
     ],
     carriers: [
         { value: "Aetna", label: "Aetna" },
+        { value: "Ambetter", label: "Ambetter (Centene)" },
         { value: "BCBS", label: "Blue Cross Blue Shield" },
         { value: "Cigna", label: "Cigna" },
         { value: "UnitedHealthcare", label: "UnitedHealthcare" },
         { value: "Kaiser", label: "Kaiser Permanente" },
         { value: "Humana", label: "Humana" },
+        { value: "Molina", label: "Molina Healthcare" },
+        { value: "Tricare", label: "Tricare (Military)" },
         { value: "Medicaid", label: "Medicaid (State)" },
         { value: "Medicare", label: "Medicare" },
         { value: "Other", label: "Other / Commercial" }

@@ -155,14 +155,19 @@
                 <div class="c-form-group l-col-span-full"> 
                     <label class="c-label">Primary Carrier <span class="u-text-error">*</span></label>
                     <div class="c-select-wrap">
-                    <select id="carrier" class="c-select">
-                        <option value="" disabled selected>Select provider...</option>
-                    </select>
+                        <select id="carrier" class="c-select" onchange="toggleCarrierField()">
+                            <option value="" disabled selected>Select provider...</option>
+                        </select>
                     </div>
                     <div class="c-error-msg u-hidden" id="carrier-error">
-                    <span class="material-symbols-outlined c-error-icon">error</span>
-                    Selection required
+                        <span class="material-symbols-outlined c-error-icon">error</span>
+                        Selection required
                     </div>
+                </div>
+
+                <div class="c-form-group l-col-span-full u-hidden" id="other-carrier-field">
+                    <label class="c-label">Please Specify Carrier Name</label>
+                    <input type="text" id="other-carrier-name" class="c-input" placeholder="e.g. Oscar, Ambetter, Meritain..." />
                 </div>
 
                 <div class="c-form-group l-col-span-full">
