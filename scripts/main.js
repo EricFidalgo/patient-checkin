@@ -23,37 +23,63 @@ document.addEventListener('DOMContentLoaded', async () => {
 function setupInputConstraints() {
     const ageInput = document.getElementById('age');
     const bmiInput = document.getElementById('bmi');
-    const memberIdInput = document.getElementById('member-id'); // Added Member ID
+    const memberIdInput = document.getElementById('member-id');
     const invalidChars = ['e', 'E', '+', '-'];
 
+    // 1. Block "e", "+", "-" on Keydown (Works for Desktop)
     const blockKeys = (e, extraBlocked = []) => {
         if (invalidChars.includes(e.key) || extraBlocked.includes(e.key)) {
             e.preventDefault();
         }
     };
 
-    if (ageInput) ageInput.addEventListener('keydown', (e) => blockKeys(e, ['.']));
+    if (ageInput) {
+        // Desktop Prevention
+        ageInput.addEventListener('keydown', (e) => blockKeys(e, ['.'])); // Block Dot
+        
+        // Mobile/Paste Prevention (The iOS Fix)
+        ageInput.addEventListener('input', function() {
+            // Strictly replace anything that is NOT a number 0-9
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    }
+
     if (bmiInput) {
+        // Desktop Prevention
         bmiInput.addEventListener('keydown', (e) => blockKeys(e));
+
+        // Mobile/Paste Prevention (The iOS Fix)
+        bmiInput.addEventListener('input', function() {
+            // 1. Allow only numbers and dots
+            let val = this.value.replace(/[^0-9.]/g, '');
+            
+            // 2. Prevent double decimals (e.g. "31.5.5")
+            const parts = val.split('.');
+            if (parts.length > 2) {
+                // Keep the first part and the first decimal, join the rest
+                val = parts[0] + '.' + parts.slice(1).join('');
+            }
+            this.value = val;
+        });
+
+        // Format to 1 decimal on blur (e.g. "31" -> "31.0")
         bmiInput.addEventListener('change', function() {
-            if (this.value) this.value = parseFloat(this.value).toFixed(1);
+            if (this.value) {
+                this.value = parseFloat(this.value).toFixed(1);
+            }
         });
     }
     
-    // NEW: Clean Member ID on blur (remove spaces/dashes for consistency)
     if (memberIdInput) {
-        memberIdInput.addEventListener('change', function() {
-            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-        });
-        // Clear error when user starts typing
-        memberIdInput.addEventListener('input', () => {
-             memberIdInput.classList.remove('border-red-500');
+        // Clean Member ID (Uppercase + No Special Chars)
+        memberIdInput.addEventListener('input', function() {
+             this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+             this.classList.remove('border-red-500');
              const existingErr = document.getElementById('member-id-error');
              if (existingErr) existingErr.classList.add('u-hidden');
         });
     }
 }
-
 // --- STEP HANDLER ---
 function handleNextStep(targetStep) {
     if (!getConfig()) return;
