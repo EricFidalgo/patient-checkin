@@ -15,11 +15,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     const year = new Date().getFullYear();
     document.querySelectorAll('.current-year').forEach(el => el.textContent = year);
     
+    // 3. Setup Input Constraints (New Helper)
+    setupInputConstraints();
+
     window.toggleEmployerField = UI.toggleEmployerField;
     window.clearError = UI.clearError;
     window.nextStep = handleNextStep; 
 });
 
+// --- NEW HELPER FUNCTION ---
+function setupInputConstraints() {
+    const ageInput = document.getElementById('age');
+    const bmiInput = document.getElementById('bmi');
+    const invalidChars = ['e', 'E', '+', '-']; // Characters to block
+
+    // Helper to block keys
+    const blockKeys = (e, extraBlocked = []) => {
+        if (invalidChars.includes(e.key) || extraBlocked.includes(e.key)) {
+            e.preventDefault();
+        }
+    };
+
+    if (ageInput) {
+        ageInput.addEventListener('keydown', (e) => {
+            // Block standard invalid chars AND decimal point (.)
+            blockKeys(e, ['.']);
+        });
+    }
+
+    if (bmiInput) {
+        bmiInput.addEventListener('keydown', (e) => blockKeys(e));
+        
+        // Auto-format to 2 decimal places when the user clicks away
+        bmiInput.addEventListener('change', function() {
+            if (this.value) {
+                // Rounds to 2 decimals (e.g., 31.567 -> 31.57)
+                this.value = parseFloat(this.value).toFixed(2);
+            }
+        });
+    }
+}
 // --- STEP HANDLER ---
 function handleNextStep(targetStep) {
     if (!getConfig()) return;
