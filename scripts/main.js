@@ -99,8 +99,18 @@ function handleNextStep(targetStep) {
             bmi.classList.add('border-red-500');
             isValid = false;
         }
-        if (!age.value) {
-            document.getElementById('age-error').classList.remove('u-hidden');
+        // Checks if empty OR if less than 18
+        if (!age.value || parseInt(age.value) < 18) {
+            const ageErr = document.getElementById('age-error');
+            ageErr.classList.remove('u-hidden');
+            
+            // Optional: Update text dynamically to explain why
+            if (parseInt(age.value) < 18) {
+                 ageErr.innerHTML = '<span class="material-symbols-outlined c-error-icon">error</span> Must be 18+';
+            } else {
+                 ageErr.innerHTML = '<span class="material-symbols-outlined c-error-icon">error</span> Required';
+            }
+            
             age.classList.add('border-red-500');
             isValid = false;
         }
