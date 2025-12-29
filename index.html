@@ -67,20 +67,50 @@
     </div>
 
     <div class="c-form-group l-col-span-full">
-      <label class="c-label">Conditions <span class="u-text-error">*</span> <span class="c-label__sub">(Check all that apply)</span></label>
-      <div class="c-check-grid l-grid-2" id="comorbidity-grid"></div>
-      <div class="c-error-msg u-hidden" id="comorbidity-error">
-        <span class="material-symbols-outlined c-error-icon">error</span>
-        Selection required
+      <label class="c-label">Do you have any diagnosed health conditions? <span class="u-text-error">*</span></label>
+      
+      <div class="l-grid-2 u-mb-md">
+        <label class="c-check-card u-justify-center">
+          <input type="radio" name="gate_conditions" value="no" onchange="toggleGrid('conditions', false)">
+          <span>None of these apply to me</span>
+        </label>
+        <label class="c-check-card u-justify-center">
+          <input type="radio" name="gate_conditions" value="yes" onchange="toggleGrid('conditions', true)">
+          <span>Yes, I have conditions</span>
+        </label>
+      </div>
+
+      <div class="c-error-msg u-hidden u-mb-sm" id="comorbidity-error">
+          <span class="material-symbols-outlined c-error-icon">error</span>
+          Please select "No" or choose your conditions.
+      </div>
+
+      <div id="wrapper-conditions" class="u-hidden">
+          <div class="c-check-grid l-grid-2" id="comorbidity-grid"></div>
       </div>
     </div>
 
     <div class="c-form-group l-col-span-full">
-      <label class="c-label">Medication History <span class="u-text-error">*</span><span class="c-label__sub">(Check all that apply)</span></label>
-      <div id="med-history-grid" class="c-check-grid l-grid-2"></div>
-      <div class="c-error-msg u-hidden" id="med-history-error">
-        <span class="material-symbols-outlined c-error-icon">error</span>
-        Selection required (Choose "None" if applicable)
+      <label class="c-label">Have you taken weight loss medication before? <span class="u-text-error">*</span></label>
+      
+      <div class="l-grid-2 u-mb-md">
+        <label class="c-check-card u-justify-center">
+          <input type="radio" name="gate_meds" value="no" onchange="toggleGrid('meds', false)">
+          <span>No previous medication history</span>
+        </label>
+        <label class="c-check-card u-justify-center">
+          <input type="radio" name="gate_meds" value="yes" onchange="toggleGrid('meds', true)">
+          <span>Yes, I have history</span>
+        </label>
+      </div>
+
+      <div class="c-error-msg u-hidden u-mb-sm" id="med-history-error">
+          <span class="material-symbols-outlined c-error-icon">error</span>
+          Please select "No" or choose your history.
+      </div>
+
+      <div id="wrapper-meds" class="u-hidden">
+          <div id="med-history-grid" class="c-check-grid l-grid-2"></div>
       </div>
     </div>
   </div>
@@ -151,7 +181,7 @@
                     </div>
                 </div>
 
-                <div class="c-form-group u-hidden" id="employer-field">
+                <div class="c-form-group l-col-span-full u-hidden" id="employer-field">
                     <label class="c-label">Employer Name <span class="u-text-error">*</span></label>
                     <input type="text" id="employer-name" class="c-input" placeholder="e.g. Amazon, State of FL..." />
                     

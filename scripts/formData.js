@@ -46,7 +46,6 @@ export const formData = {
         { value: "contrave", label: "Contrave (Bupropion/Naltrexone)" },
         { value: "qsymia", label: "Qsymia (Phentermine/Topiramate)" },
         { value: "orlistat", label: "Orlistat (Xenical / Alli)" },
-        { value: "none", label: "None / No previous history" } 
     ],
     comorbidities: [
         { value: "diabetes", label: "Type 2 Diabetes" },
@@ -57,6 +56,5 @@ export const formData = {
         { value: "established_cvd", label: "Heart Disease (History of Heart Attack/Stroke)" },
         { value: "pcos", label: "Polycystic Ovary Syndrome (PCOS)" },
         { value: "fatty_liver", label: "Fatty Liver Disease (NAFLD/NASH)" },
-        { value: "none", label: "None / No Diagnosed Conditions" }
     ]
 };

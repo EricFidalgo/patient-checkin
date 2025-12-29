@@ -85,55 +85,58 @@ function handleNextStep(targetStep) {
     if (!getConfig()) return;
 
     if (targetStep === 2) {
-        // 1. Select inputs
         const bmi = document.getElementById('bmi');
         const age = document.getElementById('age');
+        
+        // --- NEW: Grab the Radio Buttons ---
+        const conditionGate = document.querySelector('input[name="gate_conditions"]:checked');
+        const medGate = document.querySelector('input[name="gate_meds"]:checked');
+        
+        // Get the hidden checkboxes (for safety check)
         const comorbidities = document.querySelectorAll('input[name="comorbidity"]:checked');
-        
-        // --- ADD THIS LINE ---
-        const medHistory = document.querySelectorAll('input[name="med_history"]:checked'); 
-        
+        const medHistory = document.querySelectorAll('input[name="med_history"]:checked');
+
         let isValid = true;
         
-        // 2. Clear existing errors
+        // Clear Errors
         UI.clearError('bmi-error');
         UI.clearError('age-error');
         UI.clearError('comorbidity-error');
-        
-        // --- ADD THIS LINE ---
-        UI.clearError('med-history-error'); 
+        UI.clearError('med-history-error');
 
-        // 3. Validation Logic
+        // 1. Validate Age & BMI
         if (!bmi.value) {
             document.getElementById('bmi-error').classList.remove('u-hidden');
             bmi.classList.add('border-red-500');
             isValid = false;
         }
-        
         if (!age.value || parseInt(age.value) < 18) {
-            const ageErr = document.getElementById('age-error');
-            ageErr.classList.remove('u-hidden');
-            if (parseInt(age.value) < 18) {
-                 ageErr.innerHTML = '<span class="material-symbols-outlined c-error-icon">error</span> Must be 18+';
-            } else {
-                 ageErr.innerHTML = '<span class="material-symbols-outlined c-error-icon">error</span> Required';
-            }
+            document.getElementById('age-error').classList.remove('u-hidden');
             age.classList.add('border-red-500');
             isValid = false;
         }
 
-        if (comorbidities.length === 0) {
+        // 2. Validate "Conditions" Gate (Yes/No)
+        if (!conditionGate) {
+            // If they didn't click Yes or No, show error
+            document.getElementById('comorbidity-error').classList.remove('u-hidden');
+            isValid = false;
+        } else if (conditionGate.value === 'yes' && comorbidities.length === 0) {
+            // If they clicked "Yes" but didn't pick a condition
             document.getElementById('comorbidity-error').classList.remove('u-hidden');
             isValid = false;
         }
 
-        // --- ADD THIS BLOCK ---
-        if (medHistory.length === 0) {
+        // 3. Validate "Medication History" Gate (Yes/No)
+        if (!medGate) {
+            document.getElementById('med-history-error').classList.remove('u-hidden');
+            isValid = false;
+        } else if (medGate.value === 'yes' && medHistory.length === 0) {
             document.getElementById('med-history-error').classList.remove('u-hidden');
             isValid = false;
         }
 
-        if (!isValid) return; // Stop here if any field is empty
+        if (!isValid) return;
 
         // 4. Safety Stop Check
         const safetyCheck = checkSafetyStop(parseFloat(bmi.value));
@@ -352,3 +355,31 @@ function validateMemberID(carrier, rawId) {
 
     return { valid: true };
 }
+
+window.toggleGrid = function(type, isYes) {
+    const wrapper = document.getElementById(type === 'conditions' ? 'wrapper-conditions' : 'wrapper-meds');
+    const container = document.getElementById(type === 'conditions' ? 'comorbidity-grid' : 'med-history-grid');
+    
+    // Find the "None" checkbox inside the generated grid
+    // Note: This assumes 'none' is the value used in formData.js
+    const noneCheckbox = container.querySelector('input[value="none"]');
+    const allCheckboxes = container.querySelectorAll('input[type="checkbox"]');
+
+    if (isYes) {
+        // Show Grid
+        wrapper.classList.remove('u-hidden');
+        
+        // Uncheck "None" if it was checked
+        if (noneCheckbox) noneCheckbox.checked = false;
+        
+    } else {
+        // Hide Grid
+        wrapper.classList.add('u-hidden');
+        
+        // Reset all checks
+        allCheckboxes.forEach(cb => cb.checked = false);
+        
+        // Auto-select "None" so validation passes
+        if (noneCheckbox) noneCheckbox.checked = true;
+    }
+};
