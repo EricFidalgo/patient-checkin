@@ -69,7 +69,9 @@ export function determineCoverageStatus(inputData) {
     if (inputData.planSource === 'govt') {
         if (targetCarrier === 'Medicare') targetCarrier = 'Medicare';
         else if (targetCarrier === 'Tricare') targetCarrier = 'Tricare'; // Honor Tricare selection
-        else if (targetCarrier !== 'Tricare') targetCarrier = 'Medicaid'; // Default to Medicaid for generic govt
+        else if (targetCarrier !== 'Tricare' && targetCarrier !== 'BCBS') {
+                targetCarrier = 'Medicaid'; 
+            }
     }
 
     // [UPDATED] 2. 2026 Market Exit & Geo-Restriction Logic
