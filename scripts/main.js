@@ -1,6 +1,6 @@
 // scripts/main.js
 import { loadConfig, getConfig } from './config.js';
-import { determineCoverageStatus, checkSafetyStop } from './logic.js';
+import { determineCoverageStatus, checkSafetyStop, validateMemberID } from './logic.js';
 import * as UI from './ui.js';
 
 let currentResultType = null; 
@@ -230,7 +230,9 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     if (existingErr) existingErr.classList.add('u-hidden');
     memberIdInput.classList.remove('border-red-500');
 
+    // This now calls the function imported from logic.js
     const idValidation = validateMemberID(carrier.value, memberIdInput.value);
+    
     if (!idValidation.valid) {
         isValid = false;
         memberIdInput.classList.add('border-red-500');
@@ -278,108 +280,20 @@ document.getElementById('email-form').addEventListener('submit', (e) => {
     UI.displayResult(currentResultType);
 });
 
-// --- HELPER: MEMBER ID LOGIC ---
-function validateMemberID(carrier, rawId) {
-    if (!rawId) return { valid: true }; // Optional field
-
-    const id = rawId.toUpperCase().replace(/[^A-Z0-9]/g, ''); // Remove special chars
-    
-    // 1. Global Length Check (Catch obvious garbage)
-    if (id.length < 5) return { valid: false, msg: "ID is too short (min 5 characters)." };
-    if (id.length > 25) return { valid: false, msg: "ID is too long (max 25 characters)." };
-
-    // 2. Carrier-Specific Heuristics
-    switch (carrier) {
-        case 'Medicare':
-            // Medicare Beneficiary Identifier (MBI) is exactly 11 chars
-            if (id.length !== 11) return { valid: false, msg: "Medicare MBI must be exactly 11 characters." };
-            break;
-            
-        case 'BCBS':
-            // Blue Cross usually starts with a 3-letter prefix (or R for Federal)
-            if (!/^[A-Z]{3}|R/.test(id)) {
-                return { valid: false, msg: "BCBS IDs typically start with a 3-letter prefix (e.g., XYZ...)." };
-            }
-            break;
-
-        case 'UnitedHealthcare':
-            // UHC is almost always numeric
-            if (!/^\d+$/.test(id)) {
-                 return { valid: false, msg: "UnitedHealthcare IDs are typically numbers only." };
-            }
-            break;
-
-        case 'Kaiser':
-            // Kaiser is typically strictly numeric (Northern/Southern CA, etc.)
-            // Some regions use a 'K' prefix, but rarely on the card itself.
-            if (!/^\d+$/.test(id)) {
-                return { valid: false, msg: "Kaiser MRNs are typically numbers only." };
-            }
-            if (id.length < 7) return { valid: false, msg: "Kaiser ID seems too short." };
-            break;
-
-        case 'Humana':
-             // Humana IDs often start with H (Medicare) or are just numeric.
-             // We block generic text, but allow H-prefixes.
-            if (!/^H?\d+$/.test(id)) {
-                return { valid: false, msg: "Invalid Humana ID format (usually starts with H or is numeric)." };
-            }
-            break;
-
-        case 'Medicaid':
-            // STATE DEPENDENT. We only check for illegal characters to be safe.
-            // Blocks people from typing "Pending" or "Unknown"
-            if (id.length < 8) return { valid: false, msg: "State Medicaid IDs are typically at least 8 characters." };
-            break;
-            
-        case 'Tricare':
-            // Often SSN (9) or DoD ID (10-11)
-            if (!/^\d{9,11}$/.test(id)) {
-                return { valid: false, msg: "Invalid format for Tricare ID." };
-            }
-            break;
-        case 'Ambetter':
-          // Ambetter often starts with U (e.g. U12345678) or is numeric
-          if (!/^[A-Z0-9]+$/.test(id)) { 
-                return { valid: false, msg: "Invalid Ambetter ID format." };
-          }
-          break;
-
-      case 'Molina':
-          // Molina is typically 9-12 digits
-          if (!/^\d+$/.test(id)) {
-                return { valid: false, msg: "Molina IDs are typically numbers only." };
-          }
-          break;
-    }
-
-    return { valid: true };
-}
-
+// Helper for UI Grid Logic
 window.toggleGrid = function(type, isYes) {
     const wrapper = document.getElementById(type === 'conditions' ? 'wrapper-conditions' : 'wrapper-meds');
     const container = document.getElementById(type === 'conditions' ? 'comorbidity-grid' : 'med-history-grid');
     
-    // Find the "None" checkbox inside the generated grid
-    // Note: This assumes 'none' is the value used in formData.js
     const noneCheckbox = container.querySelector('input[value="none"]');
     const allCheckboxes = container.querySelectorAll('input[type="checkbox"]');
 
     if (isYes) {
-        // Show Grid
         wrapper.classList.remove('u-hidden');
-        
-        // Uncheck "None" if it was checked
         if (noneCheckbox) noneCheckbox.checked = false;
-        
     } else {
-        // Hide Grid
         wrapper.classList.add('u-hidden');
-        
-        // Reset all checks
         allCheckboxes.forEach(cb => cb.checked = false);
-        
-        // Auto-select "None" so validation passes
         if (noneCheckbox) noneCheckbox.checked = true;
     }
 };

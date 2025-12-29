@@ -23,7 +23,6 @@ export function determineCoverageStatus(inputData) {
     // ---------------------------------------------------------
     // NEW RULE: MEDICATION SPECIFIC LOGIC (Saxenda)
     // ---------------------------------------------------------
-    // Priority: High (Overrides other logic if the drug itself is the issue)
     if (medication === 'Saxenda') {
         return {
             status: 'yellow',
@@ -63,7 +62,6 @@ export function determineCoverageStatus(inputData) {
     // ---------------------------------------------------------
     // TIER 2: STATE EMPLOYEE HEALTH PLAN (SEHP) AUDIT
     // ---------------------------------------------------------
-    // [RESTORED]
     if (planSource === 'employer' && rules.sehp_audit[state]) {
         const sehpRule = rules.sehp_audit[state];
         return {
@@ -75,7 +73,6 @@ export function determineCoverageStatus(inputData) {
     // ---------------------------------------------------------
     // NEW RULE: KAISER PERMANENTE (Closed Loop)
     // ---------------------------------------------------------
-    // Inserted here to catch Kaiser before general Govt/Carrier logic
     if (carrier === 'Kaiser') {
         const kpRules = rules.carrier_logic.Kaiser;
         
@@ -120,7 +117,6 @@ export function determineCoverageStatus(inputData) {
     // ---------------------------------------------------------
     // TIER 3: GOVERNMENT PAYER LOGIC (Tricare/VA)
     // ---------------------------------------------------------
-    // [RESTORED & REFINED]
     if (planSource === 'govt') {
         const govtRules = rules.plan_source_matrix.government;
         
@@ -144,7 +140,6 @@ export function determineCoverageStatus(inputData) {
     // ---------------------------------------------------------
     // NEW RULE: MEDICAID (Fiscal Cliff & Sunsets)
     // ---------------------------------------------------------
-    // Specific logic for Medicaid carrier selection
     if (carrier === 'Medicaid') {
          const mcdRules = rules.carrier_logic.Medicaid.logic_map;
          
@@ -157,11 +152,8 @@ export function determineCoverageStatus(inputData) {
         if (mcdRules.sunset_states[state]) {
             const sunsetRule = mcdRules.sunset_states[state];
             
-            // Check if a cutoff date exists and if we have passed it
             if (sunsetRule.cutoff_date && today >= new Date(sunsetRule.cutoff_date)) {
                 
-                // If passed cutoff, check if there is a Reinstatement Date (e.g., NC)
-                // AND if we have passed that date too.
                 if (sunsetRule.reinstatement_date && today >= new Date(sunsetRule.reinstatement_date)) {
                     return { 
                         status: sunsetRule.status_reinstated || 'yellow', 
@@ -169,15 +161,12 @@ export function determineCoverageStatus(inputData) {
                     };
                 }
 
-                // If past cutoff and NOT reinstated (or no reinstatement exists) -> Expired (RED)
                 return { 
                     status: sunsetRule.status_post || 'red', 
                     reason: sunsetRule.reason_post 
                 };
             }
 
-            // If BEFORE the cutoff date -> Still Valid (YELLOW)
-            // Uses 'reason_pre' (warning text) or falls back to 'reason_text'
             return { 
                 status: sunsetRule.status_pre || 'yellow', 
                 reason: sunsetRule.reason_pre || sunsetRule.reason_text 
@@ -194,9 +183,7 @@ export function determineCoverageStatus(inputData) {
     // ---------------------------------------------------------
     // TIER 4: MARKETPLACE (ACA) LOGIC
     // ---------------------------------------------------------
-    // [RESTORED]
     if (planSource === 'marketplace') {
-        // [UPDATED] Washington State 2026 Mandate Override
         if (state === 'WA' && today.getFullYear() >= 2026) {
             return { 
                 status: 'green', 
@@ -224,8 +211,6 @@ export function determineCoverageStatus(inputData) {
     // NEW RULE: CLINICAL CONDITION MODIFIER (Hyperlipidemia)
     // ---------------------------------------------------------
     if (comorbidities.includes('high_cholesterol') && bmi >= 27) {
-        // Only applies if not already caught by strict exclusions above
-        // and acts as a "softener" for standard commercial plans
         if (carrier !== 'Medicare') {
              return {
                 status: 'yellow',
@@ -239,7 +224,7 @@ export function determineCoverageStatus(inputData) {
     // ---------------------------------------------------------
     const carrierRules = rules.carrier_logic[carrier] || rules.carrier_logic["BCBS"]; 
     
-    // Medicare Override [RESTORED]
+    // Medicare Override
     if (carrier === 'Medicare') {
         if (comorbidities.includes('established_cvd') && bmi >= 27) {
             return {
@@ -254,7 +239,7 @@ export function determineCoverageStatus(inputData) {
         };
     }
 
-    // BCBS Special Handling [RESTORED]
+    // BCBS Special Handling
     if (carrier === 'BCBS') {
         if (carrierRules.state_exclusions && carrierRules.state_exclusions.includes(state)) {
             return {
@@ -283,4 +268,79 @@ export function checkSafetyStop(bmi) {
         return { safe: false, modalId: config.safety_stop.modal_id };
     }
     return { safe: true };
+}
+
+// --- NEW FUNCTION: Moved from main.js ---
+export function validateMemberID(carrier, rawId) {
+    if (!rawId) return { valid: true }; // Optional field
+
+    const id = rawId.toUpperCase().replace(/[^A-Z0-9]/g, ''); // Remove special chars
+    
+    // 1. Global Length Check (Catch obvious garbage)
+    if (id.length < 5) return { valid: false, msg: "ID is too short (min 5 characters)." };
+    if (id.length > 25) return { valid: false, msg: "ID is too long (max 25 characters)." };
+
+    // 2. Carrier-Specific Heuristics
+    switch (carrier) {
+        case 'Medicare':
+            // Medicare Beneficiary Identifier (MBI) is exactly 11 chars
+            if (id.length !== 11) return { valid: false, msg: "Medicare MBI must be exactly 11 characters." };
+            break;
+            
+        case 'BCBS':
+            // Blue Cross usually starts with a 3-letter prefix (or R for Federal)
+            if (!/^[A-Z]{3}|R/.test(id)) {
+                return { valid: false, msg: "BCBS IDs typically start with a 3-letter prefix (e.g., XYZ...)." };
+            }
+            break;
+
+        case 'UnitedHealthcare':
+            // UHC is almost always numeric
+            if (!/^\d+$/.test(id)) {
+                 return { valid: false, msg: "UnitedHealthcare IDs are typically numbers only." };
+            }
+            break;
+
+        case 'Kaiser':
+            // Kaiser is typically strictly numeric (Northern/Southern CA, etc.)
+            if (!/^\d+$/.test(id)) {
+                return { valid: false, msg: "Kaiser MRNs are typically numbers only." };
+            }
+            if (id.length < 7) return { valid: false, msg: "Kaiser ID seems too short." };
+            break;
+
+        case 'Humana':
+             // Humana IDs often start with H (Medicare) or are just numeric.
+            if (!/^H?\d+$/.test(id)) {
+                return { valid: false, msg: "Invalid Humana ID format (usually starts with H or is numeric)." };
+            }
+            break;
+
+        case 'Medicaid':
+            // STATE DEPENDENT. We only check for illegal characters to be safe.
+            if (id.length < 8) return { valid: false, msg: "State Medicaid IDs are typically at least 8 characters." };
+            break;
+            
+        case 'Tricare':
+            // Often SSN (9) or DoD ID (10-11)
+            if (!/^\d{9,11}$/.test(id)) {
+                return { valid: false, msg: "Invalid format for Tricare ID." };
+            }
+            break;
+        case 'Ambetter':
+          // Ambetter often starts with U (e.g. U12345678) or is numeric
+          if (!/^[A-Z0-9]+$/.test(id)) { 
+                return { valid: false, msg: "Invalid Ambetter ID format." };
+          }
+          break;
+
+      case 'Molina':
+          // Molina is typically 9-12 digits
+          if (!/^\d+$/.test(id)) {
+                return { valid: false, msg: "Molina IDs are typically numbers only." };
+          }
+          break;
+    }
+
+    return { valid: true };
 }
