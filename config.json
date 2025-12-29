@@ -24,12 +24,16 @@
       "id": "aetna_2026",
       "default_status": "yellow",
       "member_id_validation": {
-        "regex": "^(W\\d{9}|\\d{10}|\\d{12})$",
+        "regex": "^(W\\d{9}|10\\d{10})$",
         "min_length": 10,
         "max_length": 12,
-        "help_text": "Typically starts with 'W' followed by 9 digits, or is 10-12 numeric digits."
+        "help_text": "Commercial: Starts with 'W'. Medicare (2026): 12 digits starting with '10'."
       },
       "rules": [
+        {
+          "if": { "state": "NY", "medication": ["Zepbound", "Wegovy"] },
+          "then": { "status": "yellow", "reason": "NY State Override (2026): Step therapy protocol may be bypassed if patient is stable on current regimen." }
+        },
         {
           "if": { "planSource": "marketplace" },
           "then": { "status": "red", "reason": "Aetna is exiting the ACA Marketplace entirely effective Jan 1, 2026. Coverage terminates." }
@@ -127,9 +131,9 @@
         {
            "if": {
              "planSource": "marketplace",
-             "state_not_in": ["CA", "MA", "NY", "VA"]
+             "state_not_in": ["AZ", "CO", "FL", "GA", "IL", "IN", "MS", "NC", "TN", "TX", "VA"]
            },
-           "then": { "status": "red", "reason": "2026 ACA Exchange plans in this state exclude weight loss medications." }
+           "then": { "status": "red", "reason": "2026 Cigna IFP is strictly limited to 11 states (AZ, CO, FL, GA, IL, IN, MS, NC, TN, TX, VA)." }
         },
         {
            "if": {
@@ -170,9 +174,9 @@
         {
           "if": {
              "state_in": ["MI", "MA"],
-             "planSource": "employer"
+             "medication": ["Wegovy", "Zepbound", "Saxenda"]
           },
-          "then": { "status": "red", "reason": "Default Exclusion in MI/MA: Requires specific Employer Rider." }
+          "then": { "status": "red", "reason": "Strict Exclusion (2026): BCBS MA & MI have removed weight loss medications from the formulary entirely." }
         },
         {
           "if": {
@@ -195,81 +199,81 @@
       }
     },
   "UHC": {
-    "id": "uhc_2026",
-    "default_status": "yellow",
-    "member_id_validation": {
-      "regex": "^([A-Z]{3,4})?\\d{9,12}$",
-      "min_length": 9,
-      "max_length": 16,
-      "help_text": "9-12 digits, optional 3-4 letter prefix. Do not include suffixes (e.g. -01)."
-    },
-    "rules": [
-      {
-        "if": { "medication": ["Compounded"] },
-        "then": { "status": "red", "reason": "Policy Exclusion: Compounded GLP-1s are considered unproven/experimental." }
+      "id": "uhc_2026",
+      "default_status": "yellow",
+      "member_id_validation": {
+        "regex": "^[A-Za-z0-9]{9,15}$",
+        "min_length": 9,
+        "max_length": 15,
+        "help_text": "Enter the Member ID as it appears on the front of the card. It is typically 9 to 15 alphanumeric characters. Do not include the Group Number."
       },
-      {
-        "if": {
-          "medication": ["Ozempic", "Mounjaro", "Trulicity", "Victoza"],
-          "missing_comorbidities": ["diabetes"]
+      "rules": [
+        {
+          "if": { "medication": ["Compounded"] },
+          "then": { "status": "red", "reason": "Policy Exclusion: Compounded GLP-1s are considered unproven/experimental." }
         },
-        "then": { "status": "red", "reason": "Diagnosis Mismatch: T2D diagnosis required for this brand." }
-      },
-      {
-        "if": {
-          "medication": ["Ozempic", "Mounjaro", "Trulicity"],
-          "has_comorbidity": "diabetes"
+        {
+          "if": {
+            "medication": ["Ozempic", "Mounjaro", "Trulicity", "Victoza"],
+            "missing_comorbidities": ["diabetes"]
+          },
+          "then": { "status": "red", "reason": "Diagnosis Mismatch: T2D diagnosis required for this brand." }
         },
-        "then": { "status": "green", "reason": "Standard Tier 2/3 coverage for Diabetes Management." }
-      },
-      {
-        "if": { "planSource": "govt", "state_in": ["NC", "CA"] },
-        "then": { "status": "red", "reason": "Medicaid coverage for weight loss ends in NC (Oct 2025) and CA (Jan 2026)." }
-      },
-      {
-        "if": {
-          "planSource": "marketplace",
-          "state_not_in": ["CA", "MA", "NY"]
+        {
+          "if": {
+            "medication": ["Ozempic", "Mounjaro", "Trulicity"],
+            "has_comorbidity": "diabetes"
+          },
+          "then": { "status": "green", "reason": "Standard Tier 2/3 coverage for Diabetes Management." }
         },
-        "then": { "status": "red", "reason": "Marketplace benchmark plans in this state exclude weight loss agents." }
-      },
-      {
-        "if": { "medication": ["Wegovy", "Zepbound"], "bmi_lt": 27 },
-        "then": { "status": "red", "reason": "BMI < 27 fails FDA clinical indication minimums." }
-      },
-      {
-        "if": {
-          "medication": ["Wegovy", "Zepbound"],
-          "bmi_range": [27, 30],
-          "missing_comorbidities": ["hypertension", "high_cholesterol", "diabetes", "osa", "established_cvd"]
+        {
+          "if": { "planSource": "govt", "state_in": ["NC", "CA"] },
+          "then": { "status": "red", "reason": "Medicaid coverage for weight loss ends in NC (Oct 2025) and CA (Jan 2026)." }
         },
-        "then": { "status": "red", "reason": "BMI 27-30 requires a qualifying comorbidity." }
-      },
-      {
-        "if": { "medication": ["Zepbound"], "has_comorbidity": "osa" },
-        "then": { "status": "yellow", "reason": "High Probability: Zepbound preferred for Obstructive Sleep Apnea." }
-      },
-      {
-        "if": { "medication": ["Wegovy"], "has_comorbidity": "established_cvd" },
-        "then": { "status": "yellow", "reason": "High Probability: FDA approved for cardiovascular risk reduction." }
-      },
-      {
-        "if": {
-           "medication": ["Wegovy", "Zepbound"],
-           "missing_history": ["phentermine", "qsymia", "contrave"]
+        {
+          "if": {
+            "planSource": "marketplace",
+            "state_not_in": ["CA", "MA", "NY"]
+          },
+          "then": { "status": "red", "reason": "Marketplace benchmark plans in this state exclude weight loss agents." }
         },
-        "then": { "status": "yellow", "reason": "Step Therapy: Must fail a preferred oral agent (e.g., Phentermine) first." }
-      },
-      {
-        "if": { "program_enrollment_required": true },
-        "then": { "status": "yellow", "reason": "Requires enrollment in 'Total Weight Support' (Real Appeal / WW) for authorization." }
+        {
+          "if": { "medication": ["Wegovy", "Zepbound"], "bmi_lt": 27 },
+          "then": { "status": "red", "reason": "BMI < 27 fails FDA clinical indication minimums." }
+        },
+        {
+          "if": {
+            "medication": ["Wegovy", "Zepbound"],
+            "bmi_range": [27, 30],
+            "missing_comorbidities": ["hypertension", "high_cholesterol", "diabetes", "osa", "established_cvd"]
+          },
+          "then": { "status": "red", "reason": "BMI 27-30 requires a qualifying comorbidity." }
+        },
+        {
+          "if": { "medication": ["Zepbound"], "has_comorbidity": "osa" },
+          "then": { "status": "yellow", "reason": "High Probability: Zepbound preferred for Obstructive Sleep Apnea." }
+        },
+        {
+          "if": { "medication": ["Wegovy"], "has_comorbidity": "established_cvd" },
+          "then": { "status": "yellow", "reason": "High Probability: FDA approved for cardiovascular risk reduction." }
+        },
+        {
+          "if": {
+             "medication": ["Wegovy", "Zepbound"],
+             "missing_history": ["phentermine", "orlistat", "topiramate"]
+          },
+          "then": { "status": "yellow", "reason": "Step Therapy: 2026 Policy typically requires trial of low-cost generics (e.g., Phentermine) before coverage." }
+        },
+        {
+          "if": { "program_enrollment_required": true },
+          "then": { "status": "yellow", "reason": "Requires enrollment in 'Total Weight Support' (Real Appeal / WW) for authorization." }
+        }
+      ],
+      "pricing": {
+        "green_copay": 75,
+        "lifestyle_program_discount": true
       }
-    ],
-    "pricing": {
-      "green_copay": 25,
-      "lifestyle_program_discount": true
-    }
-  },
+    },
   "Medicare": {
     "id": "medicare_2026",
     "default_status": "red",
@@ -280,41 +284,50 @@
       "help_text": "Must be exactly 11 chars. No S, L, O, I, B, Z."
     },
     "rules": [
-      {
-        "if": { "medication": ["Compounded"] },
-        "then": { "status": "red", "reason": "Statutory Exclusion: Non-FDA approved bulk products not covered." }
-      },
-      {
-        "if": {
-          "medication": ["Ozempic", "Mounjaro", "Trulicity"],
-          "missing_comorbidities": ["diabetes"]
+        {
+          "if": { "medication": ["Compounded"] },
+          "then": { "status": "red", "reason": "Statutory Exclusion: Non-FDA approved bulk products not covered." }
         },
-        "then": { "status": "red", "reason": "Strict Exclusion: Diagnosis mismatch. Covered for T2D only." }
-      },
-      {
-        "if": {
-          "medication": ["Wegovy"],
-          "has_comorbidity": "established_cvd",
-          "bmi_ge": 27
+        {
+          "if": {
+            "medication": ["Ozempic", "Mounjaro", "Trulicity"],
+            "missing_comorbidities": ["diabetes"]
+          },
+          "then": { "status": "red", "reason": "Strict Exclusion: Diagnosis mismatch. Covered for T2D only." }
         },
-        "then": { "status": "green", "reason": "Covered for CVD Risk Reduction (The 'CVD Loophole')." }
-      },
-      {
-        "if": {
-          "medication": ["Wegovy", "Zepbound"],
-          "date_lt": "2026-07-01"
+        {
+          "if": {
+            "medication": ["Wegovy"],
+            "has_comorbidity": "established_cvd",
+            "bmi_ge": 27
+          },
+          "then": { "status": "green", "reason": "Covered for CVD Risk Reduction (The 'CVD Loophole')." }
         },
-        "then": { "status": "red", "reason": "Statutory Exclusion until CMS 'BALANCE' Pilot begins July 1, 2026." }
-      },
-      {
-        "if": {
-          "medication": ["Wegovy", "Zepbound"],
-          "date_ge": "2026-07-01",
-          "bmi_ge": 35
+        {
+          "if": {
+            "medication": ["Wegovy", "Zepbound"],
+            "date_lt": "2026-07-01"
+          },
+          "then": { "status": "red", "reason": "Statutory Exclusion until CMS 'BALANCE' Pilot begins July 1, 2026." }
         },
-        "then": { "status": "yellow", "reason": "Conditional Coverage: CMS Pilot Program (Requires Enrollment)." }
-      }
-    ],
+        {
+          "if": {
+            "medication": ["Wegovy", "Zepbound"],
+            "date_ge": "2026-07-01",
+            "bmi_ge": 35
+          },
+          "then": { "status": "yellow", "reason": "Eligible for CMS 'Bridge' Payment Demonstration (Starts July 1, 2026)." }
+        },
+        {
+            "if": {
+              "medication": ["Wegovy", "Zepbound"],
+              "date_ge": "2026-07-01",
+              "bmi_ge": 27,
+              "has_any_comorbidity": ["prediabetes", "hypertension", "high_cholesterol", "established_cvd"]
+            },
+            "then": { "status": "yellow", "reason": "Eligible for CMS 'Bridge' Payment Demonstration (Starts July 1, 2026) via Comorbidity pathway." }
+        }
+      ],
     "pricing": {
       "green_copay": 50,
       "lifestyle_program_discount": true
@@ -330,33 +343,37 @@
       "help_text": "Varies by state (e.g. 9 digits for CA/TX, 10 for PA)."
     },
     "rules": [
-      {
-        "if": { "has_comorbidity": "diabetes" },
-        "then": { "status": "green", "reason": "Covered benefit for Type 2 Diabetes." }
-      },
-      {
-        "if": { "state_in": ["CA", "PA", "NC"] },
-        "then": { "status": "red", "reason": "Coverage removed effective 2026 (or earlier) due to state budget cuts." }
-      },
-      {
-        "if": { "state_not_in": ["CT", "DE", "MI", "MN", "NH", "RI", "SC", "VA", "WI"] },
-        "then": { "status": "red", "reason": "Excluded Benefit: State has not opted into coverage." }
-      },
-      {
-        "if": {
-          "date_ge": "2026-05-01",
-          "state_in": ["MI", "RI", "VA"] 
+        {
+          "if": { "has_comorbidity": "diabetes" },
+          "then": { "status": "green", "reason": "Covered benefit for Type 2 Diabetes." }
         },
-        "then": { "status": "yellow", "reason": "Potential eligibility via CMS BALANCE Model (Federal override)." }
-      },
-      {
-        "if": {
-           "medication": ["Wegovy", "Zepbound"],
-           "missing_history": ["phentermine", "orlistat", "contrave"]
+        {
+          "if": { "state_in": ["CA", "PA", "NC"] },
+          "then": { "status": "red", "reason": "Coverage removed effective 2026 (or earlier) due to state budget cuts." }
         },
-        "then": { "status": "red", "reason": "Strict Step Therapy: Must fail cheaper oral generics first." }
-      }
-    ],
+        {
+            "if": { "state": "MI", "medication": ["Wegovy", "Zepbound"] },
+            "then": { "status": "red", "reason": "MI 2026 Budget Restriction: Coverage limited to morbid obesity to avert surgery. High denial rate." }
+        },
+        {
+          "if": { "state_not_in": ["CT", "DE", "MI", "MN", "NH", "RI", "SC", "VA", "WI"] },
+          "then": { "status": "red", "reason": "Excluded Benefit: State has not opted into coverage." }
+        },
+        {
+          "if": {
+            "date_ge": "2026-05-01",
+            "state_in": ["RI", "VA"] 
+          },
+          "then": { "status": "yellow", "reason": "Potential eligibility via CMS BALANCE Model (Federal override)." }
+        },
+        {
+           "if": {
+             "medication": ["Wegovy", "Zepbound"],
+             "missing_history": ["phentermine", "orlistat", "contrave"]
+           },
+           "then": { "status": "red", "reason": "Strict Step Therapy: Must fail cheaper oral generics first." }
+        }
+      ],
     "pricing": {
       "green_copay": 0,
       "lifestyle_program_discount": false

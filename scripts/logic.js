@@ -38,6 +38,32 @@ export function determineCoverageStatus(inputData) {
         else if (targetCarrier !== 'Tricare') targetCarrier = 'Medicaid'; // Default to Medicaid for generic govt
     }
 
+    // [UPDATED] 2. 2026 Market Exit & Geo-Restriction Logic
+    // Intercepts Marketplace plans before processing standard rules
+    if (inputData.planSource === 'marketplace') {
+        
+        // Aetna Market Exit: Aetna has entirely exited the ACA Marketplace for 2026.
+        if (targetCarrier === 'Aetna') {
+            return { 
+                status: 'red', 
+                reason: 'MARKET EXIT: Aetna CVS Health has entirely exited the ACA Marketplace for 2026. Coverage terminated Dec 31, 2025.',
+                pricing: null 
+            };
+        }
+
+        // Cigna Geo-Fencing: 2026 IFP plans are strictly limited to 11 states.
+        if (targetCarrier === 'Cigna') {
+            const cignaAllowed = ["AZ", "CO", "FL", "GA", "IL", "IN", "MS", "NC", "TN", "TX", "VA"];
+            if (!cignaAllowed.includes(inputData.state)) {
+                return { 
+                    status: 'red', 
+                    reason: `GEO-RESTRICTION: Cigna 2026 Marketplace plans are strictly limited to 11 states. Not available in ${inputData.state}.`,
+                    pricing: null 
+                };
+            }
+        }
+    }
+
     const carrierRules = config.coverage_engine_config[targetCarrier];
     
     // If no specific rules for this carrier exist, return default yellow
@@ -49,7 +75,7 @@ export function determineCoverageStatus(inputData) {
         };
     }
 
-    // 2. Iterate Rules
+    // 3. Iterate Rules
     // We look for the FIRST matching rule (cascade logic)
     for (const rule of carrierRules.rules) {
         if (evaluateCondition(rule.if, inputData)) {
@@ -61,7 +87,7 @@ export function determineCoverageStatus(inputData) {
         }
     }
 
-    // 3. Default Fallback if no specific rule matched
+    // 4. Default Fallback if no specific rule matched
     return { 
         status: carrierRules.default_status, 
         reason: 'Standard clinical criteria applied. Prior Authorization likely.',
