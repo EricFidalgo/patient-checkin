@@ -1,6 +1,4 @@
-Copy/Paste this prompt to the AI:
-
-I have the research findings for 3 carriers: Aetna, Cigna, UHC, BCBS.
+I have the research findings for 3 carriers: Tricare, Kaiser, Humana.
 
 Task 1: Update config.json Create a JSON object for these carriers that fits this exact schema. Do not deviate from this structure:
 
@@ -38,267 +36,332 @@ JSON
 Task 2: Update logic.js Write a JavaScript snippet to handle the specific logic quirks found in these research outputs (e.g., if one carrier has a weird rule about "Lifestyle Programs").
 
 Here are the Research Outputs: 
+### **Coverage Verification Engine Audit: Tricare (2026 Plan Year)**
 
-Executive Summary: Aetna 2026 Coverage Audit
-Major Alert for 2026: Aetna (CVS Health) is exiting the ACA Marketplace (Obamacare) entirely effective Jan 1, 2026. Any user with a Marketplace plan source must be flagged RED immediately as their coverage will terminate.
+**Executive Summary:**
+As of **August 31, 2025**, Tricare implemented a major eligibility split. **Tricare For Life (TFL)** beneficiaries (Medicare-eligible retirees) have **lost all coverage** for weight loss medications (Red Light). For **Tricare Prime and Select** (Active Duty & Dependents), coverage remains available but is strictly gated by Prior Authorization (PA) and Step Therapy (Yellow Light).
 
-For Commercial/Employer plans, the 2026 logic has shifted to a "Wegovy First" protocol. Zepbound is currently treated as a "Secondary Alternative" requiring Step Therapy (failure of Wegovy) to unlock coverage.
+---
 
-1. Coverage Logic (If/Else Rules)
-Global Exclusion Check (The "Kill Switch")
+### **1. Coverage Logic (If/Else Rules)**
 
-IF Plan Source = "Marketplace (ACA)" THEN Status = RED. Reason: "Aetna CVS Health will stop offering individual and family plans on the Health Insurance Marketplace starting January 1, 2026."
+**Input Variables:** `Plan Source`, `Medication`, `Comorbidities`, `Medication History`, `Age`
 
-IF Drug = "Compounded Semaglutide" OR "Compounded Tirzepatide" THEN Status = RED. Reason: Plan exclusion for non-FDA approved compounded agents; safety warnings explicitly cited in policy updates.
+#### **Rule Set A: Eligibility & Plan Exclusion (The "Tricare For Life" Cliff)**
 
-Scenario A: Anti-Obesity Medications (Wegovy, Zepbound, Saxenda) Target User: Seeking weight loss. Diagnosis is NOT Type 2 Diabetes.
+> **Context:** Tricare has aligned with Medicare's statutory exclusion of weight loss drugs for TFL beneficiaries.
 
-Logic Rule 1: The "Wegovy First" Gate IF Drug = "Zepbound" AND History DOES NOT INCLUDE "Wegovy" THEN Status = YELLOW (Step Therapy). Reason: CPB 0039 (2026 Update): "Authorization may be granted for... Zepbound when the patient has experienced an inadequate treatment response, intolerance, or contraindication to Wegovy."
+* **IF** Plan Source = "Govt (Medicare/Tricare for Life)" **AND** Medication = [Wegovy, Zepbound, Saxenda, Qsymia, Contrave] **THEN** Status = **RED**.
+* *Reason:* "As of August 31, 2025, coverage for weight loss medications will no longer be available for non-TRICARE Prime and non-TRICARE Select beneficiaries."
 
-Logic Rule 2: Clinical Eligibility (BMI & Comorbidities) IF BMI < 27 THEN Status = RED. IF BMI >= 27 AND BMI < 30 AND Comorbidity NOT IN ["Hypertension", "High Cholesterol", "Type 2 Diabetes", "OSA", "Established CVD"] THEN Status = RED. Reason: CPB 0039 adheres strictly to FDA label. Conditions like PCOS or Fatty Liver alone are not sufficient triggers for the BMI 27+ tier without a peer-to-peer exception.
 
-Logic Rule 3: The Lifestyle Gate (Critical) IF History DOES NOT INCLUDE "6-Month Comprehensive Weight Management Program" THEN Status = YELLOW. Reason: Policy requires "participation in a comprehensive weight management program... for at least 6 months prior to using drug therapy."
+* **IF** Plan Source = "Govt (Tricare Prime/Select)" **THEN** Proceed to Rule Set B.
 
-Logic Rule 4: CVD Exemption IF Drug = "Wegovy" AND Comorbidity = "Established CVD" AND BMI >= 27 THEN Status = GREEN. Reason: Updated 2026 indication: Wegovy is covered to reduce risk of MACE (major adverse cardiovascular events) in overweight adults with established CVD.
+#### **Rule Set B: Weight Loss Medication Gates (Wegovy, Zepbound, Saxenda)**
 
-Scenario B: Anti-Diabetic Medications (Ozempic, Mounjaro, Trulicity, Rybelsus, Victoza) Target User: Seeking these specific brand names.
+> **Context:** For Prime/Select members, coverage is conditional (Yellow).
 
-Logic Rule 5: Diagnosis Verification IF Diagnosis != "Type 2 Diabetes" THEN Status = RED. Reason: Off-label use for weight loss is strictly excluded. These are Utilization Management (UM) locked for T2D diagnosis codes (ICD-10 E11.x).
+* **IF** Medication = [Wegovy, Zepbound, Saxenda] **AND** BMI < 30 **AND** Comorbidities = [None] **THEN** Status = **RED**.
+* **IF** Medication = "Compounded Semaglutide/Tirzepatide" **THEN** Status = **RED**.
+* *Reason:* Tricare strictly covers only FDA-approved products; compounded versions are considered "off-label" and non-formulary/excluded.
 
-Logic Rule 6: Metformin Step Therapy IF Diagnosis = "Type 2 Diabetes" AND History DOES NOT INCLUDE "Metformin" THEN Status = YELLOW. Reason: Most Aetna formularies require failing Metformin (or contraindication) before authorizing GLP-1s for diabetes.
 
-2. Pricing Variables
-Standard Copay (Commercial):
+* **IF** Medication History DOES NOT INCLUDE [Phentermine, Qsymia, Contrave] **THEN** Status = **YELLOW** (Step Therapy Required).
+* *Reason:* PA criteria require the patient to have "tried and failed or have a contraindication to" oral weight loss agents (Qsymia, Contrave, Phentermine) before approving GLP-1s.
 
-Preferred Brand (Wegovy, Saxenda): Tier 4. Typically $25–$75/mo (standard copay) or 20-30% Coinsurance (high deductible plans).
 
-Non-Preferred (Zepbound, Qsymia, Contrave): Tier 5. Typically 40-50% Coinsurance.
-
-Accumulator Adjustment (The "Coupon Ban"):
-
-Status: YES (Active).
-
-Impact: Aetna limits the value of manufacturer savings cards (e.g., the Wegovy $25 card) from counting toward the user's deductible/OOP max in many self-funded and large group plans. User may pay $25 for the first month, then get hit with the full deductible cost once the coupon cap is checked.
-
-Lifestyle Program Discount:
-
-Yes. Plans integrating CVS Weight Management (or partners like Virta) often waive the copay (Tiered Benefit: $0) if the member is actively enrolled and adhering to the program.
-
-3. Member ID Logic (2026 Validation)
-Valid Length: 10 to 12 characters.
-
-Required Pattern:
-
-Most common: "W" followed by 9 digits (e.g., W123456789).
-
-Legacy/Other: 10 numeric digits.
-
-Regex for Code: ^(W\d{9}|\d{10}|\d{12})$
-
-4. 2026 Specific Warnings
-Marketplace Exit: Confirm users are NOT on an Aetna Exchange/ACA plan. These plans terminate 12/31/2025.
-
-Zepbound Status: It is not at parity with Wegovy. It is a "step-up" drug. A user starting fresh on Zepbound will likely face a rejection (Red/Yellow) unless they have a documented "failure" of Wegovy.
-
-Medicare Ban: Aetna Medicare Advantage (Part D) plans cannot cover anti-obesity medications (Wegovy/Zepbound) for weight loss alone due to federal law. They only cover Wegovy if "Established CVD" is the primary diagnosis.
-
-Prior Authorization Renewal: All PAs are typically issued for 8 months initially. Renewal requires documentation of 5% weight loss. Failure to hit 5% leads to a RED light for renewals.
+* **IF** Medication History INCLUDES [Phentermine, Qsymia, OR Contrave] **THEN** Status = **YELLOW** (PA Required, but Step Therapy Met).
+* *Note:* Even with step therapy met, a PA is still required to verify participation in a lifestyle program (see below).
 
 
 
-### Part 1: Coverage Logic Audit (2026 Rules)
+#### **Rule Set C: Diabetes Medication Gates (Ozempic, Mounjaro, Trulicity)**
 
-Based on the audit of Cigna's 2026 Clinical Policy Bulletins (specifically *Policy IP0206*) and Formulary updates, the coverage logic for GLP-1s is **Restrictive**. Cigna differentiates sharply between "Weight Loss" (Wegovy/Zepbound) and "Diabetes" (Ozempic/Mounjaro).
-
-#### 1. Coverage Logic (If/Else Rules)
-
-**A. Diagnosis & Medication Gate (The "FDA Label" Rule)**
-
-> **Logic:** Cigna strictly enforces FDA indications. Prescribing a Diabetes drug for Weight Loss is an automatic denial.
-
-* `IF` Medication = ["Ozempic", "Mounjaro", "Trulicity", "Victoza", "Rybelsus"] `AND` Comorbidity  "Type 2 Diabetes" `THEN` Status = **Red**.
-* *Reason:* "Medical Necessity requires diagnosis of Type 2 Diabetes. Off-label use for obesity is excluded."
+* **IF** Comorbidities DOES NOT INCLUDE "Type 2 Diabetes" **THEN** Status = **RED** (Off-label use denied).
+* *Reason:* Tricare strictly enforces on-label use for T2D meds. They will *not* cover Ozempic for weight loss alone.
 
 
-* `IF` Medication = ["Compounded Semaglutide", "Compounded Tirzepatide"] `THEN` Status = **Red**.
-* *Reason:* "Plan Exclusion for non-FDA approved compounded bio-similars."
-
-
-* `IF` Medication = ["Wegovy", "Zepbound"] `AND` Comorbidity = "Type 2 Diabetes" `THEN` Status = **Green** (Preferred Tier).
-
-**B. Clinical Gates (BMI & Comorbidities)**
-
-> **Logic:** For Weight Loss specific drugs (Wegovy/Zepbound), the BMI threshold is rigid.
-
-* `IF` Medication = ["Wegovy", "Zepbound", "Saxenda"] `AND` BMI < 27 `THEN` Status = **Red**.
-* `IF` Medication = ["Wegovy", "Zepbound"] `AND` BMI  27 `AND` BMI < 30 `AND` Comorbidity = ["None", "PCOS", "Fatty Liver"] `THEN` Status = **Red**.
-* *Reason:* Cigna's 2026 policy specifically lists qualifying comorbidities as: Hypertension, Type 2 Diabetes, Dyslipidemia (High Cholesterol), Obstructive Sleep Apnea (OSA), or Cardiovascular Disease. PCOS and Fatty Liver alone are often insufficient without an appeal.
-
-
-* `IF` Medication = ["Wegovy", "Zepbound"] `AND` BMI  27 `AND` Comorbidity = ["High Cholesterol", "Hypertension", "OSA", "Established CVD"] `THEN` Status = **Yellow** (Conditional on Step Therapy).
-* `IF` Medication = ["Wegovy", "Zepbound"] `AND` BMI  30 `THEN` Status = **Yellow** (Conditional on Step Therapy).
-
-**C. Step Therapy & Lifestyle Gating (The "3-Month" Rule)**
-
-> **Logic:** Cigna requires *documented* failure of lifestyle changes *before* approving the PA.
-
-* `IF` Medication = ["Wegovy", "Zepbound"] `AND` History  ["3-Month Lifestyle Modification Program"] `THEN` Status = **Yellow**.
-* *Reason:* Policy IP0206 requires "Documentation of engagement in behavioral modification and dietary restriction for at least 3 months prior to initiation."
-
-
-* `IF` Medication = ["Saxenda"] `AND` History  ["Contrave", "Qsymia", "Phentermine"] `THEN` Status = **Yellow**.
-* *Reason:* Saxenda is often Non-Preferred; plan may require failing oral generic agents first depending on the specific employer formulary.
+* **IF** Comorbidities INCLUDES "Type 2 Diabetes" **THEN** Status = **YELLOW** (PA Required).
+* *Reason:* PA is required to confirm T2D diagnosis and rule out Type 1.
 
 
 
-**D. Plan Source Exclusions**
+#### **Rule Set D: Lifestyle Program Gating**
 
-> **Logic:** The "Who Pays" variable overrides clinical eligibility.
-
-* `IF` Plan Source = "Marketplace (ACA)" `AND` State  ["CA", "MA", "NY", "VA"] `THEN` Status = **Red**.
-* *Reason:* Most 2026 ACA Exchange plans default to excluding weight loss drugs unless state mandates require it.
-
-
-* `IF` Plan Source = "Medicare" `AND` Medication = ["Wegovy", "Zepbound"] `AND` Comorbidity  "Established CVD" `THEN` Status = **Red**.
-* *Reason:* Medicare statutory exclusion for weight loss drugs remains. However, Wegovy is covered *only* if the diagnosis is "Reduction of Major Adverse Cardiovascular Events" (Comorbidity = Established CVD).
+* **IF** User is seeking [Wegovy, Zepbound] **AND** Status != RED **THEN** Status = **YELLOW** (Requires "Lifestyle Program" Proof).
+* *Requirement:* The PA form requires documentation of "participation in a comprehensive weight management program" (diet, exercise, and behavioral modification) for at least 6 months prior to or concurrent with therapy.
+* *Clarification:* Unlike some commercial plans, Tricare does not currently mandate a *specific* vendor (like Omada), but the doctor must certify participation in *a* program.
 
 
 
 ---
 
-### Part 2: Pricing Variables (2026 Models)
+### **2. Pricing Variables (2026 Updates)**
 
-**Standard Copay Model:**
+Tricare has increased copays for the 2026 calendar year.
 
-* **Green Light (Diabetes T2D):** **$25/mo**. (Cigna "Patient Assurance Program" often caps T2D meds).
-* **Yellow Light (Weight Loss Approved):** **Coinsurance (30%-50%)**.
-* *Analysis:* Weight loss drugs are typically Tier 4 (Non-Preferred Brand) or Tier 5 (Specialty). You will rarely see a flat $25 copay for Zepbound/Wegovy unless the employer has a specific "Select" formulary. Expect the user to pay a percentage of the list price (~$300-$500/mo) until the deductible is met.
+| Service Channel | Drug Tier | 2026 Cost (Active Duty) | 2026 Cost (Retirees/All Others) |
+| --- | --- | --- | --- |
+| **Retail Pharmacy (30-day)** | Generic | $0 | **$16** |
+|  | Brand Formulary (Wegovy/Zepbound) | $0 | **$48** |
+|  | Non-Formulary | $0 | **$85** |
+| **Mail Order (90-day)** | Generic | $0 | **$14** |
+|  | Brand Formulary (Wegovy/Zepbound) | $0 | **$44** |
+|  | Non-Formulary | $0 | **$85** |
 
-
-
-**Savings Card Accumulator Warning:**
-
-* **Accumulator Adjustment:** **Yes.** Cigna generally enforces "copay accumulator" rules for 2026. This means if a user uses a manufacturer savings card (e.g., Zepbound card reducing cost to $25), the amount the *manufacturer* pays ($500+) will **NOT** count toward the user's annual deductible.
-
----
-
-### Part 3: Member ID Logic (Validation)
-
-**Format:**
-
-* **Valid Length:** 9 to 11 Digits (Purely Numeric usually, but some legacy/TPA IDs have letters).
-* **Structure:** Cigna IDs are typically `U` (Subscriber ID) + `S` (Suffix).
-* *Regex Pattern:* `^[0-9]{9,11}$` or `^U[0-9]{8}$` (for legacy).
-
-
-* **2026 Change:** Cigna Medicare Advantage is rebranding to **HealthSpring**.
-* *Prefix Check:* If the user selects "Medicare" and the card says "HealthSpring," validate against a numeric ID (usually 7-9 digits).
-
-
+* **Standard Copay:** **$48** (Retail / 30-day) for Brand Formulary drugs (Wegovy/Zepbound are typically Brand Formulary if PA is approved).
+* **Coinsurance Shift:** Tricare typically uses flat copays, but **Non-Network** pharmacies will trigger a 50% cost-share (Point of Service option) or full cost.
+* **Accumulator Adjustments:** Not applicable to Tricare (federal government payers generally ban the use of manufacturer coupons to lower the government's cost, and coupons cannot be applied to Tricare copays legally).
 
 ---
 
-### Part 4: 2026 Specific Warnings
+### **3. Member ID Logic (Validation)**
 
-1. **Strict Diagnosis Separation:** In 2025/2026, Cigna has closed the loophole of prescribing Mounjaro for "Metabolic Syndrome." It now requires a hard ICD-10 code for Type 2 Diabetes.
-2. **HealthSpring Rebrand:** For Seniors/Medicare users, look for "HealthSpring" branding on cards starting Jan 1, 2026. The "Cigna Medicare Advantage" name is being phased out.
-3. **Wegovy for Heart Disease:** A new "Green" lane exists for Medicare/Seniors if they have **"Established CVD"** (Heart Disease) + BMI > 27, even without Diabetes. This is a crucial exception to the Medicare ban.
+To avoid rejection errors, validate the **DBN** (DoD Benefits Number), not the DoD ID number.
+
+* **Valid Length:** **11 Digits**
+* **Required Pattern:** `^\d{9}-\d{2}$` (Often printed as 11 digits without the dash, or 9 digits + 2 digit suffix).
+* *Note on Cards:* The ID is located on the **back** of the Uniformed Services ID card (labeled "DBN" or "Benefits Number"). Do **not** use the 10-digit DoD ID on the front.
 
 
-Here is the logic audit for the Blue Cross Blue Shield (BCBS) 2026 coverage verification engine.
+* **Sponsor SSN:** Tricare also accepts the Sponsor's 9-digit SSN for claims processing if the DBN is unavailable.
 
 ---
 
-### Executive Summary: 2026 Outlook
+### **4. 2026 Specific Warnings**
 
-For 2026, BCBS entities are diverging significantly. While the **Federal Employee Program (FEP)** is maintaining coverage (moving to Tier 2), major commercial carriers like **BCBS Michigan** and **BCBS Massachusetts** have instituted **default exclusions** for weight loss drugs effective Jan 1, 2026, requiring employers to "opt-in" via a rider. Furthermore, **Horizon BCBS (NJ)** has raised the clinical bar to a **BMI of 35+**, exceeding standard FDA guidelines.
+1. **The "TFL" Lockout:** The most critical update for 2026 is the hard exclusion of Tricare For Life beneficiaries from weight loss drug coverage. This population must pay 100% out-of-pocket (approx. $1,000+/mo) or seek VA coverage if eligible (veteran status separate from retiree status).
+2. **Strict Renewal Criteria:** Renewal PAs for 2026 now strictly require documented weight loss (e.g., >5% body weight loss after 3 months). Failure to meet this metric results in coverage termination.
+3. **Active Duty "Deployability":** For Active Duty Service Members (ADSM), being prescribed a GLP-1 may affect deployability status. It typically requires a waiver or a period of stability before deployment is authorized.
+
+**Next Step:** Would you like me to generate the specific **JSON schema** or **SQL query** to implement these Tricare logic gates into your application's backend?
+
+
+Based on a detailed audit of Kaiser Permanente’s 2025/2026 formularies and Clinical Policy Bulletins (CPBs) accessible as of December 2025, here is the logic for your coverage verification engine.
+
+**Crucial 2026 Policy Update:**
+
+> "Starting in January 2025, these medications will no longer be covered for the sole purpose of weight loss. If you're seeking GLP-1 or other anti-obesity medications for weight loss only, you'll be responsible for the cost."
+> *Source: Kaiser Permanente Business "Your weight loss medication coverage" (Oct 2024 Update).*
+
+This dictates a default **RED LIGHT** for most weight loss claims unless a specific employer "Weight Management Rider" is detected.
 
 ---
 
 ### 1. Coverage Logic (If/Else Rules)
 
-#### **Global Exclusions (Hard Red)**
+**Rule Set A: Type 2 Diabetes (T2D) Logic**
+*Applies to: Ozempic, Mounjaro, Rybelsus, Trulicity, Victoza*
 
-**Rule 1: Compounded & Non-FDA Agents**
+* **IF** [Comorbidity] includes "Type 2 Diabetes":
+* **IF** [Medication History] includes "Metformin":
+* **THEN Status = Green**.
+* *Reason:* Standard of care met. Mounjaro may still be Yellow (Tier 3) requiring failure of Ozempic/Trulicity on some regional plans.
 
-> `IF Medication = "Compounded Semaglutide" OR "Compounded Tirzepatide" THEN Status = RED`
-> **Reason:** BCBS policies universally state: "Compounded medications or non-FDA approved bulk powders are not covered benefits." (Source: BCBS Tx/Il/NM Balanced Drug List).
 
-**Rule 2: Diagnosis Mismatch (Diabetes Drugs)**
+* **IF** [Medication History] = NULL (No Metformin):
+* **THEN Status = Yellow** (Requires Step Therapy).
+* *Reason:* "On maximally tolerated metformin dose or intolerance is required." (Source: KP Northwest CPB for Ozempic).
 
-> `IF Medication IN ["Ozempic", "Mounjaro", "Trulicity", "Victoza", "Rybelsus"] AND Comorbidity != "Type 2 Diabetes" THEN Status = RED`
-> **Reason:** Strict utilization management prevents off-label use. "GLP-1s for weight loss are excluded from coverage if prescribed for indications other than Type 2 Diabetes." (Source: BCBS SC Utilization Management 2026).
 
-#### **Plan-Specific Logic (The "Yellow" Zone)**
 
-**Rule 3: The "New Jersey" Protocol (Stricter BMI)**
 
-> `IF State = "NJ" (Horizon BCBS) AND Medication IN ["Wegovy", "Zepbound"] AND BMI < 35 THEN Status = RED`
-> **Reason:** Effective Jan 1, 2026, Horizon BCBS requires a BMI of **35+** (with comorbidity) rather than the FDA standard of 27/30. (Source: Horizon BCBS Policy ECN0025309).
+* **IF** [Comorbidity] does **NOT** include "Type 2 Diabetes":
+* **THEN Status = Red**.
+* *Reason:* Off-label use for weight loss is strictly excluded/denied.
 
-**Rule 4: Commercial Default Exclusion (MA, MI)**
 
-> `IF State IN ["MI", "MA"] AND Plan_Source = "Employer" AND Employer_Opt_In = FALSE THEN Status = RED`
-> **Reason:** BCBS Michigan and Massachusetts have moved weight loss GLP-1s to the "Excluded" list by default for 2026. Coverage exists only if the specific employer purchased a rider. (Source: BCBS MA Clinical & Pharmacy News, April 2025).
 
-**Rule 5: FEP (Federal) Coverage**
+**Rule Set B: Weight Loss Logic**
+*Applies to: Wegovy, Zepbound, Saxenda*
 
-> `IF Plan_Source = "Govt" (Federal Employee Program) AND Medication IN ["Wegovy", "Zepbound"] THEN Status = GREEN`
-> **Reason:** For 2026, Wegovy and Zepbound are **Tier 2 (Preferred)** on FEP Standard/Basic plans. (Source: FEP Blue Formulary 2026 Updates).
-> *Note: Still requires PA (See Rule 6).*
+* **IF** [Plan Source] = "Marketplace (ACA)" OR "Govt (Medicare/Medicaid)":
+* **THEN Status = Red**.
+* *Reason:* "Excluded by default for ACA/Medicare plans in 2026." Medicare Part D statutorily excludes weight loss drugs.
 
-#### **Clinical Gating (Step Therapy & Lifestyle)**
 
-**Rule 6: Lifestyle Program Gate (The "6-Month" Rule)**
+* **IF** [Plan Source] = "Employer":
+* **IF** [Rider Coverage] = FALSE (Default):
+* **THEN Status = Red**.
+* *Reason:* 2025/2026 Policy Update removes weight loss coverage from base medical plans.
 
-> `IF Medication IN ["Wegovy", "Zepbound", "Saxenda"] AND History_Lifestyle_Program = FALSE THEN Status = YELLOW`
-> **Reason:** Many plans (specifically BCBS MI, CA, IL) now require "Active participation for a minimum of **6 months** in a verified lifestyle modification program (e.g., Omada, Teladoc, Virta) **prior** to approval." Food diaries and exercise logs are required proofs.
 
-**Rule 7: Step Therapy (Oral Failure)**
+* **IF** [Rider Coverage] = TRUE (Employer Opt-In):
+* **Check Clinical Gates:**
+* **IF** [BMI] < 27: **Status = Red**.
+* **IF** [BMI]  30 OR ([BMI]  27 AND [Comorbidity] IN ["Hypertension", "High Cholesterol", "CVD", "OSA"]):
+* **Check Step Therapy:**
+* **IF** [Medication History] includes (2 of: "Phentermine", "Qsymia", "Contrave", "Orlistat"): **Status = Green** (Authorized).
+* **ELSE**: **Status = Yellow** (Requires Step Therapy failure first).
 
-> `IF Medication = "Saxenda" AND History_Medication NOT IN ["Phentermine", "Qsymia", "Contrave"] THEN Status = YELLOW`
-> **Reason:** Older formularies still present Saxenda as a Tier 3 non-preferred option requiring failure of cheaper oral agents first. Wegovy/Zepbound generally bypass this *if* the Lifestyle Gate (Rule 6) is met.
+
+* *Reason:* KP Northwest Zepbound criteria requires "failure of adequate trial to at least two" other agents.
+
+
+
+
+
+
+
+
+
+**Rule Set C: Exclusions**
+
+* **IF** [Medication] = "Compounded Semaglutide/Tirzepatide":
+* **THEN Status = Red**.
+* *Reason:* "Kaiser Permanente will only cover FDA-approved drugs... excludes experimental... and compounded drugs."
+
+
 
 ---
 
 ### 2. Pricing Variables
 
-| Variable | 2026 Value | Logic / Notes |
-| --- | --- | --- |
-| **Standard Copay (Green)** | **$25 - $60** | FEP Tier 2 copays often range $40-$60. Manufacturer savings cards can reduce this to $25 if the plan allows. |
-| **Coinsurance (Yellow)** | **30% - 50%** | Many commercial plans (e.g., BCBS IL, TX) place these on "Specialty Tier" requiring 40-50% coinsurance, not a flat copay. |
-| **Accumulator Adjustment** | **Yes** | **Warning:** BCBS plans increasingly block coupons from counting toward deductibles. Users may pay the first $1,500+ out of pocket despite the "$25 card." |
-| **Lifestyle Discount** | **No** | Enrolling in the lifestyle program does *not* lower the drug price; it merely **unlocks** the coverage (Status Red -> Yellow). |
+* **Standard Copay (Green Status):**
+* **Commercial/Employer:** Typically **Tier 2 ($15-$30)** or **Tier 3 ($40-$60)** depending on plan "Metal" level.
+* **Medicare (T2D only):** **$47** (Tier 3) or **Coinsurance (20-33%)**.
+* **2026 Shift:** High-cost specialty drugs (Tier 4/5) are increasingly moving to **Coinsurance (e.g., 20% of cost)** rather than flat copays.
+
+
+* **Red Light Price:**
+* **Member Pay:** Full Cash Price (~$1,000 - $1,300/mo).
+
+
+* **Lifestyle Program Impact:**
+* **Discounts:** No direct copay discount found for enrolling in lifestyle programs.
+* **Gating:** Enrollment in a program (e.g., KP's "Balance" or internal Medical Weight Management program) is often a **Clinical Gate (Yellow -> Green)** requirement, not a pricing discount mechanism.
+
+
 
 ---
 
-### 3. Member ID Logic
+### 3. Member ID Logic (Validation)
 
-**Validation Regex for 2026:**
-To prevent user error, validate the Member ID field using this logic:
+To prevent user error for Kaiser Permanente (KP) IDs.
 
-* **FEP Plans (Federal):**
-* **Pattern:** Starts with `R` followed by 8 digits.
-* **Regex:** `^R\d{8}$`
+* **Valid Length:** 7 to 11 digits.
+* *Note:* Most regions use a 7-9 digit "Medical Record Number" (MRN). Some cards display 11 digits (MRN + 2 digit suffix).
 
 
-* **Commercial Plans:**
-* **Pattern:** 3 alphanumeric characters (Prefix) + 9 digits.
-* **Regex:** `^[A-Z0-9]{3}\d{9}$`
-* **Note:** New 2026 prefixes include "XXL" (Illinois Medicaid) and "SWH" (Oklahoma unions).
+* **Structure:** Purely numeric. No alpha prefixes.
+* **Regex Pattern:**
+```regex
+^\d{7,11}$
+
+```
 
 
-
-**Valid Length:**
-
-* **Min:** 9 characters (FEP)
-* **Max:** 12 characters (Commercial)
+*Input Mask suggestion: Allow user to enter 11 digits, but strip leading zeros if validation fails against a 7-digit DB.*
 
 ---
 
 ### 4. 2026 Specific Warnings
 
-1. **Massive Exclusion in MI/MA:** If your user is in Michigan or Massachusetts on a standard commercial plan, the default answer is now **Red** (Excluded). Do not promise coverage without checking for an employer rider.
-2. **BMI Inflation (Horizon NJ):** Watch out for New Jersey users. The new BMI 35+ requirement is a "hard stop" that rejects patients who would be eligible under FDA guidelines (BMI 30).
-3. **FEP Tier Confusion:** While FEP lists Wegovy as Tier 2 (Preferred) for 2026, Zepbound may show as Tier 3 (Non-Preferred) on "Blue Standard" plans but Tier 2 on "Blue Focus". Verify specific FEP sub-plan.
-4. **ACA/Marketplace Blackout:** For 2026, weight loss drugs remain **excluded** on almost all ACA Marketplace plans across the 50 states (Red Light). Only specific states with mandates (like potentially VA or CA in future) might differ, but the safe default is Red.
+1. **"Sole Purpose" Exclusion:** Effective Jan 1, 2025 (continuing into 2026), GLP-1s for weight loss are **excluded** from base coverage. Status is Red unless a dedicated "Weight Management" rider is verified.
+2. **Mounjaro Medicare Gap:** Mounjaro is **not** listed on the Kaiser Medicare Part D Formulary for 2025/2026 (Ozempic is preferred). Mounjaro = Red for Medicare unless a rigorous formulary exception is granted.
+3. **Step Therapy Rigor:** Kaiser is stricter than most. They require failing **two** oral generic meds (e.g., Phentermine AND Topiramate) before granting a GLP-1 for weight loss, whereas many carriers only require one.
+
+
+Based on the 2026 Clinical Policy Bulletins and Formulary updates for Humana (focusing on their primary markets: Medicare Advantage, Medicaid, and Military/Tricare, as they have exited the commercial employer market), here is the logic for your coverage verification engine.
+
+### 1. Coverage Logic (If/Else Rules)
+
+**A. The "Statutory Exclusion" Check (Medicare)**
+
+> **Rule:** Medicare Part D plans are legally banned from covering drugs *solely* for weight loss. Exceptions exist only for specific non-weight indications (e.g., Heart Disease).
+
+* **IF** [Plan Source] = "Govt (Medicare)" **AND** [Medication] = "Wegovy" **AND** [Comorbidity] does **NOT** include "Established CVD" **THEN** Status = **Red**.
+* *Reason:* "Weight-loss-only prescriptions are excluded from Medicare Part D coverage... unless the drug has an FDA-approved indication beyond weight loss (e.g., cardiovascular risk reduction)."
+
+
+* **IF** [Plan Source] = "Govt (Medicare)" **AND** [Medication] = "Zepbound" OR "Saxenda" OR "Contrave" **THEN** Status = **Red**.
+* *Reason:* Zepbound and Saxenda do not yet have the "Cardiovascular Risk Reduction" indication approved by CMS for coverage; they remain classified strictly as weight loss agents.
+
+
+
+**B. The "Cardiovascular" Exception (Wegovy on Medicare)**
+
+* **IF** [Plan Source] = "Govt (Medicare)" **AND** [Medication] = "Wegovy" **AND** [Comorbidity] includes "Established CVD" **THEN** Status = **Yellow** (PA Required).
+* *Reason:* Humana covers Wegovy for "reducing the risk of major adverse cardiovascular events (MACE) in adults with established cardiovascular disease," provided the user also meets BMI criteria.
+
+
+
+**C. The "Diabetes Firewall" (GLP-1 Agonists)**
+
+> **Rule:** Humana strictly polices the boundary between Type 2 Diabetes (T2D) and Obesity.
+
+* **IF** [Medication] = "Ozempic" OR "Mounjaro" OR "Trulicity" OR "Victoza" OR "Rybelsus" **AND** [Comorbidity] does **NOT** include "Type 2 Diabetes" **THEN** Status = **Red**.
+* *Reason:* "GLP-1s for diabetes are covered only for the treatment of Type 2 Diabetes. Off-label use for weight management is excluded."
+
+
+
+**D. Tricare / Military Logic (The "Green Light" Path)**
+
+> **Rule:** Humana Military (Tricare East) *does* cover weight loss meds but enforces strict Step Therapy.
+
+* **IF** [Plan Source] = "Govt (Military)" **AND** [Medication History] includes ("Phentermine" OR "Qsymia" OR "Contrave") **THEN** Status = **Green**.
+* *Reason:* Documented failure of a "Step 1" agent (Phentermine/Qsymia) often satisfies the PA requirement, moving the GLP-1 to approved status.
+
+
+* **IF** [Plan Source] = "Govt (Military)" **AND** [Medication History] = "None" **THEN** Status = **Yellow** (Step Therapy Required).
+
+**E. Compounded / Safety Exclusion**
+
+* **IF** [Medication] = "Compounded Semaglutide/Tirzepatide" **THEN** Status = **Red**.
+* *Reason:* Plan exclusion for "non-FDA approved compounded formulations" and "bulk powder variants."
+
+
+
+**F. Commercial / Employer Status**
+
+* **IF** [Plan Source] = "Employer" **THEN** Status = **Red** (Default/Warning).
+* *Reason:* Humana has **exited** the Employer Group Commercial Medical Products business as of late 2025. Unless the user is on a legacy run-off plan or a specific administrative-only contract, valid commercial Humana coverage is unlikely to exist for 2026.
+
+
+
+---
+
+### 2. Pricing Variables
+
+**Standard Copay (Medicare Part D 2026):**
+
+* **Tier 1/2 (Generics/Metformin):** $0 - $5.
+* **Tier 3 (Preferred Brand - e.g., Ozempic for T2D):** **$47** (approximate average).
+* **Tier 4/5 (Non-Preferred/Specialty):** **33% - 50% Coinsurance**.
+
+**The "IRA" Pricing Shift (CRITICAL for 2026):**
+
+* **Logic:** IF Status = **Green** or **Yellow** (Approved) AND Total Year-to-Date Spend > $2,000 **THEN** Price = **$0**.
+* *Reason:* The Inflation Reduction Act (IRA) caps Medicare Part D out-of-pocket costs at **$2,000** annually starting Jan 1, 2026. This effectively eliminates the "Donut Hole."
+
+**Lifestyle Program Impact:**
+
+* **Price Impact:** **No direct discount.** (Enrollment is a clinical gate to get coverage, not a coupon to lower the copay).
+* **Red Light Price:** **~$1,000 - $1,300**. (The $199 target in your app likely refers to compounded cash prices; legitimate retail cash price for Zepbound/Wegovy is much higher).
+
+---
+
+### 3. Member ID Logic (Validation)
+
+**Format 1 (Medicare Advantage - Most Common):**
+
+* **Valid Length:** 11 Characters (Total)
+* **Required Pattern:** Starts with **H** followed by 8 digits (Contract ID) + rarely 2 digits (PBP). *However, the card often displays just the Member ID.*
+* **Card Display Pattern:** **H** + 8 Digits (e.g., `H12345678`) OR 9 Digits (Numeric).
+
+**Format 2 (Legacy/Medicaid):**
+
+* **Valid Length:** 9 to 10 Digits.
+* **Required Pattern:** Numeric only.
+
+**Regex for Validation:**
+`^(H\d{8}|\d{9,10})$`
+
+---
+
+### 4. 2026 Specific Warnings
+
+1. **Humana Commercial Exit:** If a user selects "Employer" and "Humana," flag this for review. Humana has ceased offering commercial medical insurance. The user may actually have **Tricare** (Military) or a **Group Medicare** plan.
+2. **Medicare Coverage of Wegovy:** Do not Auto-Red Light Wegovy for Medicare users *if* they select "Heart Disease" or "Established CVD." This is the *only* pathway for coverage in 2026.
+3. **Zepbound Lockout:** Zepbound currently has **NO** approved cardiovascular indication. Unlike Wegovy, it is strictly considered a weight loss drug and is **statutorily excluded** from all Humana Medicare plans for 2026.
+4. **$2,000 Cap:** The logic engine must account for the $2,000 cap. A user on a 50% coinsurance tier (Tier 4) will hit this cap in roughly 4 months ($500/mo), making the medication free ($0) for the remaining 8 months of the year.
