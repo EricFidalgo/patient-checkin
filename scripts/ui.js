@@ -229,3 +229,28 @@ export function showModal(modalId) {
         modal.classList.remove('u-hidden');
     }
 }
+
+export function updateMemberIdHelper() {
+    const carrierSelect = document.getElementById('carrier');
+    const helperText = document.getElementById('member-id-helper-text'); // We will add this ID to HTML
+    const selectedCarrier = carrierSelect.value;
+    const config = getConfig();
+
+    // Default message if no carrier selected or no specific rule exists
+    const defaultMsg = "Providing your Member ID allows our partner pharmacies to manually verify your 2025 benefits.";
+
+    if (!config || !config.coverage_engine_config || !selectedCarrier || selectedCarrier === 'Other') {
+        helperText.textContent = defaultMsg;
+        return;
+    }
+
+    const carrierRules = config.coverage_engine_config[selectedCarrier];
+
+    // If the carrier has specific help text in the JSON, use it.
+    if (carrierRules && carrierRules.member_id_validation && carrierRules.member_id_validation.help_text) {
+        // highlight the text to make it noticeable
+        helperText.innerHTML = `<span class="u-text-primary t-semi">Format Hint:</span> ${carrierRules.member_id_validation.help_text}`;
+    } else {
+        helperText.textContent = defaultMsg;
+    }
+}

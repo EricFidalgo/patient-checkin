@@ -19,6 +19,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.toggleCarrierField = UI.toggleCarrierField;
     window.clearError = UI.clearError;
     window.nextStep = handleNextStep; 
+
+    const carrierSelect = document.getElementById('carrier');
+    if(carrierSelect) {
+        // Update the hint whenever the user changes the carrier
+        carrierSelect.addEventListener('change', UI.updateMemberIdHelper);
+    }
 });
 
 // --- INPUT CONSTRAINTS ---
