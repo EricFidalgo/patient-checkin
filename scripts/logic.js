@@ -62,6 +62,27 @@ export function determineCoverageStatus(inputData) {
                 };
             }
         }
+
+        // Humana Market Exit: Humana has exited the Commercial Group market.
+        if (targetCarrier === 'Humana' && inputData.planSource === 'employer') {
+            return { 
+                status: 'red', 
+                reason: 'MARKET EXIT: Humana has exited the Employer Group Commercial market. Policy likely invalid.', 
+                pricing: null 
+            };
+        }
+
+        // Tricare For Life (TFL) Statutory Exclusion
+        if (targetCarrier === 'Tricare' && inputData.age >= 65) {
+             const weightLossMeds = ["Wegovy", "Zepbound", "Saxenda", "Qsymia", "Contrave"];
+             if (weightLossMeds.includes(inputData.medication[0])) { // Assuming single selection
+                return {
+                    status: 'red',
+                    reason: 'STATUTORY EXCLUSION: Tricare For Life (Age 65+) follows Medicare exclusion of weight loss drugs.',
+                    pricing: null
+                };
+             }
+        }
     }
 
     const carrierRules = config.coverage_engine_config[targetCarrier];
@@ -196,27 +217,41 @@ export function checkSafetyStop(bmi) {
 /**
  * Validates Member ID based on carrier-specific regex rules.
  */
-export function validateMemberID(carrier, rawId) {
-    if (!rawId) return { valid: true }; // Optional field
+export function validateMemberID(carrier, rawId, inputData = {}) {
+    if (!rawId) return { valid: true }; 
 
     const config = getConfig();
-    // Default fallback if config isn't loaded yet
     if (!config || !config.coverage_engine_config) return { valid: true };
 
+    // 1. Ambetter Specific: Strict Numeric Check + Legacy Legacy Handling
+    if (carrier === 'Ambetter') {
+        const clean = rawId.replace(/[^0-9]/g, '');
+        if (clean.length < 9 || clean.length > 12) {
+            return { valid: false, msg: "Ambetter 2026: ID must be 9-12 digits (Numeric Only)." };
+        }
+        return { valid: true };
+    }
+
+    // 2. Molina Specific: Polymorphic Logic (State overrides)
+    if (carrier === 'Molina') {
+        // TX & OH Duals/MMP require Alphanumeric acceptance
+        if ((inputData.state === 'TX' || inputData.state === 'OH') && /[A-Z]/.test(rawId)) {
+             return { valid: true }; // Allow alphanumeric for MMP
+        }
+        // WA requires specific suffix check or ProviderOne format
+        if (inputData.state === 'WA' && rawId.toUpperCase().endsWith('WA')) {
+             return { valid: true };
+        }
+    }
+
+    // 3. Standard Logic (Fallback to Config Regex)
     const carrierRules = config.coverage_engine_config[carrier];
-    
-    // If we don't have rules for this carrier, revert to basic check
     if (!carrierRules || !carrierRules.member_id_validation) {
-        const clean = rawId.replace(/[^A-Z0-9]/g, '');
-        if (clean.length < 5) return { valid: false, msg: "ID too short." };
         return { valid: true };
     }
 
     const valRule = carrierRules.member_id_validation;
     const regex = new RegExp(valRule.regex);
-    
-    // For regex, we usually test the raw input or a slightly cleaned version.
-    // The regexes provided (e.g., ^W\d{9}) imply uppercase.
     const cleanId = rawId.trim().toUpperCase();
 
     if (!regex.test(cleanId)) {

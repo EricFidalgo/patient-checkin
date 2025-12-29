@@ -380,285 +380,207 @@
     }
   },
   "Tricare": {
-    "id": "tricare_2026",
-    "default_status": "yellow",
-    "member_id_validation": {
-      "regex": "^(\\d{9}|\\d{11})$",
-      "min_length": 9,
-      "max_length": 11,
-      "help_text": "Enter your 9-digit Sponsor SSN or 11-digit DBN (Benefits Number) from the back of your ID."
-    },
-    "rules": [
-      {
-        "if": {
-          "planSource": "govt",
-          "age_ge": 65,
-          "medication": ["Wegovy", "Zepbound", "Saxenda", "Qsymia", "Contrave"]
-        },
-        "then": { "status": "red", "reason": "Tricare For Life (Age 65+) excludes coverage for weight loss medications." }
+      "id": "tricare_2026",
+      "default_status": "yellow",
+      "member_id_validation": {
+        "regex": "^\\d{11}$",
+        "min_length": 11,
+        "max_length": 11,
+        "help_text": "Enter the 11-digit DoD Benefits Number (DBN) from the BACK of your ID card. Do not use the 10-digit DoD ID."
       },
-      {
-        "if": { "medication": ["Compounded"] },
-        "then": { "status": "red", "reason": "Exclusion: Non-FDA approved compounded agents are not covered." }
-      },
-      {
-        "if": {
-          "medication": ["Ozempic", "Mounjaro", "Trulicity", "Rybelsus"],
-          "missing_comorbidities": ["diabetes"]
+      "rules": [
+        {
+          "if": {
+            "planSource": "govt",
+            "age_ge": 65,
+            "medication": ["Wegovy", "Zepbound", "Saxenda", "Qsymia", "Contrave"]
+          },
+          "then": { "status": "red", "reason": "Statutory Exclusion: Tricare For Life (Age 65+) follows Medicare exclusion of weight loss drugs." }
         },
-        "then": { "status": "red", "reason": "Off-label use denied. Diagnosis must be Type 2 Diabetes." }
-      },
-      {
-        "if": {
-          "medication": ["Wegovy", "Zepbound", "Saxenda"],
-          "bmi_lt": 30,
-          "missing_comorbidities": ["diabetes", "hypertension", "high_cholesterol", "osa", "established_cvd"]
+        {
+          "if": { "medication": ["Compounded"] },
+          "then": { "status": "red", "reason": "Exclusion: Non-FDA approved compounded agents are not covered." }
         },
-        "then": { "status": "red", "reason": "Clinical Gate: BMI < 30 requires a valid comorbidity for coverage." }
-      },
-      {
-        "if": {
-          "medication": ["Wegovy", "Zepbound", "Saxenda"],
-          "missing_history": ["phentermine", "qsymia", "contrave"]
+        {
+          "if": {
+            "medication": ["Ozempic", "Mounjaro", "Trulicity", "Rybelsus"],
+            "missing_comorbidities": ["diabetes"]
+          },
+          "then": { "status": "red", "reason": "Off-label use denied. Diagnosis must be Type 2 Diabetes." }
         },
-        "then": { "status": "yellow", "reason": "Step Therapy: Must try and fail an oral agent (e.g. Phentermine) first." }
-      },
-      {
-        "if": {
-          "medication": ["Wegovy", "Zepbound"],
-          "missing_history": ["lifestyle_program"]
-        },
-        "then": { "status": "yellow", "reason": "PA Requirement: Must document 6-month comprehensive lifestyle program." }
+        {
+          "if": {
+            "medication": ["Wegovy", "Zepbound", "Saxenda"],
+            "bmi_lt": 30,
+            "missing_comorbidities": ["diabetes", "hypertension", "high_cholesterol", "osa", "established_cvd"]
+          },
+          "then": { "status": "red", "reason": "Clinical Gate: BMI < 30 requires a valid comorbidity for coverage." }
+        }
+      ],
+      "pricing": {
+        "green_copay": 48,
+        "lifestyle_program_discount": false
       }
-    ],
-    "pricing": {
-      "green_copay": 48,
-      "lifestyle_program_discount": false
-    }
-  },
-  "Kaiser": {
-    "id": "kaiser_2026",
-    "default_status": "yellow",
-    "member_id_validation": {
-      "regex": "^\\d{7,11}$",
-      "min_length": 7,
-      "max_length": 11,
-      "help_text": "Enter your Medical Record Number (MRN). typically 7-11 digits, numeric only."
     },
-    "rules": [
-      {
-        "if": { "planSource": "marketplace" },
-        "then": { "status": "red", "reason": "ACA/Marketplace plans exclude weight loss medications by default." }
+    "Kaiser": {
+      "id": "kaiser_2026",
+      "default_status": "red",
+      "member_id_validation": {
+        "regex": "^\\d{7,12}$",
+        "min_length": 7,
+        "max_length": 12,
+        "help_text": "Enter your MRN. This may be 7, 8, 9, or 12 digits depending on your region (e.g. SoCal uses 12 digits)."
       },
-      {
-        "if": { "planSource": "govt" },
-        "then": { "status": "red", "reason": "Medicare/Medicaid plans exclude weight loss medications by default." }
-      },
-      {
-        "if": { "planSource": "employer", "medication": ["Wegovy", "Zepbound"] },
-        "then": { "status": "red", "reason": "Base Plan Exclusion: Coverage requires a specific Employer Weight Management Rider." }
-      },
-      {
-        "if": {
-           "medication": ["Ozempic", "Mounjaro", "Trulicity", "Victoza"],
-           "missing_comorbidities": ["diabetes"]
+      "rules": [
+        {
+          "if": { "planSource": "employer", "medication": ["Wegovy", "Zepbound"] },
+          "then": { "status": "red", "reason": "Base Plan Exclusion: Standard HMO plans exclude weight loss meds without a specific Employer Rider." }
         },
-        "then": { "status": "red", "reason": "Strict Diagnosis: Covered for Type 2 Diabetes only." }
-      },
-      {
-        "if": {
-           "medication": ["Wegovy", "Zepbound"],
-           "bmi_lt": 27
+        {
+          "if": {
+             "medication": ["Ozempic", "Mounjaro", "Trulicity", "Victoza"],
+             "missing_comorbidities": ["diabetes"]
+          },
+          "then": { "status": "red", "reason": "Strict Diagnosis: Covered for Type 2 Diabetes only." }
         },
-        "then": { "status": "red", "reason": "Clinical Criteria: BMI < 27 does not meet medical necessity." }
-      },
-      {
-        "if": {
-           "medication": ["Wegovy", "Zepbound"],
-           "missing_history": ["phentermine", "qsymia", "contrave", "orlistat"]
-        },
-        "then": { "status": "yellow", "reason": "Strict Step Therapy: Requires failure of TWO oral generic agents." }
+        {
+           "if": {
+             "planSource": "govt",
+             "medication": ["Wegovy"],
+             "has_comorbidity": "established_cvd"
+           },
+           "then": { "status": "yellow", "reason": "Medicare Advantage Exception: Covered for Established CVD Risk Reduction." }
+        }
+      ],
+      "pricing": {
+        "green_copay": 45,
+        "lifestyle_program_discount": false
       }
-    ],
-    "pricing": {
-      "green_copay": 20,
-      "lifestyle_program_discount": false
-    }
-  },
-  "Humana": {
-    "id": "humana_2026",
-    "default_status": "yellow",
-    "member_id_validation": {
-      "regex": "^(H\\d{8}|\\d{9,10})$",
-      "min_length": 9,
-      "max_length": 11,
-      "help_text": "Typically starts with 'H' followed by 8 digits, or is 9-10 numeric digits."
     },
-    "rules": [
-      {
-        "if": { "planSource": "employer" },
-        "then": { "status": "red", "reason": "Humana has exited the Commercial Employer market. Coverage unlikely." }
+    "Humana": {
+      "id": "humana_2026",
+      "default_status": "yellow",
+      "member_id_validation": {
+        "regex": "^(H\\d{8}|\\d{9,10})$",
+        "min_length": 9,
+        "max_length": 11,
+        "help_text": "IMPORTANT: Enter the ID from your Prescription Drug (PDP) card, not your Medical card."
       },
-      {
-        "if": { "medication": ["Compounded"] },
-        "then": { "status": "red", "reason": "Exclusion: Non-FDA approved compounded agents are not covered." }
-      },
-      {
-        "if": {
-          "medication": ["Ozempic", "Mounjaro", "Trulicity", "Rybelsus"],
-          "missing_comorbidities": ["diabetes"]
+      "rules": [
+        {
+          "if": { "planSource": "employer" },
+          "then": { "status": "red", "reason": "Humana has exited the Commercial Employer market. Coverage invalid." }
         },
-        "then": { "status": "red", "reason": "T2D Firewall: GLP-1s covered for Type 2 Diabetes only." }
-      },
-      {
-        "if": {
-          "planSource": "govt",
-          "medication": ["Zepbound", "Saxenda", "Contrave"]
+        {
+          "if": { "medication": ["Compounded"] },
+          "then": { "status": "red", "reason": "Exclusion: Non-FDA approved compounded agents are not covered." }
         },
-        "then": { "status": "red", "reason": "Statutory Exclusion: Zepbound is not covered by Medicare Part D." }
-      },
-      {
-        "if": {
-           "planSource": "govt",
-           "medication": ["Wegovy"],
-           "missing_comorbidities": ["established_cvd"]
+        {
+          "if": {
+            "medication": ["Ozempic", "Mounjaro", "Trulicity", "Rybelsus"],
+            "missing_comorbidities": ["diabetes"]
+          },
+          "then": { "status": "red", "reason": "T2D Firewall: GLP-1s covered for Type 2 Diabetes only." }
         },
-        "then": { "status": "red", "reason": "Medicare Coverage requires Established Cardiovascular Disease diagnosis." }
-      },
-      {
-        "if": {
-           "planSource": "govt",
-           "medication": ["Wegovy"],
-           "has_comorbidity": "established_cvd"
-        },
-        "then": { "status": "yellow", "reason": "Possible Coverage: Covered for CVD Risk Reduction (PA Required)." }
+        {
+           "if": {
+             "planSource": "govt",
+             "medication": ["Wegovy"],
+             "has_comorbidity": "established_cvd"
+           },
+           "then": { "status": "yellow", "reason": "Possible Coverage: Covered for CVD Risk Reduction (PA Required)." }
+        }
+      ],
+      "pricing": {
+        "green_copay": 47,
+        "lifestyle_program_discount": false
       }
-    ],
-    "pricing": {
-      "green_copay": 47,
-      "lifestyle_program_discount": false
-    }
-  },
+    },
   "Molina": {
-    "id": "molina_2026",
-    "default_status": "yellow",
-    "member_id_validation": {
-      "regex": "^[A-Z0-9]{9,12}$",
-      "min_length": 9,
-      "max_length": 12,
-      "help_text": "Enter your 9-12 digit Member ID. Usually numeric, but may contain letters."
-    },
-    "rules": [
-      {
-        "if": { "medication": ["Compounded"] },
-        "then": { "status": "red", "reason": "Exclusion: Non-FDA approved compounded agents are not covered." }
+      "id": "molina_2026",
+      "default_status": "yellow",
+      "member_id_validation": {
+        "regex": "^[A-Z0-9]{9,15}(?:WA)?$",
+        "min_length": 9,
+        "max_length": 15,
+        "help_text": "2026: Enter 9-12 digit ID. OH/TX Duals: Enter alphanumeric ID. WA: Include 'WA' suffix."
       },
-      {
-        "if": {
-          "planSource": "govt",
-          "state_in": ["CA", "MI", "VA", "WA"],
-          "has_comorbidity": "diabetes"
+      "rules": [
+        {
+          "if": { "medication": ["Compounded"] },
+          "then": { "status": "red", "reason": "Exclusion: Non-FDA approved compounded agents are not covered." }
         },
-        "then": { "status": "yellow", "reason": "State Medicaid Exception: Covered for Type 2 Diabetes in your state." }
-      },
-      {
-        "if": { "planSource": "medicaid" },
-        "then": { "status": "red", "reason": "General Exclusion: Weight loss drugs are not a covered Medicaid benefit." }
-      },
-      {
-        "if": {
-           "planSource": "medicare",
-           "medication": ["Wegovy"],
-           "has_any_comorbidity": ["diabetes", "established_cvd"]
+        {
+          "if": { "state": "CA", "date_ge": "2026-01-01", "medication": ["Wegovy", "Zepbound", "Saxenda"], "age_ge": 21 },
+          "then": { "status": "red", "reason": "CA Medi-Cal 2026 Hard Cut: Weight loss coverage removed for adults (Age 21+) due to budget deficit." }
         },
-        "then": { "status": "yellow", "reason": "Exception: Covered for Diabetes or CVD Risk Reduction." }
-      },
-      {
-        "if": { "planSource": "medicare" },
-        "then": { "status": "red", "reason": "Statutory Exclusion: Weight loss medications are excluded from Medicare Part D." }
-      },
-      {
-        "if": {
-          "medication": ["Wegovy", "Zepbound"],
-          "bmi_lt": 27
+        {
+          "if": { "state": "WA", "medication": ["Wegovy", "Zepbound"] },
+          "then": { "status": "red", "reason": "WA Apple Health Carve-Out: Weight loss drugs excluded from Molina. Submit to State FFS via ETR." }
         },
-        "then": { "status": "red", "reason": "Medical Necessity: BMI < 27 does not meet clinical criteria." }
-      },
-      {
-        "if": {
-          "medication": ["Wegovy", "Zepbound"],
-          "bmi_range": [27, 30],
-          "missing_comorbidities": ["hypertension", "diabetes", "high_cholesterol", "osa", "established_cvd"]
+        {
+          "if": { "state": "MI", "date_ge": "2026-01-01", "bmi_lt": 40, "missing_comorbidities": ["diabetes", "hypertension", "established_cvd", "osa"] },
+          "then": { "status": "red", "reason": "MI Medicaid 2026 Restriction: Coverage limited to Morbid Obesity (BMI > 40) strictly to avert surgery." }
         },
-        "then": { "status": "red", "reason": "Medical Necessity: BMI 27-30 requires a serious comorbidity (e.g. Hypertension)." }
-      },
-      {
-        "if": {
-           "missing_history": ["phentermine", "qsymia", "contrave", "orlistat", "benzphetamine"]
+        {
+          "if": { "state": "VA", "medication": ["Wegovy"], "bmi_lt": 24 },
+          "then": { "status": "red", "reason": "VA Safety Floor: BMI < 24 is strictly denied to prevent underweight usage." }
         },
-        "then": { "status": "yellow", "reason": "Step Therapy: Must fail one oral agent (e.g. Phentermine) for 3-6 months first." }
+        {
+          "if": { "planSource": "marketplace", "medication": ["Wegovy"], "state_in": ["CA", "NM"] },
+          "then": { "status": "red", "reason": "Formulary Exclusion: Wegovy listed as 'NC' (Not Covered) for Marketplace in CA/NM." }
+        },
+        {
+           "if": { "planSource": "medicare", "medication": ["Wegovy", "Zepbound"] },
+           "then": { "status": "red", "reason": "Statutory Exclusion: Weight loss medications are excluded from Medicare Part D." }
+        },
+        {
+          "if": { "has_comorbidity": "diabetes" },
+          "then": { "status": "green", "reason": "Covered Benefit: Approved for Type 2 Diabetes." }
+        }
+      ],
+      "pricing": {
+        "green_copay": 0,
+        "lifestyle_program_discount": false,
+        "note": "Marketplace Tier 5: 30-40% Coinsurance applies."
       }
-    ],
-    "pricing": {
-      "green_copay": 400,
-      "lifestyle_program_discount": false
-    }
-  },
-  "Ambetter": {
-    "id": "ambetter_2026",
-    "default_status": "red",
-    "member_id_validation": {
-      "regex": "^(U\\d{8,11}|\\d{9,10})$",
-      "min_length": 9,
-      "max_length": 12,
-      "help_text": "Typically starts with 'U' followed by digits (Marketplace) or is 9-10 digits."
     },
-    "rules": [
-      {
-        "if": { "medication": ["Compounded"] },
-        "then": { "status": "red", "reason": "Exclusion: Non-FDA approved formulations are not covered." }
+    "Ambetter": {
+      "id": "ambetter_2026",
+      "default_status": "red",
+      "member_id_validation": {
+        "regex": "^\\d{9,12}$",
+        "min_length": 9,
+        "max_length": 12,
+        "help_text": "Strictly Numeric: Enter the 9-digit Member ID (or full 12 digits) as shown on card."
       },
-      {
-        "if": {
-           "planSource": "marketplace",
-           "state_not_in": ["CA", "MA", "MD"]
+      "rules": [
+        {
+          "if": { "medication": ["Zepbound"], "has_comorbidity": "osa", "bmi_ge": 30 },
+          "then": { "status": "green", "reason": "2026 CP.PMN.298 Exception: Covered for OSA (AHI > 15) despite general weight loss exclusion." }
         },
-        "then": { "status": "red", "reason": "Plan Exclusion: Anti-obesity medications are excluded on Marketplace plans in this state." }
-      },
-      {
-        "if": {
-           "medication": ["Ozempic", "Mounjaro", "Trulicity"],
-           "has_comorbidity": "diabetes",
-           "has_med_history": true
+        {
+          "if": { "medication": ["Compounded"] },
+          "then": { "status": "red", "reason": "Exclusion: Non-FDA approved formulations are not covered." }
         },
-        "then": { "status": "green", "reason": "Approved: T2D Diagnosis + Metformin history confirmed." }
-      },
-      {
-        "if": {
-           "medication": ["Ozempic", "Mounjaro"],
-           "missing_comorbidities": ["diabetes"]
+        {
+           "if": { "planSource": "marketplace", "state_not_in": ["CA", "MA", "MD"], "missing_comorbidities": ["osa"] },
+           "then": { "status": "red", "reason": "Plan Exclusion: Anti-obesity medications are generally excluded on Marketplace plans." }
         },
-        "then": { "status": "red", "reason": "Diagnosis Mismatch: T2D diagnosis strictly required." }
-      },
-      {
-        "if": {
-           "medication": ["Wegovy"],
-           "missing_history": ["lifestyle_program"]
+        {
+           "if": { "medication": ["Ozempic", "Mounjaro", "Trulicity"], "has_comorbidity": "diabetes" },
+           "then": { "status": "green", "reason": "Approved: T2D Diagnosis Confirmation." }
         },
-        "then": { "status": "yellow", "reason": "Requirement: Proof of 6-month Physician-Directed Weight Loss Program." }
-      },
-      {
-        "if": {
-           "medication": ["Zepbound"],
-           "has_comorbidity": "osa"
-        },
-        "then": { "status": "yellow", "reason": "Medical Necessity: Covered for OSA with AHI ≥ 15 (Sleep Study Required)." }
+        {
+           "if": { "medication": ["Ozempic", "Mounjaro"], "missing_comorbidities": ["diabetes"] },
+           "then": { "status": "red", "reason": "Diagnosis Mismatch: T2D diagnosis strictly required." }
+        }
+      ],
+      "pricing": {
+        "green_copay": 250,
+        "lifestyle_program_discount": false,
+        "note": "Tier 4: 10% Coinsurance (Capped at $250/mo)."
       }
-    ],
-    "pricing": {
-      "green_copay": 100,
-      "lifestyle_program_discount": false
     }
-  }
 }
 }
