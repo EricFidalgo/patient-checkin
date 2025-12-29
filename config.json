@@ -361,6 +361,166 @@
       "green_copay": 0,
       "lifestyle_program_discount": false
     }
+  },
+  "Tricare": {
+    "id": "tricare_2026",
+    "default_status": "yellow",
+    "member_id_validation": {
+      "regex": "^(\\d{9}|\\d{11})$",
+      "min_length": 9,
+      "max_length": 11,
+      "help_text": "Enter your 9-digit Sponsor SSN or 11-digit DBN (Benefits Number) from the back of your ID."
+    },
+    "rules": [
+      {
+        "if": {
+          "planSource": "govt",
+          "age_ge": 65,
+          "medication": ["Wegovy", "Zepbound", "Saxenda", "Qsymia", "Contrave"]
+        },
+        "then": { "status": "red", "reason": "Tricare For Life (Age 65+) excludes coverage for weight loss medications." }
+      },
+      {
+        "if": { "medication": ["Compounded"] },
+        "then": { "status": "red", "reason": "Exclusion: Non-FDA approved compounded agents are not covered." }
+      },
+      {
+        "if": {
+          "medication": ["Ozempic", "Mounjaro", "Trulicity", "Rybelsus"],
+          "missing_comorbidities": ["diabetes"]
+        },
+        "then": { "status": "red", "reason": "Off-label use denied. Diagnosis must be Type 2 Diabetes." }
+      },
+      {
+        "if": {
+          "medication": ["Wegovy", "Zepbound", "Saxenda"],
+          "bmi_lt": 30,
+          "missing_comorbidities": ["diabetes", "hypertension", "high_cholesterol", "osa", "established_cvd"]
+        },
+        "then": { "status": "red", "reason": "Clinical Gate: BMI < 30 requires a valid comorbidity for coverage." }
+      },
+      {
+        "if": {
+          "medication": ["Wegovy", "Zepbound", "Saxenda"],
+          "missing_history": ["phentermine", "qsymia", "contrave"]
+        },
+        "then": { "status": "yellow", "reason": "Step Therapy: Must try and fail an oral agent (e.g. Phentermine) first." }
+      },
+      {
+        "if": {
+          "medication": ["Wegovy", "Zepbound"],
+          "missing_history": ["lifestyle_program"]
+        },
+        "then": { "status": "yellow", "reason": "PA Requirement: Must document 6-month comprehensive lifestyle program." }
+      }
+    ],
+    "pricing": {
+      "green_copay": 48,
+      "lifestyle_program_discount": false
+    }
+  },
+  "Kaiser": {
+    "id": "kaiser_2026",
+    "default_status": "yellow",
+    "member_id_validation": {
+      "regex": "^\\d{7,11}$",
+      "min_length": 7,
+      "max_length": 11,
+      "help_text": "Enter your Medical Record Number (MRN). typically 7-11 digits, numeric only."
+    },
+    "rules": [
+      {
+        "if": { "planSource": "marketplace" },
+        "then": { "status": "red", "reason": "ACA/Marketplace plans exclude weight loss medications by default." }
+      },
+      {
+        "if": { "planSource": "govt" },
+        "then": { "status": "red", "reason": "Medicare/Medicaid plans exclude weight loss medications by default." }
+      },
+      {
+        "if": { "planSource": "employer", "medication": ["Wegovy", "Zepbound"] },
+        "then": { "status": "red", "reason": "Base Plan Exclusion: Coverage requires a specific Employer Weight Management Rider." }
+      },
+      {
+        "if": {
+           "medication": ["Ozempic", "Mounjaro", "Trulicity", "Victoza"],
+           "missing_comorbidities": ["diabetes"]
+        },
+        "then": { "status": "red", "reason": "Strict Diagnosis: Covered for Type 2 Diabetes only." }
+      },
+      {
+        "if": {
+           "medication": ["Wegovy", "Zepbound"],
+           "bmi_lt": 27
+        },
+        "then": { "status": "red", "reason": "Clinical Criteria: BMI < 27 does not meet medical necessity." }
+      },
+      {
+        "if": {
+           "medication": ["Wegovy", "Zepbound"],
+           "missing_history": ["phentermine", "qsymia", "contrave", "orlistat"]
+        },
+        "then": { "status": "yellow", "reason": "Strict Step Therapy: Requires failure of TWO oral generic agents." }
+      }
+    ],
+    "pricing": {
+      "green_copay": 20,
+      "lifestyle_program_discount": false
+    }
+  },
+  "Humana": {
+    "id": "humana_2026",
+    "default_status": "yellow",
+    "member_id_validation": {
+      "regex": "^(H\\d{8}|\\d{9,10})$",
+      "min_length": 9,
+      "max_length": 11,
+      "help_text": "Typically starts with 'H' followed by 8 digits, or is 9-10 numeric digits."
+    },
+    "rules": [
+      {
+        "if": { "planSource": "employer" },
+        "then": { "status": "red", "reason": "Humana has exited the Commercial Employer market. Coverage unlikely." }
+      },
+      {
+        "if": { "medication": ["Compounded"] },
+        "then": { "status": "red", "reason": "Exclusion: Non-FDA approved compounded agents are not covered." }
+      },
+      {
+        "if": {
+          "medication": ["Ozempic", "Mounjaro", "Trulicity", "Rybelsus"],
+          "missing_comorbidities": ["diabetes"]
+        },
+        "then": { "status": "red", "reason": "T2D Firewall: GLP-1s covered for Type 2 Diabetes only." }
+      },
+      {
+        "if": {
+          "planSource": "govt",
+          "medication": ["Zepbound", "Saxenda", "Contrave"]
+        },
+        "then": { "status": "red", "reason": "Statutory Exclusion: Zepbound is not covered by Medicare Part D." }
+      },
+      {
+        "if": {
+           "planSource": "govt",
+           "medication": ["Wegovy"],
+           "missing_comorbidities": ["established_cvd"]
+        },
+        "then": { "status": "red", "reason": "Medicare Coverage requires Established Cardiovascular Disease diagnosis." }
+      },
+      {
+        "if": {
+           "planSource": "govt",
+           "medication": ["Wegovy"],
+           "has_comorbidity": "established_cvd"
+        },
+        "then": { "status": "yellow", "reason": "Possible Coverage: Covered for CVD Risk Reduction (PA Required)." }
+      }
+    ],
+    "pricing": {
+      "green_copay": 47,
+      "lifestyle_program_discount": false
+    }
   }
 }
 }
