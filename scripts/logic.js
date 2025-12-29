@@ -1,6 +1,40 @@
 // scripts/logic.js
 import { getConfig } from './config.js';
 
+function normalizeInputData(inputData) {
+    const data = { ...inputData }; // Create copy
+
+    // 1. Map Comorbidities (Long Text -> Short Code)
+    const conditionMap = {
+        "Obstructive Sleep Apnea (OSA)": "osa",
+        "Type 2 Diabetes": "diabetes",
+        "Prediabetes (HbA1c 5.7% - 6.4%)": "prediabetes",
+        "High Cholesterol (Hyperlipidemia)": "cvd", // Generalized CVD risk
+        "Heart Disease (History of Heart Attack/Stroke)": "established_cvd",
+        "Polycystic Ovary Syndrome (PCOS)": "pcos",
+        "Hypertension / High Blood Pressure": "hypertension"
+    };
+
+    if (data.comorbidities && Array.isArray(data.comorbidities)) {
+        data.comorbidities = data.comorbidities.map(c => conditionMap[c] || c);
+    }
+
+    // 2. Map Medication History (Include Metformin as valid history if selected)
+    const historyMap = {
+        "Metformin (90+ days)": "metformin",
+        "Phentermine (Adipex-P)": "phentermine",
+        "Qsymia (Phentermine/Topiramate)": "qsymia",
+        "Contrave (Bupropion/Naltrexone)": "contrave",
+        "Orlistat (Xenical / Alli)": "orlistat"
+    };
+
+    if (data.medicationHistory && Array.isArray(data.medicationHistory)) {
+        data.medicationHistory = data.medicationHistory.map(h => historyMap[h] || h);
+    }
+
+    return data;
+}
+
 /**
  * Main function to determine coverage status based on user input and config rules.
  */

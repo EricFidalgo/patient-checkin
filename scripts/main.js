@@ -2,8 +2,10 @@
 import { loadConfig, getConfig } from './config.js';
 import { determineCoverageStatus, checkSafetyStop, validateMemberID } from './logic.js';
 import * as UI from './ui.js';
+import { exportDataToTextFile } from './fileExport.js';
 
 let currentResultType = null; 
+let currentInputData = null;
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
@@ -178,7 +180,11 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     const carrier = document.getElementById('carrier');
     const planSource = document.getElementById('plan-source');
     const employerNameInput = document.getElementById('employer-name'); 
+    
+    // [FIX] Get the Radio Gate from Step 1 to check user intent
+    const medGate = document.querySelector('input[name="gate_meds"]:checked');
     const medHistoryChecks = document.querySelectorAll('input[name="med_history"]:checked');
+    
     const lifestyleInput = document.getElementById('lifestyle-program');
     const memberIdInput = document.getElementById('member-id');
 
@@ -213,24 +219,23 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
         }
     }
 
-    // 5. Validate Medication History (UPDATED & SAFE)
-    if (medHistoryChecks.length === 0) {
+    // 5. Validate Medication History ([FIXED] Logic)
+    // Only require checkboxes if the user clicked "Yes" in Step 1, or if they somehow bypassed Step 1 (gate is null)
+    if ((!medGate || medGate.value === 'yes') && medHistoryChecks.length === 0) {
         const errEl = document.getElementById('med-history-error');
-        // Check if element exists to prevent crash
         if (errEl) {
             errEl.classList.remove('u-hidden');
-        } else {
-            console.error("Missing HTML ID: med-history-error");
         }
-        isValid = false; // This ensures the form stops even if HTML is missing
+        // If we fail here, we must probably alert the user they missed something in Step 1
+        // But simply setting isValid = false stops the form.
+        isValid = false; 
     }
 
-    // --- NEW: MEMBER ID VALIDATION ---
-  const existingErr = document.getElementById('member-id-error');
+    // --- MEMBER ID VALIDATION ---
+    const existingErr = document.getElementById('member-id-error');
     if (existingErr) existingErr.classList.add('u-hidden');
     memberIdInput.classList.remove('border-red-500');
 
-    // This now calls the function imported from logic.js
     const idValidation = validateMemberID(carrier.value, memberIdInput.value);
     
     if (!idValidation.valid) {
@@ -252,7 +257,7 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     if (!isValid) return; // STOP HERE if invalid
 
     // Gather Data
-    const inputData = {
+    currentInputData = {
         carrier: carrier.value,
         carrierSpecificName: (carrier.value === 'Other') 
             ? document.getElementById('other-carrier-name').value 
@@ -267,8 +272,8 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
         medication: document.getElementById('medication').value,
         lifestyleProgramEnrollment: lifestyleInput ? lifestyleInput.checked : false
     };
-
-    currentResultType = determineCoverageStatus(inputData);
+    
+    currentResultType = determineCoverageStatus(currentInputData);
 
     UI.runLoadingSequence(getConfig(), () => {
         document.getElementById('email-gate').classList.remove('u-hidden');
@@ -277,6 +282,14 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
 
 document.getElementById('email-form').addEventListener('submit', (e) => {
     e.preventDefault();
+    
+    // 4. GET EMAIL AND TRIGGER DOWNLOAD
+    const email = document.getElementById('user-email').value;
+    
+    if (currentInputData && currentResultType) {
+        exportDataToTextFile(currentInputData, email, currentResultType);
+    }
+
     UI.displayResult(currentResultType);
 });
 
