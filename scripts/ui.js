@@ -222,3 +222,10 @@ export function displayResult(resultData) {
         }
     }
 }
+
+export function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('u-hidden');
+    }
+}

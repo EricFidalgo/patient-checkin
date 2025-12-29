@@ -2,16 +2,20 @@
 
 export const formData = {
     medications: [
-        { value: "Wegovy", label: "Wegovy (Semaglutide)" },
-        { value: "Zepbound", label: "Zepbound (Tirzepatide)" },
-        { value: "Mounjaro", label: "Mounjaro (Tirzepatide - Type 2 Focus)" },
-        { value: "Ozempic", label: "Ozempic (Semaglutide - Type 2 Focus)" },
-        { value: "Saxenda", label: "Saxenda (Liraglutide)" }
+        { value: "Wegovy", label: "Wegovy (Semaglutide) - Weight Loss" },
+        { value: "Zepbound", label: "Zepbound (Tirzepatide) - Weight Loss" },
+        { value: "Ozempic", label: "Ozempic (Semaglutide) - Type 2 Focus" },
+        { value: "Mounjaro", label: "Mounjaro (Tirzepatide) - Type 2 Focus" },
+        { value: "Rybelsus", label: "Rybelsus (Oral Semaglutide Pill)" },
+        { value: "Saxenda", label: "Saxenda (Liraglutide)" },
+        { value: "Trulicity", label: "Trulicity (Dulaglutide)" },
+        { value: "Victoza", label: "Victoza (Liraglutide)" },
+        { value: "Compounded", label: "Compounded Semaglutide / Tirzepatide" }
     ],
     planSources: [
         { value: "employer", label: "Through my Job (Employer)" },
-        { value: "marketplace", label: "Marketplace" },
-        { value: "govt", label: "Government / Military" },
+        { value: "marketplace", label: "Marketplace / ACA (Obamacare)" },
+        { value: "govt", label: "Medicaid / Medicare / Military" },
         { value: "direct", label: "Direct Private Purchase" }
     ],
     carriers: [
@@ -24,8 +28,8 @@ export const formData = {
         { value: "Humana", label: "Humana" },
         { value: "Molina", label: "Molina Healthcare" },
         { value: "Tricare", label: "Tricare (Military)" },
-        { value: "Medicaid", label: "Medicaid (State)" },
-        { value: "Medicare", label: "Medicare" },
+        { value: "Medicaid", label: "Medicaid (State - Generic)" },
+        { value: "Medicare", label: "Medicare (Original)" },
         { value: "Other", label: "Other / Commercial" }
     ],
     states: [
@@ -37,15 +41,22 @@ export const formData = {
     ],
     medicationHistory: [
         { value: "metformin", label: "Metformin (90+ days)" },
-        { value: "sglt2", label: "SGLT-2 (e.g. Jardiance, Farxiga)" }
+        { value: "sglt2", label: "SGLT-2 (e.g. Jardiance, Farxiga)" },
+        { value: "phentermine", label: "Phentermine (Adipex-P)" },
+        { value: "contrave", label: "Contrave (Bupropion/Naltrexone)" },
+        { value: "qsymia", label: "Qsymia (Phentermine/Topiramate)" },
+        { value: "orlistat", label: "Orlistat (Xenical / Alli)" },
+        { value: "none", label: "None / No previous history" } 
     ],
     comorbidities: [
         { value: "diabetes", label: "Type 2 Diabetes" },
-        { value: "established_cvd", label: "Heart Attack / Stroke / PAD" },
-        { value: "hypertension", label: "Hypertension / High BP" },
+        { value: "prediabetes", label: "Prediabetes (HbA1c 5.7% - 6.4%)" },
+        { value: "high_cholesterol", label: "High Cholesterol (Hyperlipidemia)" },
+        { value: "hypertension", label: "Hypertension / High Blood Pressure" },
         { value: "osa", label: "Obstructive Sleep Apnea (OSA)" },
-        { value: "pcos", label: "PCOS / Prediabetes" },
-        { value: "high_cholesterol", label: "High Cholesterol" },
-        { value: "none", label: "None" }
+        { value: "established_cvd", label: "Heart Disease (History of Heart Attack/Stroke)" },
+        { value: "pcos", label: "Polycystic Ovary Syndrome (PCOS)" },
+        { value: "fatty_liver", label: "Fatty Liver Disease (NAFLD/NASH)" },
+        { value: "none", label: "None / No Diagnosed Conditions" }
     ]
 };
