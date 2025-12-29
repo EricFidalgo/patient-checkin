@@ -26,6 +26,8 @@ export function determineCoverageStatus(inputData) {
         else if (name.includes('tricare')) targetCarrier = 'Tricare';
         else if (name.includes('humana')) targetCarrier = 'Humana';
         else if (name.includes('kaiser')) targetCarrier = 'Kaiser';
+        else if (name.includes('molina')) targetCarrier = 'Molina';
+        else if (name.includes('ambetter')) targetCarrier = 'Ambetter';
     }
 
     // Direct mapping for Govt/Plan Source overrides
@@ -69,80 +71,83 @@ export function determineCoverageStatus(inputData) {
 
 /**
  * Evaluates a single rule condition against the user data.
- * Returns TRUE if the condition is met (meaning the rule should trigger).
+ * Updated to handle "OR" logic for comorbidities (Molina) and strict history checks (Ambetter).
  */
 function evaluateCondition(cond, data) {
-    const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD" for temporal logic
+    const today = new Date().toISOString().split('T')[0];
 
     // --- 1. Basic Demographics & Plan ---
     if (cond.planSource && cond.planSource !== data.planSource) return false;
     
-    // State Logic
+    // State Logic (Molina/Ambetter Geographic Rules)
     if (cond.state && cond.state !== data.state) return false;
     if (cond.state_in && !cond.state_in.includes(data.state)) return false;
     if (cond.state_not_in && cond.state_not_in.includes(data.state)) return false;
 
-    // --- 2. Clinical Data (BMI, Age & Meds) ---
+    // --- 2. Clinical Data ---
     
-    // Medication Match (support Array or String)
+    // Medication Match
     if (cond.medication) {
         const meds = Array.isArray(cond.medication) ? cond.medication : [cond.medication];
-        // Check if data.medication contains any of the rule's target meds (partial match allowed)
         const matches = meds.some(m => data.medication.includes(m));
         if (!matches) return false;
     }
 
-    // BMI Logic (Expanded)
-    // Supports standard lt/ge and new "bmi_min" (treat as "if bmi < min, then true")
+    // BMI Logic
     if (cond.bmi_lt !== undefined && data.bmi >= cond.bmi_lt) return false;
     if (cond.bmi_ge !== undefined && data.bmi < cond.bmi_ge) return false;
-    if (cond.bmi_min !== undefined && data.bmi >= cond.bmi_min) return false; // Rule fails if BMI is high enough
-    
+    if (cond.bmi_min !== undefined && data.bmi >= cond.bmi_min) return false;
     if (cond.bmi_range !== undefined) {
         if (data.bmi < cond.bmi_range[0] || data.bmi >= cond.bmi_range[1]) return false;
     }
 
-    // Age Logic (New for Tricare/Medicare)
+    // Age Logic
     if (cond.age_ge !== undefined && data.age < cond.age_ge) return false;
     if (cond.age_lt !== undefined && data.age >= cond.age_lt) return false;
 
-    // --- 3. Comorbidities ---
+    // --- 3. Comorbidities (Updated) ---
     
-    // Check if user HAS a specific comorbidity
+    // Exact Match (Single)
     if (cond.has_comorbidity) {
         if (!data.comorbidities.includes(cond.has_comorbidity)) return false;
     }
 
-    // Check if user is MISSING required comorbidities
-    // Condition is met if the intersection of user comorbidities and the required list is empty
+    // NEW: "OR" Logic (Molina Exception: Diabetes OR CVD)
+    // Returns FALSE (rule mismatch) if user has NONE of the listed conditions.
+    if (cond.has_any_comorbidity) {
+        const hasMatch = cond.has_any_comorbidity.some(c => data.comorbidities.includes(c));
+        if (!hasMatch) return false;
+    }
+
+    // Exclusion Match (Missing specific conditions)
     if (cond.missing_comorbidities) {
+        // If user has ANY of the items in the list, they are NOT missing the requirement.
         const hasAny = cond.missing_comorbidities.some(c => data.comorbidities.includes(c));
         if (hasAny) return false; 
     }
 
     // --- 4. History & Lifestyle ---
     
-    // We map the UI's "lifestyle-program" check to a virtual history item for unified checking
     const effectiveHistory = [...data.medicationHistory];
     if (data.lifestyleProgramEnrollment) effectiveHistory.push('lifestyle_program');
 
-    // New: Check for explicit boolean presence of history (True = Must have history, False = Must have none)
+    // Boolean History Check (Ambetter Metformin Gate)
     if (cond.has_med_history === true && effectiveHistory.length === 0) return false;
     if (cond.has_med_history === false && effectiveHistory.length > 0) return false;
 
-    // Check if user is MISSING specific history items (Step Therapy)
+    // Step Therapy Logic
     if (cond.missing_history) {
         const hasAnyHist = cond.missing_history.some(h => effectiveHistory.includes(h));
         if (hasAnyHist) return false;
     }
 
-    // Specific Boolean check for program enrollment (Used by UHC)
+    // Explicit Program Enrollment (UHC/Ambetter)
     if (cond.program_enrollment_required === true) {
-        if (!data.lifestyleProgramEnrollment) return true; // Rule triggers (bad outcome) if NOT enrolled
+        if (!data.lifestyleProgramEnrollment) return true; // Fail rule if not enrolled
         return false;
     }
 
-    // --- 5. Date Logic (For 2026 Cliffs/Pilots) ---
+    // --- 5. Date Logic ---
     if (cond.date_lt && today >= cond.date_lt) return false;
     if (cond.date_ge && today < cond.date_ge) return false;
 

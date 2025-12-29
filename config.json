@@ -521,6 +521,127 @@
       "green_copay": 47,
       "lifestyle_program_discount": false
     }
+  },
+  "Molina": {
+    "id": "molina_2026",
+    "default_status": "yellow",
+    "member_id_validation": {
+      "regex": "^[A-Z0-9]{9,12}$",
+      "min_length": 9,
+      "max_length": 12,
+      "help_text": "Enter your 9-12 digit Member ID. Usually numeric, but may contain letters."
+    },
+    "rules": [
+      {
+        "if": { "medication": ["Compounded"] },
+        "then": { "status": "red", "reason": "Exclusion: Non-FDA approved compounded agents are not covered." }
+      },
+      {
+        "if": {
+          "planSource": "govt",
+          "state_in": ["CA", "MI", "VA", "WA"],
+          "has_comorbidity": "diabetes"
+        },
+        "then": { "status": "yellow", "reason": "State Medicaid Exception: Covered for Type 2 Diabetes in your state." }
+      },
+      {
+        "if": { "planSource": "medicaid" },
+        "then": { "status": "red", "reason": "General Exclusion: Weight loss drugs are not a covered Medicaid benefit." }
+      },
+      {
+        "if": {
+           "planSource": "medicare",
+           "medication": ["Wegovy"],
+           "has_any_comorbidity": ["diabetes", "established_cvd"]
+        },
+        "then": { "status": "yellow", "reason": "Exception: Covered for Diabetes or CVD Risk Reduction." }
+      },
+      {
+        "if": { "planSource": "medicare" },
+        "then": { "status": "red", "reason": "Statutory Exclusion: Weight loss medications are excluded from Medicare Part D." }
+      },
+      {
+        "if": {
+          "medication": ["Wegovy", "Zepbound"],
+          "bmi_lt": 27
+        },
+        "then": { "status": "red", "reason": "Medical Necessity: BMI < 27 does not meet clinical criteria." }
+      },
+      {
+        "if": {
+          "medication": ["Wegovy", "Zepbound"],
+          "bmi_range": [27, 30],
+          "missing_comorbidities": ["hypertension", "diabetes", "high_cholesterol", "osa", "established_cvd"]
+        },
+        "then": { "status": "red", "reason": "Medical Necessity: BMI 27-30 requires a serious comorbidity (e.g. Hypertension)." }
+      },
+      {
+        "if": {
+           "missing_history": ["phentermine", "qsymia", "contrave", "orlistat", "benzphetamine"]
+        },
+        "then": { "status": "yellow", "reason": "Step Therapy: Must fail one oral agent (e.g. Phentermine) for 3-6 months first." }
+      }
+    ],
+    "pricing": {
+      "green_copay": 400,
+      "lifestyle_program_discount": false
+    }
+  },
+  "Ambetter": {
+    "id": "ambetter_2026",
+    "default_status": "red",
+    "member_id_validation": {
+      "regex": "^(U\\d{8,11}|\\d{9,10})$",
+      "min_length": 9,
+      "max_length": 12,
+      "help_text": "Typically starts with 'U' followed by digits (Marketplace) or is 9-10 digits."
+    },
+    "rules": [
+      {
+        "if": { "medication": ["Compounded"] },
+        "then": { "status": "red", "reason": "Exclusion: Non-FDA approved formulations are not covered." }
+      },
+      {
+        "if": {
+           "planSource": "marketplace",
+           "state_not_in": ["CA", "MA", "MD"]
+        },
+        "then": { "status": "red", "reason": "Plan Exclusion: Anti-obesity medications are excluded on Marketplace plans in this state." }
+      },
+      {
+        "if": {
+           "medication": ["Ozempic", "Mounjaro", "Trulicity"],
+           "has_comorbidity": "diabetes",
+           "has_med_history": true
+        },
+        "then": { "status": "green", "reason": "Approved: T2D Diagnosis + Metformin history confirmed." }
+      },
+      {
+        "if": {
+           "medication": ["Ozempic", "Mounjaro"],
+           "missing_comorbidities": ["diabetes"]
+        },
+        "then": { "status": "red", "reason": "Diagnosis Mismatch: T2D diagnosis strictly required." }
+      },
+      {
+        "if": {
+           "medication": ["Wegovy"],
+           "missing_history": ["lifestyle_program"]
+        },
+        "then": { "status": "yellow", "reason": "Requirement: Proof of 6-month Physician-Directed Weight Loss Program." }
+      },
+      {
+        "if": {
+           "medication": ["Zepbound"],
+           "has_comorbidity": "osa"
+        },
+        "then": { "status": "yellow", "reason": "Medical Necessity: Covered for OSA with AHI ≥ 15 (Sleep Study Required)." }
+      }
+    ],
+    "pricing": {
+      "green_copay": 100,
+      "lifestyle_program_discount": false
+    }
   }
 }
 }

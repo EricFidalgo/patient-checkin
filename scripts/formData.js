@@ -23,7 +23,7 @@ export const formData = {
         { value: "Ambetter", label: "Ambetter (Centene)" },
         { value: "BCBS", label: "Blue Cross Blue Shield" },
         { value: "Cigna", label: "Cigna" },
-        { value: "UnitedHealthcare", label: "UnitedHealthcare" },
+        { value: "UHC", label: "UnitedHealthcare" },
         { value: "Kaiser", label: "Kaiser Permanente" },
         { value: "Humana", label: "Humana" },
         { value: "Molina", label: "Molina Healthcare" },
