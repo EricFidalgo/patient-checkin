@@ -75,10 +75,16 @@
                   </div>
                 </div>
 
-                <div class="c-form-group l-col-span-full">
-                    <label class="c-label">Medication History <span class="c-label__sub">(Check all that apply)</span></label>
-                    <div class="c-check-grid" id="med-history-grid"></div>
-                </div>
+                <div class="c-form-group">
+    <label class="c-label">Medication History <span class="u-text-error">*</span></label>
+    
+    <div id="med-history-grid" class="c-check-grid l-grid-2"></div>
+
+    <div class="c-error-msg u-hidden" id="med-history-error">
+        <span class="material-symbols-outlined c-error-icon">error</span>
+        Selection required (Choose "None" if applicable)
+    </div>
+</div>
             </div>
 
             <button type="button" class="c-btn c-btn--primary u-mt-lg" onclick="nextStep(2)">
@@ -147,9 +153,14 @@
                     </div>
                 </div>
 
-                <div class="c-form-group l-col-span-full u-hidden" id="employer-field">
-                    <label class="c-label">Employer Name</label>
-                    <input type="text" id="employer-name" class="c-input" placeholder="e.g. Amazon, State of FL" />
+                <div class="c-form-group u-hidden" id="employer-field">
+                    <label class="c-label">Employer Name <span class="u-text-error">*</span></label>
+                    <input type="text" id="employer-name" class="c-input" placeholder="e.g. Amazon, State of FL..." />
+                    
+                    <div class="c-error-msg u-hidden" id="employer-error">
+                        <span class="material-symbols-outlined c-error-icon">error</span>
+                        Employer name is required
+                    </div>
                 </div>
 
                 <div class="c-form-group l-col-span-full"> 

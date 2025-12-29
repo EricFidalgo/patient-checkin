@@ -85,42 +85,57 @@ function handleNextStep(targetStep) {
     if (!getConfig()) return;
 
     if (targetStep === 2) {
+        // 1. Select inputs
         const bmi = document.getElementById('bmi');
         const age = document.getElementById('age');
         const comorbidities = document.querySelectorAll('input[name="comorbidity"]:checked');
+        
+        // --- ADD THIS LINE ---
+        const medHistory = document.querySelectorAll('input[name="med_history"]:checked'); 
+        
         let isValid = true;
         
+        // 2. Clear existing errors
         UI.clearError('bmi-error');
         UI.clearError('age-error');
         UI.clearError('comorbidity-error');
+        
+        // --- ADD THIS LINE ---
+        UI.clearError('med-history-error'); 
 
+        // 3. Validation Logic
         if (!bmi.value) {
             document.getElementById('bmi-error').classList.remove('u-hidden');
             bmi.classList.add('border-red-500');
             isValid = false;
         }
-        // Checks if empty OR if less than 18
+        
         if (!age.value || parseInt(age.value) < 18) {
             const ageErr = document.getElementById('age-error');
             ageErr.classList.remove('u-hidden');
-            
-            // Optional: Update text dynamically to explain why
             if (parseInt(age.value) < 18) {
                  ageErr.innerHTML = '<span class="material-symbols-outlined c-error-icon">error</span> Must be 18+';
             } else {
                  ageErr.innerHTML = '<span class="material-symbols-outlined c-error-icon">error</span> Required';
             }
-            
             age.classList.add('border-red-500');
             isValid = false;
         }
+
         if (comorbidities.length === 0) {
             document.getElementById('comorbidity-error').classList.remove('u-hidden');
             isValid = false;
         }
 
-        if (!isValid) return;
+        // --- ADD THIS BLOCK ---
+        if (medHistory.length === 0) {
+            document.getElementById('med-history-error').classList.remove('u-hidden');
+            isValid = false;
+        }
 
+        if (!isValid) return; // Stop here if any field is empty
+
+        // 4. Safety Stop Check
         const safetyCheck = checkSafetyStop(parseFloat(bmi.value));
         if (!safetyCheck.safe) {
             UI.showModal(safetyCheck.modalId);
@@ -160,28 +175,55 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     const carrier = document.getElementById('carrier');
     const planSource = document.getElementById('plan-source');
     const employerNameInput = document.getElementById('employer-name'); 
+    const medHistoryChecks = document.querySelectorAll('input[name="med_history"]:checked');
     const lifestyleInput = document.getElementById('lifestyle-program');
     const memberIdInput = document.getElementById('member-id');
 
     let isValid = true;
 
+    // 1. Reset Errors
     UI.clearError('carrier-error');
     UI.clearError('source-error');
+    UI.clearError('employer-error');
+    UI.clearError('med-history-error');
 
+    // 2. Validate Carrier
     if (!carrier.value) {
         document.getElementById('carrier-error').classList.remove('u-hidden');
         carrier.classList.add('border-red-500');
         isValid = false;
     }
+
+    // 3. Validate Plan Source
     if (!planSource.value) {
         document.getElementById('source-error').classList.remove('u-hidden');
         planSource.classList.add('border-red-500');
         isValid = false;
     }
 
+    // 4. Validate Employer Name (CONDITIONAL)
+    if (planSource.value === 'employer') {
+        if (!employerNameInput.value.trim()) {
+            document.getElementById('employer-error').classList.remove('u-hidden');
+            employerNameInput.classList.add('border-red-500');
+            isValid = false;
+        }
+    }
+
+    // 5. Validate Medication History (UPDATED & SAFE)
+    if (medHistoryChecks.length === 0) {
+        const errEl = document.getElementById('med-history-error');
+        // Check if element exists to prevent crash
+        if (errEl) {
+            errEl.classList.remove('u-hidden');
+        } else {
+            console.error("Missing HTML ID: med-history-error");
+        }
+        isValid = false; // This ensures the form stops even if HTML is missing
+    }
+
     // --- NEW: MEMBER ID VALIDATION ---
-    // Remove old error if present
-    const existingErr = document.getElementById('member-id-error');
+  const existingErr = document.getElementById('member-id-error');
     if (existingErr) existingErr.classList.add('u-hidden');
     memberIdInput.classList.remove('border-red-500');
 
@@ -190,7 +232,6 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
         isValid = false;
         memberIdInput.classList.add('border-red-500');
         
-        // Dynamically show error since it's not in HTML
         let errDiv = document.getElementById('member-id-error');
         if (!errDiv) {
             errDiv = document.createElement('div');
@@ -202,22 +243,22 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
         document.getElementById('member-id-msg').textContent = idValidation.msg;
         errDiv.classList.remove('u-hidden');
     }
-    // ---------------------------------
 
-    if (!isValid) return;
+    if (!isValid) return; // STOP HERE if invalid
 
+    // Gather Data
     const inputData = {
         carrier: carrier.value,
         carrierSpecificName: (carrier.value === 'Other') 
-        ? document.getElementById('other-carrier-name').value 
-        : carrier.value,
+            ? document.getElementById('other-carrier-name').value 
+            : carrier.value,
         state: document.getElementById('state').value,
         planSource: planSource.value,
         employerName: employerNameInput ? employerNameInput.value : '',
         bmi: parseFloat(document.getElementById('bmi').value),
         age: parseInt(document.getElementById('age').value),
         comorbidities: Array.from(document.querySelectorAll('input[name="comorbidity"]:checked')).map(cb => cb.value),
-        medicationHistory: Array.from(document.querySelectorAll('input[name="med_history"]:checked')).map(cb => cb.value),
+        medicationHistory: Array.from(medHistoryChecks).map(cb => cb.value),
         medication: document.getElementById('medication').value,
         lifestyleProgramEnrollment: lifestyleInput ? lifestyleInput.checked : false
     };
