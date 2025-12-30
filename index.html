@@ -289,37 +289,51 @@
           <p class="t-body t-sm">Enter your email to unlock your full fee report.</p>
 
           <form id="email-form" class="u-mt-lg">
-  
-            <div class="c-form-group">
-              <label class="c-label">Email Address <span class="u-text-error">*</span></label>
-              <input type="email" id="user-email" required placeholder="name@example.com" class="c-input" />
+            <div class="c-form-group u-mb-md">
+              <label class="c-label">Contact Information <span class="u-text-muted">(At least one required)</span></label>
+              <div class="l-grid-2" style="gap: 10px;">
+                <input type="email" id="user-email" placeholder="Email Address" class="c-input" />
+                <input type="tel" id="user-phone" placeholder="Phone Number" class="c-input" />
+              </div>
+              <div id="contact-error" class="c-error-msg u-mt-sm u-hidden">
+                <span class="material-symbols-outlined c-error-icon">error</span>
+                Please provide an email or phone number to receive your report.
+              </div>
             </div>
 
             <div class="c-legal-scroll u-mb-md" style="height: 120px; overflow-y: scroll; border: 1px solid #e2e8f0; padding: 12px; font-size: 0.75rem; background: #f8fafc; color: #334155; border-radius: 6px;">
-              <strong>AUTHORIZATION FOR SALE OF PHI</strong><br>
+              <strong>AUTHORIZATION FOR SALE OF PHI & TCPA CONSENT</strong><br>
               <p class="u-mb-sm">I hereby authorize VeriScript ("Discloser") to disclose and <strong>sell</strong> my protected health information (PHI), including my name, contact details, and clinical profile, to third-party pharmacy networks for the purpose of marketing pharmacy services.</p>
               
               <strong>Terms of Signature:</strong><br>
               <ul style="padding-left: 1rem; margin: 0;">
                 <li><strong>Remuneration:</strong> VeriScript will receive financial payment for this data.</li>
+                <li><strong>TCPA Consent:</strong> By providing my phone number, I provide express written consent to receive marketing calls/SMS from VeriScript and its partners, even if I am on a Do Not Call list.</li>
                 <li><strong>Expiration:</strong> This authorization is valid for 1 year from today.</li>
-                <li><strong>Revocation:</strong> I may revoke this at any time by contacting support@veriscript.com.</li>
-                <li><strong>Electronic Signature:</strong> By typing my name below, I am electronically signing this authorization and agree to be bound by its terms just as if I had signed a paper document.</li>
+                <li><strong>Electronic Signature:</strong> By typing my name below, I am electronically signing this authorization.</li>
               </ul>
             </div>
 
             <div class="c-highlight-box u-mb-lg" style="background: #f0fdf4; border-color: #86efac;">
               <label class="c-label t-sm u-mb-sm">To verify and sign, type your full legal name:</label>
-              
               <div class="l-grid-2" style="gap: 10px;">
-                <input type="text" id="sign-first-name" required placeholder="First Name" class="c-input" />
-                <input type="text" id="sign-last-name" required placeholder="Last Name" class="c-input" />
+                <input 
+                    type="text" 
+                    id="sign-first-name" 
+                    required 
+                    placeholder="First Name" 
+                    class="c-input" 
+                    onkeydown="return /[a-z, ,-]/i.test(event.key)" 
+                />
+                <input 
+                    type="text" 
+                    id="sign-last-name" 
+                    required 
+                    placeholder="Last Name" 
+                    class="c-input" 
+                    onkeydown="return /[a-z, ,-]/i.test(event.key)" 
+                />
               </div>
-              
-              <p class="t-xs u-text-muted u-mt-sm">
-                <span class="material-symbols-outlined" style="font-size: 1em; vertical-align: text-bottom;">verified</span>
-                Matches records for coverage verification.
-              </p>
             </div>
 
             <button type="submit" class="c-btn c-btn--primary">

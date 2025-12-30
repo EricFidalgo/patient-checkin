@@ -18,7 +18,8 @@ Generated: ${timestamp}
 --- LEAD IDENTITY (SIGNED) ---
 First Name: ${inputData.firstName || 'N/A'}
 Last Name:  ${inputData.lastName || 'N/A'}
-Email:      ${email}
+Email:      ${inputData.email}
+Phone:      ${inputData.phone}
 
 --- HIPAA AUTHORIZATION PROOF ---
 Signed By:  ${inputData.fullName}

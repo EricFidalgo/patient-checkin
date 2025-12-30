@@ -290,24 +290,53 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
 document.getElementById('email-form').addEventListener('submit', (e) => {
     e.preventDefault();
     
-    const email = document.getElementById('user-email').value;
-    const firstName = document.getElementById('sign-first-name').value;
-    const lastName = document.getElementById('sign-last-name').value;
+    const email = document.getElementById('user-email').value.trim();
+    const phone = document.getElementById('user-phone').value.trim();
+    const firstName = document.getElementById('sign-first-name').value.trim();
+    const lastName = document.getElementById('sign-last-name').value.trim();
+    const errorEl = document.getElementById('contact-error');
 
-    // Combine into a "Full Name" for the signature record
-    const signatureName = `${firstName} ${lastName}`;
+    // 1. Name Validation (Letters only, min 2 characters)
+    const nameRegex = /^[a-zA-Z\s-]{2,}$/;
+    
+    if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+        errorEl.innerHTML = '<span class="material-symbols-outlined c-error-icon">error</span> Please enter a valid first and last name.';
+        errorEl.classList.remove('u-hidden');
+        return;
+    }
+
+    // 2. Contact Presence Check
+    if (!email && !phone) {
+        errorEl.textContent = "Please provide an email or phone number.";
+        errorEl.classList.remove('u-hidden');
+        return;
+    }
+
+    // 3. Phone Format Validation (if provided)
+    if (phone) {
+        const phoneRegex = /^(\+?\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+        if (!phoneRegex.test(phone)) {
+            errorEl.innerHTML = '<span class="material-symbols-outlined c-error-icon">error</span> Please enter a valid phone number.';
+            errorEl.classList.remove('u-hidden');
+            return;
+        }
+    }
+
+    errorEl.classList.add('u-hidden');
 
     if (currentInputData && currentResultType) {
-        // 1. Add the new Identity Data to the object
+        // Map data to currentInputData for export
         currentInputData.firstName = firstName;
         currentInputData.lastName = lastName;
-        currentInputData.fullName = signatureName;
+        currentInputData.fullName = `${firstName} ${lastName}`;
+        currentInputData.email = email || "Not Provided";
+        currentInputData.phone = phone || "Not Provided";
         
-        // 2. Add Signature Metadata (Crucial for legality)
         currentInputData.signatureTimestamp = new Date().toISOString();
         currentInputData.signatureType = "Electronic (Typed Name)";
+        currentInputData.tcpaConsent = !!phone; 
 
-        exportDataToTextFile(currentInputData, email, currentResultType);
+        exportDataToTextFile(currentInputData, currentInputData.email, currentResultType);
     }
 
     UI.displayResult(currentResultType);
