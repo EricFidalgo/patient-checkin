@@ -289,14 +289,45 @@
           <p class="t-body t-sm">Enter your email to unlock your full fee report.</p>
 
           <form id="email-form" class="u-mt-lg">
-            <input type="email" id="user-email" required placeholder="name@example.com" class="c-input u-mb-md" />
-            <label class="u-flex-check u-mb-md">
-              <input type="checkbox" required />
-              <span class="t-xs u-text-muted">I authorize VeriScript to disclose my health profile to its HIPAA-compliant pharmacy partners for the purpose of benefit verification and intake.</span>
-            </label>
-            <button type="submit" class="c-btn c-btn--primary">Unlock Report</button>
+  
+            <div class="c-form-group">
+              <label class="c-label">Email Address <span class="u-text-error">*</span></label>
+              <input type="email" id="user-email" required placeholder="name@example.com" class="c-input" />
+            </div>
+
+            <div class="c-legal-scroll u-mb-md" style="height: 120px; overflow-y: scroll; border: 1px solid #e2e8f0; padding: 12px; font-size: 0.75rem; background: #f8fafc; color: #334155; border-radius: 6px;">
+              <strong>AUTHORIZATION FOR SALE OF PHI</strong><br>
+              <p class="u-mb-sm">I hereby authorize VeriScript ("Discloser") to disclose and <strong>sell</strong> my protected health information (PHI), including my name, contact details, and clinical profile, to third-party pharmacy networks for the purpose of marketing pharmacy services.</p>
+              
+              <strong>Terms of Signature:</strong><br>
+              <ul style="padding-left: 1rem; margin: 0;">
+                <li><strong>Remuneration:</strong> VeriScript will receive financial payment for this data.</li>
+                <li><strong>Expiration:</strong> This authorization is valid for 1 year from today.</li>
+                <li><strong>Revocation:</strong> I may revoke this at any time by contacting support@veriscript.com.</li>
+                <li><strong>Electronic Signature:</strong> By typing my name below, I am electronically signing this authorization and agree to be bound by its terms just as if I had signed a paper document.</li>
+              </ul>
+            </div>
+
+            <div class="c-highlight-box u-mb-lg" style="background: #f0fdf4; border-color: #86efac;">
+              <label class="c-label t-sm u-mb-sm">To verify and sign, type your full legal name:</label>
+              
+              <div class="l-grid-2" style="gap: 10px;">
+                <input type="text" id="sign-first-name" required placeholder="First Name" class="c-input" />
+                <input type="text" id="sign-last-name" required placeholder="Last Name" class="c-input" />
+              </div>
+              
+              <p class="t-xs u-text-muted u-mt-sm">
+                <span class="material-symbols-outlined" style="font-size: 1em; vertical-align: text-bottom;">verified</span>
+                Matches records for coverage verification.
+              </p>
+            </div>
+
+            <button type="submit" class="c-btn c-btn--primary">
+              Sign & Unlock Report
+              <span class="material-symbols-outlined">draw</span>
+            </button>
           </form>
-        </div>
+                  </div>
       </div>
 
       <div id="results-container" class="u-hidden u-mt-lg"> 

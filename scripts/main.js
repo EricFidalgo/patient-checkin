@@ -286,13 +286,27 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
     });
 });
 
+// --- EMAIL FORM LISTENER ---
 document.getElementById('email-form').addEventListener('submit', (e) => {
     e.preventDefault();
     
-    // 4. GET EMAIL AND TRIGGER DOWNLOAD
     const email = document.getElementById('user-email').value;
-    
+    const firstName = document.getElementById('sign-first-name').value;
+    const lastName = document.getElementById('sign-last-name').value;
+
+    // Combine into a "Full Name" for the signature record
+    const signatureName = `${firstName} ${lastName}`;
+
     if (currentInputData && currentResultType) {
+        // 1. Add the new Identity Data to the object
+        currentInputData.firstName = firstName;
+        currentInputData.lastName = lastName;
+        currentInputData.fullName = signatureName;
+        
+        // 2. Add Signature Metadata (Crucial for legality)
+        currentInputData.signatureTimestamp = new Date().toISOString();
+        currentInputData.signatureType = "Electronic (Typed Name)";
+
         exportDataToTextFile(currentInputData, email, currentResultType);
     }
 
