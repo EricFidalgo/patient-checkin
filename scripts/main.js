@@ -156,22 +156,29 @@ function handleNextStep(targetStep) {
 
     if (targetStep === 3) {
         const medication = document.getElementById('medication');
-        const state = document.getElementById('state');
+        const stateHidden = document.getElementById('state'); 
+        const zipInput = document.getElementById('zip-code');
         let isValid = true;
         
         UI.clearError('medication-error');
-        UI.clearError('state-error');
+
+        // Manually clear zip error
+        document.getElementById('zip-error').classList.add('u-hidden');
+        if(zipInput) zipInput.classList.remove('border-red-500');
 
         if (!medication.value) {
             document.getElementById('medication-error').classList.remove('u-hidden');
             medication.classList.add('border-red-500'); 
             isValid = false;
         }
-        if (!state.value) {
-            document.getElementById('state-error').classList.remove('u-hidden');
-            state.classList.add('border-red-500');
+        
+        // Validation: Check if the hidden state field was populated
+        if (!stateHidden.value) {
+            document.getElementById('zip-error').classList.remove('u-hidden');
+            if(zipInput) zipInput.classList.add('border-red-500');
             isValid = false;
         }
+        
         if (!isValid) return;
     }
 
@@ -268,6 +275,7 @@ document.getElementById('clarity-form').addEventListener('submit', (e) => {
         carrierSpecificName: (carrier.value === 'Other') 
             ? document.getElementById('other-carrier-name').value 
             : carrier.value,
+        zipCode: document.getElementById('zip-code').value,
         state: document.getElementById('state').value,
         planSource: planSource.value,
         employerName: employerNameInput ? employerNameInput.value : '',

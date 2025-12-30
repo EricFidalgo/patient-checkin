@@ -3,7 +3,6 @@
 export function exportDataToTextFile(inputData, email, result) {
     const timestamp = new Date().toLocaleString();
     
-    // Formatting helpers
     const conditions = inputData.comorbidities && inputData.comorbidities.length > 0 
         ? inputData.comorbidities.join(', ') : 'None';
     const history = inputData.medicationHistory && inputData.medicationHistory.length > 0
@@ -38,6 +37,7 @@ History:    ${history}
 Carrier:    ${inputData.carrier}
 Plan Type:  ${inputData.planSource}
 State:      ${inputData.state}
+Zip Code:   ${inputData.zipCode || 'N/A'}
 Member ID:  ${document.getElementById('member-id').value || 'Not Provided'}
 
 --- VERIFICATION RESULT ---
@@ -53,7 +53,6 @@ CONFIDENTIAL - CONTAINS PHI
     const a = document.createElement('a');
     
     a.href = url;
-    // Filename now includes the lead's name for easier organization
     a.download = `Lead_${inputData.lastName}_${Date.now()}.txt`;
     a.style.display = 'none';
     

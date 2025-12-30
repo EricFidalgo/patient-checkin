@@ -68,10 +68,66 @@ export function populateFormInputs() {
     createOptions('medication', formData.medications);
     createOptions('plan-source', formData.planSources);
     createOptions('carrier', formData.carriers);
-    createOptions('state', formData.states);
 
     createCheckboxes('med-history-grid', formData.medicationHistory, 'med_history');
     createCheckboxes('comorbidity-grid', formData.comorbidities, 'comorbidity');
+
+    initZipCodeListener();
+}
+
+function initZipCodeListener() {
+    const zipInput = document.getElementById('zip-code');
+    const stateInput = document.getElementById('state'); // The hidden field
+    const stateBadge = document.getElementById('state-badge');
+    const errorMsg = document.getElementById('zip-error');
+    const errorText = document.getElementById('zip-error-text');
+
+    if (!zipInput) return;
+
+    zipInput.addEventListener('input', async function() {
+        // 1. Clean input (numbers only)
+        this.value = this.value.replace(/[^0-9]/g, '');
+        const zip = this.value;
+
+        // Reset UI if user is typing
+        if (zip.length < 5) {
+            stateInput.value = '';
+            stateBadge.classList.add('u-hidden');
+            zipInput.classList.remove('border-red-500', 'border-green-500');
+            errorMsg.classList.add('u-hidden');
+            return;
+        }
+
+        // 2. Fetch State when 5 digits reached
+        try {
+            const response = await fetch(`https://api.zippopotam.us/us/${zip}`);
+            
+            if (!response.ok) throw new Error('Invalid Zip');
+
+            const data = await response.json();
+            const stateAbbr = data.places[0]['state abbreviation'];
+
+            // 3. Update Hidden State Field & UI
+            stateInput.value = stateAbbr; // This feeds the backend logic
+            
+            // Show the resolved state to the user
+            stateBadge.textContent = stateAbbr;
+            stateBadge.classList.remove('u-hidden');
+            
+            // Visual Success
+            zipInput.classList.remove('border-red-500');
+            zipInput.classList.add('border-green-500'); // Optional: Add a green border style in CSS
+            errorMsg.classList.add('u-hidden');
+
+        } catch (error) {
+            // Handle Invalid Zip
+            stateInput.value = '';
+            stateBadge.classList.add('u-hidden');
+            zipInput.classList.add('border-red-500');
+            errorText.textContent = "Invalid Zip Code";
+            errorMsg.classList.remove('u-hidden');
+        }
+    });
 }
 
 export function toggleCarrierField() {

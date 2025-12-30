@@ -141,17 +141,29 @@
             </div>
 
             <div class="c-form-group">
-                <label class="c-label">State <span class="u-text-error">*</span></label>
-                <div class="c-select-wrap">
-                <select id="state" class="c-select">
-                    <option value="" disabled selected>State</option>
-                    </select>
-                </div>
-                <div class="c-error-msg u-hidden" id="state-error">
-                <span class="material-symbols-outlined c-error-icon">error</span>
-                Selection required
-                </div>
-            </div>
+              <label class="c-label">Zip Code <span class="u-text-error">*</span></label>
+              <div class="c-input-icon-wrap">
+                  <input 
+                      type="text" 
+                      id="zip-code" 
+                      class="c-input" 
+                      placeholder="e.g. 10001" 
+                      pattern="[0-9]*" 
+                      maxlength="5" 
+                      inputmode="numeric"
+                  />
+                  <span id="state-badge" class="c-badge u-hidden" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                      --
+                  </span>
+              </div>
+              
+              <input type="hidden" id="state" value="" />
+              
+              <div class="c-error-msg u-hidden" id="zip-error">
+                  <span class="material-symbols-outlined c-error-icon">error</span>
+                  <span id="zip-error-text">Valid 5-digit Zip Code required</span>
+              </div>
+          </div>
 
             <div class="u-flex-gap u-mt-lg">
                 <button type="button" class="c-btn c-btn--secondary" onclick="nextStep(1)">Back</button>
