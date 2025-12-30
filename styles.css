@@ -405,3 +405,55 @@ body {
   margin: 1.5rem auto 0; 
   background: #f1f5f9;
 }
+
+.c-badge--floating {
+  position: absolute; 
+  right: 12px; 
+  top: 50%; 
+  transform: translateY(-50%); 
+  background: #e0f2fe; 
+  color: #0284c7; 
+  padding: 2px 8px; 
+  border-radius: 4px; 
+  font-size: 0.75rem; 
+  font-weight: 600;
+}
+
+/* Result Icon Variants (moved from #email-gate icon) */
+.c-result__icon--primary {
+  background: var(--color-primary-bg); 
+  color: var(--color-primary);
+}
+
+/* Legal Scroll Box (moved from .c-legal-scroll) */
+.c-legal-scroll {
+  height: 120px; 
+  overflow-y: scroll; 
+  border: 1px solid var(--color-border); 
+  padding: 12px; 
+  font-size: 0.75rem; 
+  background: #f8fafc; 
+  color: var(--color-text-body); 
+  border-radius: 6px;
+}
+
+.c-legal-list {
+  padding-left: 1rem; 
+  margin: 0;
+}
+
+/* Highlight Box Variants (moved from email gate highlight) */
+.c-highlight-box--success {
+  background: #f0fdf4; 
+  border-color: #86efac;
+}
+
+/* Grid Variants (moved from inline gap adjustments) */
+.l-grid-2--tight {
+  gap: 10px;
+}
+
+/* Brand Variants (moved from footer) */
+.c-brand--white {
+  color: white;
+}

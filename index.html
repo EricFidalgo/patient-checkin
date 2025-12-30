@@ -49,82 +49,82 @@
         <form id="clarity-form" class="c-card__body">
           
           <div id="step-1" data-js="step">
-  <div class="c-step-header u-mb-lg">
-    <span class="c-step-header__circle">1</span>
-    <h2 class="c-step-header__title">Clinical Profile</h2>
-  </div>
+            <div class="c-step-header u-mb-lg">
+                <span class="c-step-header__circle">1</span>
+                <h2 class="c-step-header__title">Clinical Profile</h2>
+            </div>
 
-  <div class="l-grid-2">
-    <div class="c-form-group">
-      <label class="c-label">Age <span class="u-text-error">*</span></label>
-      <input type="number" id="age" class="c-input" placeholder="e.g. 45" inputmode="numeric" required min="18"/>
-      <div class="c-error-msg u-hidden" id="age-error">
-        <span class="material-symbols-outlined c-error-icon">error</span> Required
-      </div>
-    </div>
+            <div class="l-grid-2">
+                <div class="c-form-group">
+                <label class="c-label">Age <span class="u-text-error">*</span></label>
+                <input type="number" id="age" class="c-input" placeholder="e.g. 45" inputmode="numeric" required min="18"/>
+                <div class="c-error-msg u-hidden" id="age-error">
+                    <span class="material-symbols-outlined c-error-icon">error</span> Required
+                </div>
+                </div>
 
-    <div class="c-form-group">
-      <label class="c-label">Current BMI <span class="u-text-error">*</span></label>
-      <input type="number" id="bmi" step="0.1" class="c-input" placeholder="e.g. 31.5" inputmode="decimal" required />
-      <div class="c-error-msg u-hidden" id="bmi-error">
-        <span class="material-symbols-outlined c-error-icon">error</span> Required
-      </div>
-    </div>
+                <div class="c-form-group">
+                <label class="c-label">Current BMI <span class="u-text-error">*</span></label>
+                <input type="number" id="bmi" step="0.1" class="c-input" placeholder="e.g. 31.5" inputmode="decimal" required />
+                <div class="c-error-msg u-hidden" id="bmi-error">
+                    <span class="material-symbols-outlined c-error-icon">error</span> Required
+                </div>
+                </div>
 
-    <div class="c-form-group l-col-span-full">
-      <label class="c-label">Do you have any diagnosed health conditions? <span class="u-text-error">*</span></label>
-      
-      <div class="l-grid-2 u-mb-md">
-        <label class="c-check-card u-justify-center">
-          <input type="radio" name="gate_conditions" value="no" onchange="toggleGrid('conditions', false)">
-          <span>None of these apply to me</span>
-        </label>
-        <label class="c-check-card u-justify-center">
-          <input type="radio" name="gate_conditions" value="yes" onchange="toggleGrid('conditions', true)">
-          <span>Yes, I have conditions</span>
-        </label>
-      </div>
+                <div class="c-form-group l-col-span-full">
+                <label class="c-label">Do you have any diagnosed health conditions? <span class="u-text-error">*</span></label>
+                
+                <div class="l-grid-2 u-mb-md">
+                    <label class="c-check-card u-justify-center">
+                    <input type="radio" name="gate_conditions" value="no" onchange="toggleGrid('conditions', false)">
+                    <span>None of these apply to me</span>
+                    </label>
+                    <label class="c-check-card u-justify-center">
+                    <input type="radio" name="gate_conditions" value="yes" onchange="toggleGrid('conditions', true)">
+                    <span>Yes, I have conditions</span>
+                    </label>
+                </div>
 
-      <div class="c-error-msg u-hidden u-mb-sm" id="comorbidity-error">
-          <span class="material-symbols-outlined c-error-icon">error</span>
-          Please select "No" or choose your conditions.
-      </div>
+                <div class="c-error-msg u-hidden u-mb-sm" id="comorbidity-error">
+                    <span class="material-symbols-outlined c-error-icon">error</span>
+                    Please select "No" or choose your conditions.
+                </div>
 
-      <div id="wrapper-conditions" class="u-hidden">
-          <div class="c-check-grid l-grid-2" id="comorbidity-grid"></div>
-      </div>
-    </div>
+                <div id="wrapper-conditions" class="u-hidden">
+                    <div class="c-check-grid l-grid-2" id="comorbidity-grid"></div>
+                </div>
+                </div>
 
-    <div class="c-form-group l-col-span-full">
-      <label class="c-label">Have you taken weight loss medication before? <span class="u-text-error">*</span></label>
-      
-      <div class="l-grid-2 u-mb-md">
-        <label class="c-check-card u-justify-center">
-          <input type="radio" name="gate_meds" value="no" onchange="toggleGrid('meds', false)">
-          <span>No previous medication history</span>
-        </label>
-        <label class="c-check-card u-justify-center">
-          <input type="radio" name="gate_meds" value="yes" onchange="toggleGrid('meds', true)">
-          <span>Yes, I have history</span>
-        </label>
-      </div>
+                <div class="c-form-group l-col-span-full">
+                <label class="c-label">Have you taken weight loss medication before? <span class="u-text-error">*</span></label>
+                
+                <div class="l-grid-2 u-mb-md">
+                    <label class="c-check-card u-justify-center">
+                    <input type="radio" name="gate_meds" value="no" onchange="toggleGrid('meds', false)">
+                    <span>No previous medication history</span>
+                    </label>
+                    <label class="c-check-card u-justify-center">
+                    <input type="radio" name="gate_meds" value="yes" onchange="toggleGrid('meds', true)">
+                    <span>Yes, I have history</span>
+                    </label>
+                </div>
 
-      <div class="c-error-msg u-hidden u-mb-sm" id="med-history-error">
-          <span class="material-symbols-outlined c-error-icon">error</span>
-          Please select "No" or choose your history.
-      </div>
+                <div class="c-error-msg u-hidden u-mb-sm" id="med-history-error">
+                    <span class="material-symbols-outlined c-error-icon">error</span>
+                    Please select "No" or choose your history.
+                </div>
 
-      <div id="wrapper-meds" class="u-hidden">
-          <div id="med-history-grid" class="c-check-grid l-grid-2"></div>
-      </div>
-    </div>
-  </div>
+                <div id="wrapper-meds" class="u-hidden">
+                    <div id="med-history-grid" class="c-check-grid l-grid-2"></div>
+                </div>
+                </div>
+            </div>
 
-  <button type="button" class="c-btn c-btn--primary u-mt-lg" onclick="nextStep(2)">
-    Continue
-    <span class="material-symbols-outlined">arrow_forward</span>
-  </button>
-</div>
+            <button type="button" class="c-btn c-btn--primary u-mt-lg" onclick="nextStep(2)">
+                Continue
+                <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+            </div>
 
           <div id="step-2" class="u-hidden" data-js="step">
             <div class="c-step-header u-mb-lg">
@@ -157,7 +157,7 @@
                       maxlength="5" 
                       inputmode="numeric"
                   />
-                  <span id="state-badge" class="c-badge u-hidden" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                  <span id="state-badge" class="c-badge u-hidden c-badge--floating">
                       --
                   </span>
               </div>
@@ -235,9 +235,6 @@
                 </div>
             </div>
 
-
-
-
             <div class="c-highlight-box u-mt-lg">
                 <label class="c-label">Member ID / Policy Number <span class="c-label__sub">(Optional)</span></label>
                 
@@ -299,7 +296,7 @@
 
       <div id="email-gate" class="c-modal-overlay u-hidden">
         <div class="c-modal">
-          <div class="c-result__icon" style="background: var(--color-primary-bg); color: var(--color-primary);">
+          <div class="c-result__icon c-result__icon--primary">
             <span class="material-symbols-outlined">lock</span>
           </div>
           <h2 class="t-h2">Analysis Complete</h2>
@@ -308,7 +305,7 @@
           <form id="email-form" class="u-mt-lg">
             <div class="c-form-group u-mb-md">
               <label class="c-label">Contact Information <span class="u-text-muted">(At least one required)</span></label>
-              <div class="l-grid-2" style="gap: 10px;">
+              <div class="l-grid-2 l-grid-2--tight">
                 <input type="email" id="user-email" placeholder="Email Address" class="c-input" />
                 <input type="tel" id="user-phone" placeholder="Phone Number" class="c-input" />
               </div>
@@ -318,12 +315,12 @@
               </div>
             </div>
 
-            <div class="c-legal-scroll u-mb-md" style="height: 120px; overflow-y: scroll; border: 1px solid #e2e8f0; padding: 12px; font-size: 0.75rem; background: #f8fafc; color: #334155; border-radius: 6px;">
+            <div class="c-legal-scroll u-mb-md">
               <strong>AUTHORIZATION FOR SALE OF PHI & TCPA CONSENT</strong><br>
               <p class="u-mb-sm">I hereby authorize VeriScript ("Discloser") to disclose and <strong>sell</strong> my protected health information (PHI), including my name, contact details, and clinical profile, to third-party pharmacy networks for the purpose of marketing pharmacy services.</p>
               
               <strong>Terms of Signature:</strong><br>
-              <ul style="padding-left: 1rem; margin: 0;">
+              <ul class="c-legal-list">
                 <li><strong>Remuneration:</strong> VeriScript will receive financial payment for this data.</li>
                 <li><strong>TCPA Consent:</strong> By providing my phone number, I provide express written consent to receive marketing calls/SMS from VeriScript and its partners, even if I am on a Do Not Call list.</li>
                 <li><strong>Expiration:</strong> This authorization is valid for 1 year from today.</li>
@@ -331,9 +328,9 @@
               </ul>
             </div>
 
-            <div class="c-highlight-box u-mb-lg" style="background: #f0fdf4; border-color: #86efac;">
+            <div class="c-highlight-box c-highlight-box--success u-mb-lg">
               <label class="c-label t-sm u-mb-sm">To verify and sign, type your full legal name:</label>
-              <div class="l-grid-2" style="gap: 10px;">
+              <div class="l-grid-2 l-grid-2--tight">
                 <input 
                     type="text" 
                     id="sign-first-name" 
@@ -406,7 +403,7 @@
   <div class="l-container">
     <div class="c-footer__grid">
       <div class="c-footer__col">
-        <div class="c-brand u-mb-md" style="color: white;">
+        <div class="c-brand c-brand--white u-mb-md">
           <span class="material-symbols-outlined c-brand__icon">verified_user</span>
           <span>VeriScript</span>
         </div>
